@@ -5,7 +5,7 @@ import Link from 'next/link'
 const categories = [
   {
     name: 'Vegetariano',
-    icon: Leaf,
+    icon: Salad,
     href: '/menu?category=Vegetariano',
     color: 'bg-green-100',
     iconColor: 'text-green-600'

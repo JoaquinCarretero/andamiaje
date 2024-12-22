@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
 import { Dish } from '@/app/types/dish'
@@ -15,14 +14,12 @@ interface DishModalProps {
 }
 
 export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
-  const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  //const [selectedDay, setSelectedDay] = useState<string | null>(null)
 
-  const handleAddToCart = () => {
-    if (selectedDay) {
-      // Aquí iría la lógica para agregar al carrito
-      console.log(`Agregado al carrito: ${dish.name} para ${selectedDay}`)
-      onClose()
-    }
+  const handleNewReservation = () => {
+    // Here we'll add logic to navigate to the new WeeklyPlanningView
+    console.log(`Nueva reserva para: ${dish.name}`)
+    onClose()
   }
 
   const hasDietaryRestrictions = dish.dietary.isVegan || dish.dietary.isVegetarian || dish.dietary.isGlutenFree
@@ -38,7 +35,7 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
           <div className="flex flex-col">
             <div className="relative h-[300px]">
               <Image
-                src={dish.image}
+                src={dish.image || '/placeholder.jpg'} // Usa una imagen de placeholder si no hay imagen
                 alt={dish.name}
                 fill
                 className="object-cover"
@@ -53,19 +50,6 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
                       <Badge key={time} variant="secondary">{time}</Badge>
                     ))}
                   </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Seleccione el día:</h4>
-                  <Select onValueChange={setSelectedDay}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecciona un día" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {daysOfWeek.map(day => (
-                        <SelectItem key={day} value={day}>{day}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
             </div>
@@ -116,11 +100,10 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
               <div className="flex items-center justify-between pt-4 border-t">
                 <span className="text-2xl font-bold text-primary">${dish.price.toFixed(2)}</span>
                 <Button 
-                  onClick={handleAddToCart} 
-                  disabled={!selectedDay}
-                  className="w-32"
+                  onClick={handleNewReservation} 
+                  className="w-full"
                 >
-                  {selectedDay ? 'Agregar' : 'Seleccione día'}
+                  Nueva Reserva
                 </Button>
               </div>
             </div>

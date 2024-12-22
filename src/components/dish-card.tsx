@@ -2,12 +2,14 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Dish } from '@/app/types/dish'
+import { useRouter } from 'next/navigation'
 
 interface DishCardProps extends Dish {
   onClick: () => void;
 }
 
 export function DishCard({ name, description, price, image, dietary, onClick }: DishCardProps) {
+  const router = useRouter()
   return (
     <motion.div
       layout
@@ -19,7 +21,7 @@ export function DishCard({ name, description, price, image, dietary, onClick }: 
     >
       <div className="relative h-48">
         <Image
-          src={image}
+          src={image || '/placeholder.jpg'} // Usa una imagen de placeholder si no hay imagen
           alt={name}
           fill
           className="object-cover"
@@ -30,7 +32,7 @@ export function DishCard({ name, description, price, image, dietary, onClick }: 
         <p className="text-gray-600 text-sm mb-4">{description}</p>
         <div className="flex justify-between items-center">
           <span className="font-bold text-lg">${price.toFixed(2)}</span>
-          <Button onClick={onClick} variant="outline">Ver detalles</Button>
+          <Button onClick={() => router.push(`/weekly-planning?dish=${encodeURIComponent(JSON.stringify({ name, description, price, image, dietary }))}`)} variant="outline">Ver detalles</Button>
         </div>
         <div className="mt-2 flex gap-2">
           {dietary.isVegan && (
