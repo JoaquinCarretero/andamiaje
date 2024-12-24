@@ -172,12 +172,12 @@ export function Sidebar({ className }: SidebarProps) {
           </Button>
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           <nav className="grid gap-2 px-2 py-4">
             {navSections.map((section, sectionIndex) => (
               <div key={sectionIndex} className="grid gap-1">
                 {!isCollapsed && (
-                  <h3 className="px-3 text-xs font-medium text-muted-foreground mb-1">
+                  <h3 className="px-3 text-xs font-medium text-muted-foreground mb-1 sticky top-0 bg-background z-10">
                     {section.title}
                   </h3>
                 )}

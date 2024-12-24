@@ -9,13 +9,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import PhoneInput from 'react-phone-input-2'
 import 'react-phone-input-2/lib/style.css'
 import Image from 'next/image'
@@ -41,13 +34,13 @@ export default function RegisterPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative w-full max-w-lg"
+        className="relative w-full max-w-4xl"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-xl" />
         
         <Card className="relative backdrop-blur-sm bg-background/95 border-primary/20">
           <CardHeader className="space-y-1 flex flex-col items-center">
-            <div className="w-32 h-32 relative mb-4">
+            <div className="w-24 h-24 relative mb-4">
               <Image
                 src="/cervesia_logo-removebg-preview.png"
                 alt="Cervesia Logo"
@@ -63,122 +56,130 @@ export default function RegisterPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="firstName"
-                      placeholder="Juan"
-                      className="pl-10"
-                      required
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Columna izquierda */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Nombre</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                          id="firstName"
+                          placeholder="Juan"
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Apellido</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                          id="lastName"
+                          placeholder="Pérez"
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="dni">DNI</Label>
+                    <div className="relative">
+                      <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        id="dni"
+                        placeholder="12345678"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Teléfono</Label>
+                    <PhoneInput
+                      country={'ar'}
+                      value={phone}
+                      onChange={phone => setPhone(phone)}
+                      inputClass="!w-full !h-10 !pl-[48px] !rounded-md !text-base"
+                      containerClass="!w-full"
+                      buttonClass="!border-0 !border-r !rounded-l-md"
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      id="lastName"
-                      placeholder="Pérez"
-                      className="pl-10"
-                      required
-                    />
+
+                {/* Columna derecha */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Correo electrónico</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="tu@email.com"
+                        className="pl-10"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="dni">DNI</Label>
-                <div className="relative">
-                  <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="dni"
-                    placeholder="12345678"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        className="pl-10 pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
-                <PhoneInput
-                  country={'ar'}
-                  value={phone}
-                  onChange={phone => setPhone(phone)}
-                  inputClass="!w-full !h-10 !pl-[48px] !rounded-md !text-base"
-                  containerClass="!w-full"
-                  buttonClass="!border-0 !border-r !rounded-l-md"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="tu@email.com"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        className="pl-10 pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -212,10 +213,7 @@ export default function RegisterPage() {
               >
                 {isLoading ? "Creando cuenta..." : "Crear cuenta"}
               </Button>
-            </form>
 
-            {/* Espaciado entre los botones */}
-            <div className="space-y-4 mt-4">
               <Button 
                 variant="outline" 
                 className="w-full bg-white hover:bg-gray-50 text-gray-500 border-gray-300"
@@ -224,7 +222,7 @@ export default function RegisterPage() {
                 <Chrome className="w-5 h-5 mr-2 text-[#4285f4]" />
                 Continuar con Google
               </Button>
-            </div>
+            </form>
           </CardContent>
           <CardFooter className="justify-center">
             <p className="text-sm text-muted-foreground">
@@ -239,3 +237,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+

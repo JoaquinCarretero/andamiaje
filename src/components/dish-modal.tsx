@@ -2,22 +2,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
-import { Dish } from '@/app/types/dish'
-import { useState } from 'react'
-
-const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+import { CartItem } from '@/app/cart/page'
 
 interface DishModalProps {
   isOpen: boolean;
   onClose: () => void;
-  dish: Dish;
+  dish: CartItem;
+  isCartView: boolean;
 }
 
-export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
-  //const [selectedDay, setSelectedDay] = useState<string | null>(null)
-
+export function DishModal({ isOpen, onClose, dish, isCartView }: DishModalProps) {
   const handleNewReservation = () => {
-    // Here we'll add logic to navigate to the new WeeklyPlanningView
     console.log(`Nueva reserva para: ${dish.name}`)
     onClose()
   }
@@ -35,7 +30,7 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
           <div className="flex flex-col">
             <div className="relative h-[300px]">
               <Image
-                src={dish.image || '/placeholder.jpg'} // Usa una imagen de placeholder si no hay imagen
+                src={dish.image || '/placeholder.jpg'}
                 alt={dish.name}
                 fill
                 className="object-cover"
@@ -97,15 +92,17 @@ export function DishModal({ isOpen, onClose, dish }: DishModalProps) {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t">
-                <span className="text-2xl font-bold text-primary">${dish.price.toFixed(2)}</span>
-                <Button 
-                  onClick={handleNewReservation} 
-                  className="w-full"
-                >
-                  Nueva Reserva
-                </Button>
-              </div>
+              {!isCartView && (
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <span className="text-2xl font-bold text-primary">${dish.price.toFixed(2)}</span>
+                  <Button 
+                    onClick={handleNewReservation} 
+                    className="w-full"
+                  >
+                    Nueva Reserva
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>

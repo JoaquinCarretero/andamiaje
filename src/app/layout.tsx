@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { MainLayout } from "@/components/main-layout";
+import { MainLayout } from "@/components/layouts/main-layout";
 import { SearchProvider } from "@/context/SearchContext";
 
 export const metadata: Metadata = {
