@@ -17,7 +17,8 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Andamiaje - Centro de Rehabilitación",
-  description: "Sistema de gestión para terapeutas y coordinadores"
+  description: "Sistema de gestión para terapeutas y coordinadores",
+  generator: "v0.app",
 }
 
 export default function RootLayout({

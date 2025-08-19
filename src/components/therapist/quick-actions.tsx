@@ -20,7 +20,7 @@ export function QuickActions({ onNavigate }: QuickActionsProps) {
       section: "plan-trabajo",
     },
     {
-      title: "Completar Informe",
+      title: "Completar Informe Semestral",
       description: "Informe semestral de Juan Pérez",
       icon: FileText,
       variant: "secondary" as const,
@@ -28,7 +28,7 @@ export function QuickActions({ onNavigate }: QuickActionsProps) {
       section: "informe-semestral",
     },
     {
-      title: "Registrar Acta",
+      title: "Registrar Acta de Reunión",
       description: "Reunión del 15 de enero",
       icon: Users,
       variant: "outline" as const,
@@ -36,7 +36,7 @@ export function QuickActions({ onNavigate }: QuickActionsProps) {
       section: "actas",
     },
     {
-      title: "Subir Factura",
+      title: "Subir Factura Mensual",
       description: "Factura de diciembre 2024",
       icon: Upload,
       variant: "outline" as const,
@@ -46,43 +46,44 @@ export function QuickActions({ onNavigate }: QuickActionsProps) {
   ]
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Clock className="h-5 w-5 text-primary" />
+    <Card className="h-full min-h-[600px]">
+      <CardHeader className="pb-6">
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <Clock className="h-6 w-6 text-primary" />
           Acciones Rápidas
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {actions.map((action, index) => (
           <div
             key={index}
-            className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border-2 hover:bg-accent/30 hover:border-primary/20 transition-all duration-200"
+            className="flex items-start gap-4 p-5 rounded-xl border-2 hover:bg-accent/30 hover:border-primary/20 transition-all duration-200 min-h-[80px]"
           >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
-                <action.icon className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
-                  <p className="font-medium text-sm truncate">{action.title}</p>
-                  {action.urgent && (
-                    <Badge variant="destructive" className="text-xs w-fit">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      Urgente
-                    </Badge>
-                  )}
+            <div className="p-3 rounded-lg bg-primary/10 flex-shrink-0">
+              <action.icon className="h-5 w-5 text-primary" />
+            </div>
+
+            <div className="flex-1 min-w-0 space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-base leading-tight">{action.title}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{action.description}</p>
+                {action.urgent && (
+                  <Badge variant="destructive" className="text-xs flex items-center gap-1 flex-shrink-0">
+                    <AlertTriangle className="h-3 w-3" />
+                    Urgente
+                  </Badge>
+                )}
               </div>
             </div>
 
-            <div className="flex-shrink-0 sm:ml-4">
+            <div className="flex-shrink-0">
               <Button
                 variant={action.variant}
-                size="sm"
+                size="default"
                 onClick={() => onNavigate(action.section)}
-                className="w-full sm:w-auto min-w-[60px] hover:scale-105 transition-transform"
+                className="min-w-[70px] hover:scale-105 transition-transform"
               >
                 Ir
               </Button>
