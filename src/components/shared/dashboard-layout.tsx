@@ -7,6 +7,7 @@ import { QuickActions } from "@/components/shared/quick-actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import colors from "@/lib/colors"
 
 interface DashboardLayoutProps {
   userData: {
@@ -40,13 +41,16 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: "📋" },
         { id: "reporte-mensual", title: "Reporte Mensual", icon: "📊" },
-        { id: "facturas", title: "Facturas ARCA", icon: "📄" },
+        { id: "facturas", title: "Facturas", icon: "📄" },
       ]
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: colors.background, color: colors.text }}
+    >
       <Navbar userData={userData} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -58,12 +62,12 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
             {/* Welcome Section */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
               <div className="xl:col-span-2">
-                <Card className="h-full">
+                <Card className="h-full" style={{ backgroundColor: colors.surface }}>
                   <CardContent className="p-6 lg:p-8">
-                    <h2 className="font-serif text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                    <h2 className="font-serif text-2xl lg:text-2xl font-bold mb-4" style={{ color: colors.text }}>
                       {getGreeting()}, {userData.name}
                     </h2>
-                    <p className="text-gray-600 mb-8 text-base lg:text-lg leading-relaxed">
+                    <p className="mb-8 leading-relaxed" style={{ color: colors.textMuted }}>
                       Aquí tienes un resumen de tus actividades pendientes y el progreso de tus {userData.role === "terapeuta" ? "pacientes" : "estudiantes"}.
                     </p>
 
@@ -73,10 +77,21 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                         <Button
                           key={section.id}
                           variant="outline"
-                          className="h-24 lg:h-32 flex-col gap-3 bg-card hover:bg-accent/50 border-2 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                          className="h-24 lg:h-32 flex-col gap-3 border-2 rounded-2xl transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: colors.primary,
+                            color: colors.text
+                          }}
                           onClick={() => onNavigate(section.id)}
                         >
-                          <div className="text-2xl lg:text-3xl bg-primary/10 p-3 lg:p-4 rounded-2xl border-4 border-primary/30">
+                          <div
+                            className="text-2xl lg:text-3xl p-3 lg:p-4 rounded-2xl border-4"
+                            style={{
+                              backgroundColor: `${colors.primary}33`, // transparente
+                              borderColor: `${colors.primary}30`,
+                            }}
+                          >
                             {section.icon}
                           </div>
                           <span className="text-xs lg:text-sm font-medium text-center leading-tight px-2">
@@ -101,13 +116,13 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
               <Button 
                 variant="ghost" 
                 onClick={() => onNavigate("dashboard")} 
-                className="self-start hover:bg-accent"
+                style={{ color: colors.text }}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Volver al Dashboard
               </Button>
               
-              <h1 className="font-serif text-2xl lg:text-4xl font-bold text-foreground">
+              <h1 className="font-serif text-2xl lg:text-4xl font-bold" style={{ color: colors.text }}>
                 {currentView === "plan-trabajo" && "Plan de Trabajo"}
                 {currentView === "informe-semestral" && "Informe Semestral"}
                 {currentView === "reporte-mensual" && "Reporte Mensual"}
