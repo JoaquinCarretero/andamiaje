@@ -20,15 +20,15 @@ interface QuickActionsProps {
 
 const roleActions = {
   terapeuta: [
-    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo paciente", icon: Plus, buttonText: "Ir" },
-    { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de Juan Pérez", icon: FileText, urgent: true, buttonText: "Ir" },
-    { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
-    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
+    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo paciente", icon: Plus, buttonText: "Crear" },
+    { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de Juan Pérez", icon: FileText, urgent: true, buttonText: "Completar" },
+    { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Registrar" },
+    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Subir" },
   ],
   acompanante: [
-    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Ir" },
-    { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Ir" },
-    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
+    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Crear" },
+    { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Completar" },
+    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Subir" },
   ],
 }
 
@@ -37,83 +37,98 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
 
   return (
     <div
-      className="rounded-lg shadow-sm border p-6"
-      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
+      className="rounded-xl shadow-soft border"
+      style={{ 
+        backgroundColor: colors.surface, 
+        borderColor: colors.border,
+        boxShadow: `0 4px 16px ${colors.shadow}`
+      }}
     >
-      <div className="flex items-center space-x-2 mb-6">
-        <div
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: colors.primary }}
-        ></div>
-        <h2 className="text-lg font-semibold" style={{ color: colors.text }}>
-          Acciones Rápidas
-        </h2>
-      </div>
+      <div className="p-6">
+        <div className="flex items-center space-x-3 mb-6">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: colors.primary }}
+          />
+          <h2 
+            className="text-lg font-semibold font-display" 
+            style={{ color: colors.text }}
+          >
+            Acciones Rápidas
+          </h2>
+        </div>
 
-      <div className="space-y-4">
-        {actions.map((action) => {
-          const Icon = action.icon
-          return (
-            <div
-              key={action.id}
-              className="flex items-center justify-between p-4 rounded-lg transition-colors"
-              style={{
-                backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
-              }}
-            >
-              <div className="flex items-center space-x-4">
-                <div
-                  className="p-2 rounded-lg"
-                  style={{ backgroundColor: colors.hover }}
-                >
-                  <Icon
-                    className="w-5 h-5"
-                    style={{ color: action.urgent ? colors.error : colors.primary }}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <h3
-                      className="text-sm font-medium truncate"
-                      style={{ color: colors.text }}
-                    >
-                      {action.title}
-                    </h3>
-                    {action.urgent && (
-                      <span
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium flex-shrink-0"
-                        style={{
-                          backgroundColor: "#fee2e2", // rojo muy claro
-                          color: colors.error,
-                        }}
-                      >
-                        <AlertTriangle className="w-3 h-3 mr-1" />
-                        Urgente
-                      </span>
-                    )}
-                  </div>
-                  <p
-                    className="text-sm truncate"
-                    style={{ color: colors.textMuted }}
-                  >
-                    {action.subtitle}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => onNavigate(action.id)}
-                className="ml-1 px-5 py-2 text-sm font-medium rounded-lg transition-colors flex-shrink-0"
+        <div className="space-y-3">
+          {actions.map((action) => {
+            const Icon = action.icon
+            return (
+              <div
+                key={action.id}
+                className="group p-4 rounded-lg border transition-all duration-200 hover:shadow-medium"
                 style={{
-                  backgroundColor: colors.primary,
-                  color: "#ffffff",
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                 }}
               >
-                {action.buttonText}
-              </button>
-            </div>
-          )
-        })}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    <div
+                      className="p-2.5 rounded-lg transition-colors duration-200"
+                      style={{ 
+                        backgroundColor: action.urgent ? colors.errorLight : colors.surfaceSecondary 
+                      }}
+                    >
+                      <Icon
+                        className="w-5 h-5"
+                        style={{ 
+                          color: action.urgent ? colors.error : colors.primary 
+                        }}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <h3
+                          className="text-sm font-medium truncate"
+                          style={{ color: colors.text }}
+                        >
+                          {action.title}
+                        </h3>
+                        {action.urgent && (
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
+                            style={{
+                              backgroundColor: colors.errorLight,
+                              color: colors.error,
+                            }}
+                          >
+                            <AlertTriangle className="w-3 h-3 mr-1" />
+                            Urgente
+                          </span>
+                        )}
+                      </div>
+                      <p
+                        className="text-sm truncate"
+                        style={{ color: colors.textMuted }}
+                      >
+                        {action.subtitle}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => onNavigate(action.id)}
+                    className="ml-4 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm transform hover:scale-105 whitespace-nowrap"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.surface,
+                    }}
+                  >
+                    {action.buttonText}
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

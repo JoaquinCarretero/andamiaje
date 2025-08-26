@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Playfair_Display } from "next/font/google"
+import { Inter, Poppins } from "next/font/google"
 import colors from "@/lib/colors"
 import "./globals.css"
 
@@ -8,19 +8,23 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+  weight: ["300", "400", "500", "600", "700"],
 })
 
-const playfair = Playfair_Display({
+const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-playfair",
+  variable: "--font-poppins",
+  weight: ["300", "400", "500", "600", "700"],
 })
 
 export const metadata: Metadata = {
   title: "Andamiaje - Centro de Rehabilitación",
   description: "Sistema de gestión para terapeutas y coordinadores",
-   icons: {
-    icon: "/favicon.ico", // o /logo.png
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 }
 
@@ -30,11 +34,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${playfair.variable}`}>
-      {/* Fondo general con el color definido en lib/colors.ts */}
+    <html lang="es" className={`${inter.variable} ${poppins.variable}`}>
       <body
-        style={{ backgroundColor: colors.accent, color: colors.text }}
-        className="font-sans antialiased"
+        style={{ backgroundColor: colors.background, color: colors.text }}
+        className="font-sans antialiased min-h-screen"
       >
         {children}
       </body>
