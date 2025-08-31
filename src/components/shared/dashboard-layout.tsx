@@ -89,11 +89,11 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                     </p>
 
                     {/* Action Buttons Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
-                          className="group p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left"
+                          className="group p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left"
                           style={{
                             backgroundColor: colors.surface,
                             borderColor: colors.border,
@@ -102,7 +102,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                         >
                           <div className="space-y-3">
                             <div
-                              className="text-3xl p-3 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110"
+                              className="text-2xl p-2.5 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110"
                               style={{
                                 backgroundColor: colors.primary[50],
                                 borderColor: colors.primary[100],
@@ -114,7 +114,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                               <h3 className="font-medium text-sm mb-1" style={{ color: colors.text }}>
                                 {section.title}
                               </h3>
-                              <p className="text-xs leading-tight" style={{ color: colors.textMuted }}>
+                              <p className="text-xs leading-tight line-clamp-2" style={{ color: colors.textMuted }}>
                                 {section.description}
                               </p>
                             </div>

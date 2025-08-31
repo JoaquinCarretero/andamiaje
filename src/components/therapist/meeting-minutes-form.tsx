@@ -7,39 +7,54 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Users, Save, Send, Plus, Trash2, Clock } from "lucide-react"
+import { Users, Save, Send, Clock, AlertCircle } from "lucide-react"
 import colors from "@/lib/colors"
 
 export function MeetingMinutesForm() {
-  const [attendees, setAttendees] = useState([""])
-  const [agreements, setAgreements] = useState([""])
+  const [formData, setFormData] = useState({
+    patientName: "",
+    meetingDate: new Date().toISOString().split('T')[0],
+    modality: "",
+    subject: ""
+  })
 
-  const addAttendee = () => {
-    setAttendees([...attendees, ""])
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }))
+    }
   }
 
-  const removeAttendee = (index: number) => {
-    setAttendees(attendees.filter((_, i) => i !== index))
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.patientName.trim()) {
+      newErrors.patientName = "El nombre del paciente es obligatorio"
+    }
+
+    if (!formData.meetingDate) {
+      newErrors.meetingDate = "La fecha de la reunión es obligatoria"
+    }
+
+    if (!formData.modality) {
+      newErrors.modality = "La modalidad es obligatoria"
+    }
+
+    if (!formData.subject.trim()) {
+      newErrors.subject = "El asunto es obligatorio"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
-  const updateAttendee = (index: number, value: string) => {
-    const newAttendees = [...attendees]
-    newAttendees[index] = value
-    setAttendees(newAttendees)
-  }
-
-  const addAgreement = () => {
-    setAgreements([...agreements, ""])
-  }
-
-  const removeAgreement = (index: number) => {
-    setAgreements(agreements.filter((_, i) => i !== index))
-  }
-
-  const updateAgreement = (index: number, value: string) => {
-    const newAgreements = [...agreements]
-    newAgreements[index] = value
-    setAgreements(newAgreements)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (validateForm()) {
+      console.log("Formulario válido:", formData)
+    }
   }
 
   return (
@@ -71,157 +86,150 @@ export function MeetingMinutesForm() {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6">
-        {/* Información básica */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="meeting-date">Fecha de la Reunión</Label>
-            <Input id="meeting-date" type="date" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="meeting-time">Hora</Label>
-            <Input id="meeting-time" type="time" />
-          </div>
-        </div>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Información de la Reunión */}
+          <div 
+            className="p-4 rounded-lg border-l-4 space-y-4"
+            style={{ 
+              backgroundColor: colors.primary[50],
+              borderLeftColor: colors.primary[500]
+            }}
+          >
+            <h3 className="font-medium" style={{ color: colors.text }}>
+              Información de la Reunión
+            </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="meeting-type">Tipo de Reunión</Label>
-            <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-              <option value="">Seleccionar tipo</option>
-              <option value="seguimiento">Seguimiento de caso</option>
-              <option value="evaluacion">Evaluación inicial</option>
-              <option value="revision">Revisión de plan</option>
-              <option value="coordinacion">Coordinación interdisciplinaria</option>
-              <option value="familia">Reunión con familia</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="patient-case">Caso del Paciente</Label>
-            <Input id="patient-case" placeholder="Ej: Juan Pérez - TEA" />
-          </div>
-        </div>
-
-        {/* Asistentes */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Asistentes</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addAttendee}>
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
-            </Button>
-          </div>
-          {attendees.map((attendee, index) => (
-            <div key={index} className="flex gap-2">
-              <Input
-                placeholder="Nombre y cargo del asistente"
-                value={attendee}
-                onChange={(e) => updateAttendee(index, e.target.value)}
+            <div className="space-y-2">
+              <Label htmlFor="patient-name" style={{ color: colors.text }}>
+                Paciente *
+              </Label>
+              <Input 
+                id="patient-name" 
+                placeholder="Ej: Juan Carlos Pérez González"
+                value={formData.patientName}
+                onChange={(e) => handleInputChange('patientName', e.target.value)}
+                className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.patientName ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
               />
-              {attendees.length > 1 && (
-                <Button type="button" variant="outline" size="icon" onClick={() => removeAttendee(index)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              {errors.patientName && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.patientName}
+                </div>
               )}
             </div>
-          ))}
-        </div>
 
-        {/* Temas tratados */}
-        <div className="space-y-2">
-          <Label htmlFor="topics-discussed">Temas Tratados</Label>
-          <Textarea
-            id="topics-discussed"
-            placeholder="Describe los principales temas discutidos en la reunión..."
-            className="min-h-[120px]"
-          />
-        </div>
-
-        {/* Observaciones */}
-        <div className="space-y-2">
-          <Label htmlFor="observations">Observaciones y Comentarios</Label>
-          <Textarea
-            id="observations"
-            placeholder="Registra observaciones importantes, comentarios de los asistentes..."
-            className="min-h-[100px]"
-          />
-        </div>
-
-        {/* Acuerdos y compromisos */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label>Acuerdos y Compromisos</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addAgreement}>
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar
-            </Button>
-          </div>
-          {agreements.map((agreement, index) => (
-            <div key={index} className="flex gap-2">
-              <Textarea
-                placeholder="Describe el acuerdo o compromiso establecido..."
-                value={agreement}
-                onChange={(e) => updateAgreement(index, e.target.value)}
-                className="min-h-[60px]"
-              />
-              {agreements.length > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeAgreement(index)}
-                  className="mt-2"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="meeting-date" style={{ color: colors.text }}>
+                  Fecha *
+                </Label>
+                <Input 
+                  id="meeting-date" 
+                  type="date"
+                  value={formData.meetingDate}
+                  onChange={(e) => handleInputChange('meetingDate', e.target.value)}
+                  className={`h-11 ${errors.meetingDate ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.meetingDate ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.meetingDate && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.meetingDate}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="modality" style={{ color: colors.text }}>
+                  Modalidad *
+                </Label>
+                <select 
+                  id="modality"
+                  value={formData.modality}
+                  onChange={(e) => handleInputChange('modality', e.target.value)}
+                  className={`flex h-11 w-full rounded-md border px-3 py-2 text-sm transition-all duration-200 ${errors.modality ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.modality ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
+                  <option value="">Seleccionar modalidad</option>
+                  <option value="presencial">Presencial</option>
+                  <option value="virtual">Virtual</option>
+                </select>
+                {errors.modality && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.modality}
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Próximos pasos */}
-        <div className="space-y-2">
-          <Label htmlFor="next-steps">Próximos Pasos</Label>
-          <Textarea
-            id="next-steps"
-            placeholder="Define las acciones a seguir después de esta reunión..."
-            className="min-h-[80px]"
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="next-meeting">Próxima Reunión</Label>
-            <Input id="next-meeting" type="date" />
+            <div className="space-y-2">
+              <Label htmlFor="subject" style={{ color: colors.text }}>
+                Asunto *
+              </Label>
+              <Textarea
+                id="subject"
+                placeholder="Describe el asunto principal de la reunión, temas a tratar, objetivos de la reunión y cualquier información relevante sobre el propósito del encuentro..."
+                value={formData.subject}
+                onChange={(e) => handleInputChange('subject', e.target.value)}
+                className={`min-h-[140px] resize-none ${errors.subject ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.subject ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.subject && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.subject}
+                </div>
+              )}
+              <p className="text-xs" style={{ color: colors.textMuted }}>
+                Incluye todos los detalles relevantes sobre el propósito y contenido de la reunión
+              </p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="responsible">Responsable del Acta</Label>
-            <Input id="responsible" placeholder="Dr. María González" disabled />
+
+          {/* Botones de acción */}
+          <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
+            <Button 
+              type="button"
+              variant="outline"
+              style={{
+                borderColor: colors.border,
+                color: colors.textSecondary
+              }}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Guardar Borrador
+            </Button>
+
+            <Button
+              type="submit"
+              style={{
+                backgroundColor: colors.primary[500],
+                color: colors.surface
+              }}
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Finalizar Acta
+            </Button>
           </div>
-        </div>
-
-        <div className="flex justify-between pt-4 border-t">
-          <Button
-            variant="outline"
-            style={{
-              borderColor: colors.border,
-              color: colors.textSecondary
-            }}
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Guardar Borrador
-          </Button>
-
-          <Button
-            style={{
-              backgroundColor: colors.primary[500],
-              color: colors.surface
-            }}
-          >
-            <Send className="h-4 w-4 mr-2" />
-            Finalizar Acta
-          </Button>
-        </div>
+        </form>
       </CardContent>
     </Card>
   )

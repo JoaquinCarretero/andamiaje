@@ -59,13 +59,13 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[calc(100vh-300px)] overflow-y-auto overscroll-contain">
           {actions.map((action) => {
             const Icon = action.icon
             return (
               <div
                 key={action.id}
-                className="group p-4 rounded-lg border transition-all duration-200 hover:shadow-medium"
+                className="group p-3 rounded-lg border transition-all duration-200 hover:shadow-medium"
                 style={{
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
@@ -73,13 +73,13 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="p-2.5 rounded-lg transition-colors duration-200 flex-shrink-0"
+                    className="p-2 rounded-lg transition-colors duration-200 flex-shrink-0"
                     style={{ 
                       backgroundColor: action.urgent ? colors.error[50] : colors.primary[50]
                     }}
                   >
                     <Icon
-                      className="w-5 h-5"
+                      className="w-4 h-4"
                       style={{ 
                         color: action.urgent ? colors.error[500] : colors.primary[500]
                       }}
@@ -89,26 +89,26 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h3
-                        className="text-sm font-medium"
+                        className="text-xs font-medium"
                         style={{ color: colors.text }}
                       >
                         {action.title}
                       </h3>
                       {action.urgent && (
                         <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
+                          className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
                           style={{
                             backgroundColor: colors.error[50],
                             color: colors.error[600],
                           }}
                         >
-                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          <AlertTriangle className="w-2.5 h-2.5 mr-1" />
                           Urgente
                         </span>
                       )}
                     </div>
                     <p
-                      className="text-sm"
+                      className="text-xs"
                       style={{ color: colors.textMuted }}
                     >
                       {action.subtitle}
@@ -117,7 +117,7 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
                   
                   <button
                     onClick={() => onNavigate(action.id)}
-                    className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm transform hover:scale-105 whitespace-nowrap flex-shrink-0"
+                    className="px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 hover:shadow-sm transform hover:scale-105 whitespace-nowrap flex-shrink-0"
                     style={{
                       backgroundColor: colors.primary[500],
                       color: colors.surface,
