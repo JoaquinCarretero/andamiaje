@@ -1,1 +1,13 @@
-{"code":"rate-limited","message":"You have hit the rate limit. Please upgrade to keep chatting.","providerLimitHit":false,"isRetryable":true}
+// TODO: Implement the SemesterReportForm component here
+
+import React from 'react';
+
+const SemesterReportForm: React.FC = () => {
+  return (
+	<div>
+	  {/* Semester Report Form content goes here */}
+	</div>
+  );
+};
+
+export default SemesterReportForm;

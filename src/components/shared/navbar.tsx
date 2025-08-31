@@ -204,10 +204,9 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                         <button
                           key={action.id}
                           onClick={() => handleMobileNavigation(action.id)}
-                          className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                          className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-neutral-100"
                           style={{ 
-                            backgroundColor: colors.neutral[50],
-                            ':hover': { backgroundColor: colors.neutral[100] }
+                            backgroundColor: colors.neutral[50]
                           }}
                         >
                           <Icon className="h-5 w-5" style={{ color: colors.primary[500] }} />
@@ -223,10 +222,9 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                   <div className="mt-6 pt-6 border-t" style={{ borderColor: colors.border }}>
                     <button
                       onClick={() => handleMobileNavigation("dashboard")}
-                      className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                      className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105 hover:bg-neutral-100"
                       style={{ 
-                        backgroundColor: colors.neutral[50],
-                        ':hover': { backgroundColor: colors.neutral[100] }
+                        backgroundColor: colors.neutral[50]
                       }}
                     >
                       <Home className="h-5 w-5" style={{ color: colors.primary[500] }} />

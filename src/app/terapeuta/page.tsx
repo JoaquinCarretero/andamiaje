@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { DashboardLayout } from "@/components/shared/dashboard-layout"
 import { WorkPlanForm } from "@/components/therapist/work-plan-form"
-import { SemesterReportForm } from "@/components/therapist/semester-report-form"
+import SemesterReportForm from "@/components/therapist/semester-report-form"
 import { MeetingMinutesForm } from "@/components/therapist/meeting-minutes-form"
 import { InvoiceUpload } from "@/components/therapist/invoice-upload"
 

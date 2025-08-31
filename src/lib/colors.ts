@@ -93,7 +93,7 @@ const colors = {
   
   text: '#1c1917',
   textSecondary: '#44403c',
-  textMuted: '#78716c',
+  textMuted: '#0b8374',
   textLight: '#a8a29e',
   
   border: '#e7e5e4',

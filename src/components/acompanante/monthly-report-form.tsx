@@ -239,12 +239,14 @@ export function MonthlyReportForm() {
             </Button>
 
             {currentSection < totalSections ? (
-              <Button onClick={() => setCurrentSection(Math.min(totalSections, currentSection + 1))}>
-                Siguiente
+              <Button
+                onClick={() => setCurrentSection(Math.min(totalSections, currentSection + 1))}
                 style={{
                   backgroundColor: colors.secondary[500],
                   color: colors.surface
                 }}
+              >
+                Siguiente
               </Button>
             ) : (
               <Button

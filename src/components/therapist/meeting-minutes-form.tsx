@@ -201,12 +201,14 @@ export function MeetingMinutesForm() {
         </div>
 
         <div className="flex justify-between pt-4 border-t">
-          <Button variant="outline">
-            <Save className="h-4 w-4 mr-2" />
+          <Button
+            variant="outline"
             style={{
               borderColor: colors.border,
               color: colors.textSecondary
             }}
+          >
+            <Save className="h-4 w-4 mr-2" />
             Guardar Borrador
           </Button>
 
