@@ -14,7 +14,7 @@ interface QuickAction {
 }
 
 interface QuickActionsProps {
-  role: "terapeuta" | "acompanante"
+  role: "terapeuta" | "acompanante" | "coordinador"
   onNavigate: (view: string) => void
 }
 
@@ -29,6 +29,13 @@ const roleActions = {
   acompanante: [
     { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Ir" },
     { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Ir" },
+    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
+  ],
+  coordinador: [
+    { id: "seguimiento-acompanantes", title: "Revisar Acompañantes", subtitle: "3 reportes pendientes de revisión", icon: Users, urgent: true, buttonText: "Ir" },
+    { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de María López", icon: FileText, urgent: true, buttonText: "Ir" },
+    { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
+    { id: "reporte-mensual", title: "Revisar Reporte", subtitle: "Reporte mensual pendiente", icon: FileText, buttonText: "Ir" },
     { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
   ],
 }

@@ -13,7 +13,7 @@ interface DashboardLayoutProps {
   userData: {
     name: string
     title: string
-    role: "terapeuta" | "acompanante"
+    role: "terapeuta" | "acompanante" | "coordinador"
     gender?: string
   }
   children?: React.ReactNode
@@ -31,6 +31,9 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
     if (userData.role === "terapeuta") {
       return userData.gender === "female" ? `${timeGreeting}, Dra.` : `${timeGreeting}, Dr.`
     }
+    if (userData.role === "coordinador") {
+      return `${timeGreeting}, ${userData.name.split(' ')[0]}`
+    }
     return `${timeGreeting}, Prof.`
   }
 
@@ -42,6 +45,16 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
         { id: "informe-semestral", title: "Informe Semestral", icon: "📊", description: "Reportes de progreso" },
         { id: "actas", title: "Actas de Reunión", icon: "👥", description: "Registrar reuniones" },
         { id: "facturas", title: "Gestión de Facturas", icon: "📄", description: "Subir documentos" },
+      ]
+    } else if (userData.role === "coordinador") {
+      return [
+        { id: "plan-trabajo", title: "Plan de Trabajo", icon: "📋", description: "Crear y gestionar planes" },
+        { id: "informe-inicial", title: "Informe Inicial", icon: "📝", description: "Evaluación inicial del paciente" },
+        { id: "informe-semestral", title: "Informe Semestral", icon: "📊", description: "Reportes de progreso" },
+        { id: "seguimiento-acompanantes", title: "Seguimiento Acompañantes", icon: "👥", description: "Gestionar acompañantes externos" },
+        { id: "actas", title: "Actas de Reunión", icon: "👥", description: "Registrar reuniones" },
+        { id: "facturas", title: "Gestión de Facturas", icon: "📄", description: "Subir documentos" },
+        { id: "reporte-mensual", title: "Reporte Mensual", icon: "📊", description: "Informes mensuales" },
       ]
     } else {
       return [
@@ -153,6 +166,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                 {currentView === "informe-inicial" && "Informe Inicial"}
                 {currentView === "informe-semestral" && "Informe Semestral"}
                 {currentView === "reporte-mensual" && "Reporte Mensual"}
+                {currentView === "seguimiento-acompanantes" && "Seguimiento de Acompañantes"}
+                {currentView === "seguimiento-flia" && "Seguimiento de Familias"}
                 {currentView === "actas" && "Actas de Reunión"}
                 {currentView === "facturas" && "Gestión de Facturas"}
               </h1>

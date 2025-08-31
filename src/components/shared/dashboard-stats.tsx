@@ -15,7 +15,7 @@ interface StatCard {
 }
 
 interface DashboardStatsProps {
-  role: "terapeuta" | "acompanante"
+  role: "terapeuta" | "acompanante" | "coordinador"
 }
 
 const roleStats = {
@@ -91,6 +91,44 @@ const roleStats = {
       subtitle: "Completado", 
       icon: Upload, 
       color: colors.primary[500], 
+      progress: 92,
+      trend: "stable" as const
+    },
+  ],
+  coordinador: [
+    { 
+      title: "Acompañantes Activos", 
+      value: 8, 
+      subtitle: "6 con reportes al día", 
+      icon: Users, 
+      color: colors.primary[500], 
+      progress: 75,
+      trend: "up" as const
+    },
+    { 
+      title: "Reportes Pendientes", 
+      value: 5, 
+      subtitle: "2 vencen esta semana", 
+      icon: FileText, 
+      color: colors.warning[500], 
+      progress: 40,
+      trend: "down" as const
+    },
+    { 
+      title: "Reuniones del Mes", 
+      value: 12, 
+      subtitle: "3 programadas", 
+      icon: Calendar, 
+      color: colors.accent[500], 
+      progress: 80,
+      trend: "up" as const
+    },
+    { 
+      title: "Documentos Procesados", 
+      value: "92%", 
+      subtitle: "Este mes", 
+      icon: CheckCircle, 
+      color: colors.success[500], 
       progress: 92,
       trend: "stable" as const
     },
