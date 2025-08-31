@@ -98,7 +98,7 @@ const roleStats = {
 }
 
 export function DashboardStats({ role }: DashboardStatsProps) {
-  const stats = roleStats[role]
+  const stats = roleStats[role] || []
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -124,11 +124,13 @@ export function DashboardStats({ role }: DashboardStatsProps) {
               </div>
               {stat.trend && (
                 <div className="flex items-center space-x-1">
-                  {stat.trend === "up" ? (
+                  {stat.trend === "up" && (
                     <TrendingUp className="w-4 h-4 text-green-500 rotate-0" />
-                  ) : stat.trend === "down" ? (
+                  )}
+                  {stat.trend === "down" && (
                     <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />
-                  ) : (
+                  )}
+                  {stat.trend === "stable" && (
                     <TrendingUp className="w-4 h-4 text-gray-400 rotate-90" />
                   )}
                 </div>
