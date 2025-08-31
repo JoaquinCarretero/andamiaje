@@ -15,14 +15,12 @@ interface Family {
   phone: string
   email: string
   lastContact: string
-  status: "active" | "needs_attention" | "scheduled"
   notes: string
   nextMeeting?: string
 }
 
 export function FamilyTracking() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
 
   const [families] = useState<Family[]>([
     {
@@ -32,7 +30,6 @@ export function FamilyTracking() {
       phone: "+54 11 1234-5678",
       email: "maria.perez@email.com",
       lastContact: "2024-01-28",
-      status: "active",
       notes: "Familia muy colaborativa, asisten regularmente a las reuniones",
       nextMeeting: "2024-02-15"
     },
@@ -43,7 +40,6 @@ export function FamilyTracking() {
       phone: "+54 11 2345-6789",
       email: "laura.gonzalez@email.com",
       lastContact: "2024-01-20",
-      status: "needs_attention",
       notes: "Necesita seguimiento más frecuente, preocupaciones sobre el progreso"
     },
     {
@@ -53,7 +49,6 @@ export function FamilyTracking() {
       phone: "+54 11 3456-7890",
       email: "jose.rodriguez@email.com",
       lastContact: "2024-01-25",
-      status: "scheduled",
       notes: "Reunión programada para revisar objetivos del trimestre",
       nextMeeting: "2024-02-10"
     },
@@ -64,7 +59,6 @@ export function FamilyTracking() {
       phone: "+54 11 4567-8901",
       email: "elena.martin@email.com",
       lastContact: "2024-01-30",
-      status: "active",
       notes: "Excelente comunicación, muy involucrada en el proceso"
     }
   ])
@@ -72,56 +66,9 @@ export function FamilyTracking() {
   const filteredFamilies = families.filter(family => {
     const matchesSearch = family.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          family.parentNames.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || family.status === filterStatus
     
-    return matchesSearch && matchesStatus
+    return matchesSearch
   })
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "active":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.success[50],
-              color: colors.success[700],
-              borderColor: colors.success[200]
-            }}
-          >
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Activa
-          </Badge>
-        )
-      case "needs_attention":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.error[50],
-              color: colors.error[700],
-              borderColor: colors.error[200]
-            }}
-          >
-            <AlertTriangle className="h-3 w-3 mr-1" />
-            Requiere Atención
-          </Badge>
-        )
-      case "scheduled":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.warning[50],
-              color: colors.warning[700],
-              borderColor: colors.warning[200]
-            }}
-          >
-            <Calendar className="h-3 w-3 mr-1" />
-            Reunión Programada
-          </Badge>
-        )
-      default:
-        return null
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -140,7 +87,7 @@ export function FamilyTracking() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
                 Buscar
@@ -163,35 +110,14 @@ export function FamilyTracking() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Estado
-              </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  color: colors.text
-                }}
-              >
-                <option value="all">Todos los estados</option>
-                <option value="active">Activas</option>
-                <option value="needs_attention">Requieren Atención</option>
-                <option value="scheduled">Reunión Programada</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: colors.text }}>
                 Estadísticas
               </label>
               <div className="flex items-center gap-4 text-sm">
                 <span style={{ color: colors.textMuted }}>
                   Total: <span className="font-medium" style={{ color: colors.text }}>{families.length}</span>
                 </span>
-                <span style={{ color: colors.error[500] }}>
-                  Atención: <span className="font-medium">{families.filter(f => f.status === "needs_attention").length}</span>
+                <span style={{ color: colors.primary[500] }}>
+                  Familias: <span className="font-medium">{filteredFamilies.length}</span>
                 </span>
               </div>
             </div>
@@ -247,7 +173,6 @@ export function FamilyTracking() {
                             {family.parentNames}
                           </p>
                         </div>
-                        {getStatusBadge(family.status)}
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">

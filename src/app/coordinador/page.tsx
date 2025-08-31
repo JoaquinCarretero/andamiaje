@@ -10,9 +10,6 @@ import { InvoiceUpload } from "@/components/therapist/invoice-upload"
 import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
 import { CompanionTracking } from "@/components/coordinator/companion-tracking"
 import { FamilyTracking } from "@/components/coordinator/family-tracking"
-import { Button } from "@/components/ui/button"
-import { Users, ArrowLeft, UserCheck } from "lucide-react"
-import colors from "@/lib/colors"
 
 const userData = {
   name: "Lucre Martínez",
@@ -47,60 +44,13 @@ export default function CoordinadorPage() {
     }
   }
 
-  const getPageTitle = () => {
-    switch (currentView) {
-      case "plan-trabajo": return "Plan de Trabajo"
-      case "informe-inicial": return "Informe Inicial"
-      case "informe-semestral": return "Informe Semestral"
-      case "reporte-mensual": return "Reporte Mensual"
-      case "seguimiento-acompanantes": return "Seguimiento de Acompañantes Externos"
-      case "seguimiento-flia": return "Seguimiento de Familias"
-      case "actas": return "Actas de Reunión"
-      case "facturas": return "Gestión de Facturas"
-      default: return ""
-    }
-  }
-
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: colors.background }}
+    <DashboardLayout
+      userData={userData}
+      currentView={currentView}
+      onNavigate={setCurrentView}
     >
-      <DashboardLayout
-        userData={userData}
-        currentView={currentView}
-        onNavigate={setCurrentView}
-      >
-        {currentView !== "dashboard" && (
-          <div className="space-y-6">
-            {/* Back button and title */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <Button 
-                variant="ghost" 
-                onClick={() => setCurrentView("dashboard")}
-                className="w-fit rounded-lg transition-all duration-200 hover:shadow-sm"
-                style={{ 
-                  color: colors.textSecondary,
-                  backgroundColor: colors.neutral[50]
-                }}
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver al Dashboard
-              </Button>
-              
-              <h1 className="font-display text-3xl lg:text-4xl font-bold" style={{ color: colors.text }}>
-                {getPageTitle()}
-              </h1>
-            </div>
-
-            {/* Content */}
-            <div className="animate-slide-in-up">
-              {renderContent()}
-            </div>
-          </div>
-        )}
-
-      </DashboardLayout>
-    </div>
+      {renderContent()}
+    </DashboardLayout>
   )
 }

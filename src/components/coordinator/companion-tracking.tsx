@@ -104,7 +104,7 @@ export function CompanionTracking() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
                 Buscar
@@ -143,20 +143,6 @@ export function CompanionTracking() {
                 <option value="Plan de Trabajo">Planes de Trabajo</option>
                 <option value="Reporte Mensual">Reportes Mensuales</option>
               </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Estadísticas
-              </label>
-              <div className="flex items-center gap-4 text-sm">
-                <span style={{ color: colors.textMuted }}>
-                  Total: <span className="font-medium" style={{ color: colors.text }}>{reports.length}</span>
-                </span>
-                <span style={{ color: colors.primary[500] }}>
-                  Documentos: <span className="font-medium">{filteredReports.length}</span>
-                </span>
-              </div>
             </div>
 
             <div className="space-y-2">
