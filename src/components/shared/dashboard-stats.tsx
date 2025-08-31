@@ -128,9 +128,9 @@ export function DashboardStats({ role }: DashboardStatsProps) {
                     <TrendingUp className="w-4 h-4 text-green-500 rotate-0" />
                   ) : stat.trend === "down" ? (
                     <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />
-                  ) : stat.trend === "stable" ? (
+                  ) : (
                     <TrendingUp className="w-4 h-4 text-gray-400 rotate-90" />
-                  ) : null}
+                  )}
                 </div>
               )}
             </div>

@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useRef } from "react"
 import { useSpring, animated } from "@react-spring/web"
 import { useInView } from "react-intersection-observer"
 import colors from "@/lib/colors"
@@ -28,11 +27,11 @@ export function FloatingCard({ children, delay = 0, className = "" }: FloatingCa
     from: { transform: 'translateY(0px)' },
     to: async (next) => {
       while (true) {
-        await next({ transform: 'translateY(-10px)' })
-        await next({ transform: 'translateY(0px)' })
+        await next({ transform: 'translateY(-15px) scale(1.02)' })
+        await next({ transform: 'translateY(0px) scale(1)' })
       }
     },
-    config: { duration: 3000 }
+    config: { duration: 4000, tension: 120, friction: 40 }
   })
 
   return (
@@ -58,24 +57,28 @@ interface FloatingIconProps {
 export function FloatingIcon({ icon, delay = 0, duration = 4000, className = "" }: FloatingIconProps) {
   const animation = useSpring({
     from: { 
-      transform: 'translateY(0px) rotate(0deg)',
+      transform: 'translateX(0px) translateY(0px) rotate(0deg) scale(1)',
       opacity: 0.7
     },
     to: async (next) => {
       await next({ opacity: 1 })
       while (true) {
         await next({ 
-          transform: 'translateY(-15px) rotate(5deg)',
+          transform: 'translateX(10px) translateY(-20px) rotate(8deg) scale(1.1)',
+          opacity: 0.8
+        })
+        await next({ 
+          transform: 'translateX(-5px) translateY(-10px) rotate(-3deg) scale(1.05)',
           opacity: 0.9
         })
         await next({ 
-          transform: 'translateY(0px) rotate(0deg)',
+          transform: 'translateX(0px) translateY(0px) rotate(0deg) scale(1)',
           opacity: 1
         })
       }
     },
     delay,
-    config: { duration }
+    config: { duration: duration * 0.8, tension: 100, friction: 30 }
   })
 
   return (
@@ -94,46 +97,68 @@ export function AnimatedBackground() {
       <FloatingIcon
         icon={
           <div 
-            className="w-20 h-20 rounded-full opacity-20"
+            className="w-24 h-24 rounded-full opacity-25"
             style={{ backgroundColor: colors.primary[200] }}
           />
         }
-        className="top-20 left-20"
+        className="top-16 left-16"
         delay={0}
-        duration={5000}
-      />
-      <FloatingIcon
-        icon={
-          <div 
-            className="w-16 h-16 rounded-full opacity-15"
-            style={{ backgroundColor: colors.secondary[200] }}
-          />
-        }
-        className="top-40 right-32"
-        delay={1000}
-        duration={4000}
-      />
-      <FloatingIcon
-        icon={
-          <div 
-            className="w-12 h-12 rounded-full opacity-25"
-            style={{ backgroundColor: colors.accent[200] }}
-          />
-        }
-        className="bottom-32 left-40"
-        delay={2000}
         duration={6000}
       />
       <FloatingIcon
         icon={
           <div 
-            className="w-24 h-24 rounded-full opacity-10"
+            className="w-20 h-20 rounded-full opacity-20"
+            style={{ backgroundColor: colors.secondary[200] }}
+          />
+        }
+        className="top-32 right-24"
+        delay={1500}
+        duration={5500}
+      />
+      <FloatingIcon
+        icon={
+          <div 
+            className="w-16 h-16 rounded-full opacity-30"
+            style={{ backgroundColor: colors.accent[200] }}
+          />
+        }
+        className="bottom-40 left-32"
+        delay={2500}
+        duration={4500}
+      />
+      <FloatingIcon
+        icon={
+          <div 
+            className="w-28 h-28 rounded-full opacity-15"
             style={{ backgroundColor: colors.primary[300] }}
           />
         }
-        className="bottom-20 right-20"
-        delay={1500}
-        duration={4500}
+        className="bottom-24 right-16"
+        delay={3000}
+        duration={7000}
+      />
+      <FloatingIcon
+        icon={
+          <div 
+            className="w-14 h-14 rounded-full opacity-25"
+            style={{ backgroundColor: colors.accent[300] }}
+          />
+        }
+        className="top-1/2 left-8"
+        delay={4000}
+        duration={5000}
+      />
+      <FloatingIcon
+        icon={
+          <div 
+            className="w-18 h-18 rounded-full opacity-20"
+            style={{ backgroundColor: colors.secondary[300] }}
+          />
+        }
+        className="top-3/4 right-1/3"
+        delay={2000}
+        duration={6500}
       />
     </div>
   )

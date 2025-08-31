@@ -139,13 +139,13 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
 
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden overflow-hidden">
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm overflow-hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           <div 
-            className="fixed right-0 top-0 h-full w-80 max-w-[85vw] shadow-xl overflow-y-auto"
+            className="fixed right-0 top-0 h-full w-80 max-w-[85vw] shadow-xl"
             style={{ backgroundColor: colors.surface }}
           >
             <div className="flex flex-col h-full">
@@ -192,7 +192,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
               </div>
 
               {/* Quick Actions - Scrollable */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto overscroll-contain">
                 <div className="p-6">
                   <h3 className="text-sm font-medium mb-4" style={{ color: colors.textSecondary }}>
                     Acciones Rápidas
