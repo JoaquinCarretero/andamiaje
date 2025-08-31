@@ -100,28 +100,6 @@ export default function CoordinadorPage() {
           </div>
         )}
 
-        {/* Special Companion Tracking Button - Fixed position in navbar area */}
-        {currentView === "dashboard" && (
-          <div 
-            className="fixed top-20 right-6 z-50"
-          >
-            <Button
-              onClick={() => setCurrentView("seguimiento-acompanantes")}
-              className="flex items-center gap-3 px-6 py-4 rounded-xl shadow-xl transition-all duration-200 hover:scale-105 hover:shadow-2xl"
-              style={{
-                backgroundColor: colors.secondary[500],
-                color: colors.surface,
-                boxShadow: `0 8px 25px ${colors.secondary[500]}40`
-              }}
-            >
-              <UserCheck className="h-5 w-5" />
-              <div className="text-left">
-                <div className="font-medium text-sm">Seguimiento</div>
-                <div className="text-xs opacity-90">Acompañantes Externos</div>
-              </div>
-            </Button>
-          </div>
-        )}
       </DashboardLayout>
     </div>
   )

@@ -33,7 +33,6 @@ const roleActions = {
   coordinador: [
     { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de María López", icon: FileText, urgent: true, buttonText: "Ir" },
     { id: "informe-inicial", title: "Completar Informe Inicial", subtitle: "Evaluación inicial pendiente", icon: FileText, urgent: true, buttonText: "Ir" },
-    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Ir" },
     { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
     { id: "reporte-mensual", title: "Revisar Reporte", subtitle: "Reporte mensual pendiente", icon: FileText, buttonText: "Ir" },
     { id: "seguimiento-flia", title: "Seguimiento Familias", subtitle: "Gestionar comunicación familiar", icon: Users, buttonText: "Ir" },

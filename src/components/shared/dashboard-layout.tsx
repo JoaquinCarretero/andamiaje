@@ -106,26 +106,47 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
-                          className="group p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left"
+                          className={`group p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left ${
+                            section.id === "seguimiento-acompanantes" ? "ring-2 ring-offset-2" : ""
+                          }`}
                           style={{
                             backgroundColor: colors.surface,
-                            borderColor: colors.border,
+                            borderColor: section.id === "seguimiento-acompanantes" ? colors.secondary[300] : colors.border,
+                            ringColor: section.id === "seguimiento-acompanantes" ? colors.secondary[200] : undefined,
+                            boxShadow: section.id === "seguimiento-acompanantes" ? `0 8px 25px ${colors.secondary[500]}20` : undefined,
                           }}
                           onClick={() => onNavigate(section.id)}
                         >
                           <div className="space-y-3">
                             <div
-                              className="text-2xl p-2.5 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110"
+                              className={`text-2xl p-2.5 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110 ${
+                                section.id === "seguimiento-acompanantes" ? "animate-pulse-soft" : ""
+                              }`}
                               style={{
-                                backgroundColor: colors.primary[50],
-                                borderColor: colors.primary[100],
+                                backgroundColor: section.id === "seguimiento-acompanantes" ? colors.secondary[50] : colors.primary[50],
+                                borderColor: section.id === "seguimiento-acompanantes" ? colors.secondary[200] : colors.primary[100],
                               }}
                             >
                               {section.icon}
                             </div>
                             <div>
-                              <h3 className="font-medium text-sm mb-1" style={{ color: colors.text }}>
+                              <h3 
+                                className={`font-medium text-sm mb-1 ${
+                                  section.id === "seguimiento-acompanantes" ? "font-semibold" : ""
+                                }`} 
+                                style={{ 
+                                  color: section.id === "seguimiento-acompanantes" ? colors.secondary[700] : colors.text 
+                                }}
+                              >
                                 {section.title}
+                                {section.id === "seguimiento-acompanantes" && (
+                                  <span className="ml-1 text-xs font-normal px-1.5 py-0.5 rounded-full" style={{
+                                    backgroundColor: colors.secondary[100],
+                                    color: colors.secondary[600]
+                                  }}>
+                                    Prioritario
+                                  </span>
+                                )}
                               </h3>
                               <p className="text-xs leading-tight line-clamp-2" style={{ color: colors.textMuted }}>
                                 {section.description}
