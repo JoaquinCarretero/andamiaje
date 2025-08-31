@@ -23,6 +23,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
     if (userData.role === "terapeuta") {
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: FileText },
+        { id: "informe-inicial", title: "Informe Inicial", icon: User },
         { id: "informe-semestral", title: "Informe Semestral", icon: Calendar },
         { id: "actas", title: "Actas", icon: User },
         { id: "facturas", title: "Facturas", icon: Upload },

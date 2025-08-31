@@ -38,6 +38,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
     if (userData.role === "terapeuta") {
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: "📋", description: "Crear y gestionar planes" },
+        { id: "informe-inicial", title: "Informe Inicial", icon: "📝", description: "Evaluación inicial del paciente" },
         { id: "informe-semestral", title: "Informe Semestral", icon: "📊", description: "Reportes de progreso" },
         { id: "actas", title: "Actas de Reunión", icon: "👥", description: "Registrar reuniones" },
         { id: "facturas", title: "Gestión de Facturas", icon: "📄", description: "Subir documentos" },
@@ -149,6 +150,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
               
               <h1 className="font-display text-3xl lg:text-4xl font-bold" style={{ color: colors.text }}>
                 {currentView === "plan-trabajo" && "Plan de Trabajo"}
+                {currentView === "informe-inicial" && "Informe Inicial"}
                 {currentView === "informe-semestral" && "Informe Semestral"}
                 {currentView === "reporte-mensual" && "Reporte Mensual"}
                 {currentView === "actas" && "Actas de Reunión"}

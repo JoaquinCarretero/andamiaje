@@ -21,6 +21,7 @@ interface QuickActionsProps {
 const roleActions = {
   terapeuta: [
     { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo paciente", icon: Plus, buttonText: "Ir" },
+    { id: "informe-inicial", title: "Completar Informe Inicial", subtitle: "Evaluación inicial de María López", icon: FileText, urgent: true, buttonText: "Ir" },
     { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de Juan Pérez", icon: FileText, urgent: true, buttonText: "Ir" },
     { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
     { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
