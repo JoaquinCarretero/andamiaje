@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Users, Save, Send, Plus, Trash2, Clock } from "lucide-react"
+import colors from "@/lib/colors"
 
 export function MeetingMinutesForm() {
   const [attendees, setAttendees] = useState([""])
@@ -42,14 +43,28 @@ export function MeetingMinutesForm() {
   }
 
   return (
-    <Card className="w-full">
+    <Card 
+      className="w-full shadow-soft border-0"
+      style={{ 
+        backgroundColor: colors.surface,
+        borderColor: colors.border 
+      }}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            Acta de Reunión
+            <Users className="h-5 w-5" style={{ color: colors.primary[500] }} />
+            <span style={{ color: colors.text }}>Acta de Reunión</span>
           </CardTitle>
-          <Badge variant="outline" className="flex items-center gap-1">
+          <Badge 
+            variant="outline" 
+            className="flex items-center gap-1"
+            style={{ 
+              backgroundColor: colors.accent[50], 
+              color: colors.accent[700],
+              borderColor: colors.accent[200]
+            }}
+          >
             <Clock className="h-3 w-3" />
             En progreso
           </Badge>
@@ -188,10 +203,19 @@ export function MeetingMinutesForm() {
         <div className="flex justify-between pt-4 border-t">
           <Button variant="outline">
             <Save className="h-4 w-4 mr-2" />
+            style={{
+              borderColor: colors.border,
+              color: colors.textSecondary
+            }}
             Guardar Borrador
           </Button>
 
-          <Button>
+          <Button
+            style={{
+              backgroundColor: colors.primary[500],
+              color: colors.surface
+            }}
+          >
             <Send className="h-4 w-4 mr-2" />
             Finalizar Acta
           </Button>

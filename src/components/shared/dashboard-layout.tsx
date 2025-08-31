@@ -56,7 +56,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
       className="min-h-screen"
       style={{ backgroundColor: colors.background }}
     >
-      <Navbar userData={userData} />
+      <Navbar userData={userData} onNavigate={onNavigate} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {currentView === "dashboard" ? (
@@ -71,12 +71,12 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                   className="h-full shadow-soft border-0" 
                   style={{ 
                     backgroundColor: colors.surface,
-                    background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.surfaceHover} 100%)`
+                    background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.neutral[50]} 100%)`
                   }}
                 >
                   <CardContent className="p-8">
                     <div className="flex items-center space-x-3 mb-6">
-                      <Sparkles className="h-6 w-6" style={{ color: colors.primary }} />
+                      <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
                       <h2 className="font-display text-3xl font-bold" style={{ color: colors.text }}>
                         {getGreeting()} {userData.name.split(' ')[0]}
                       </h2>
@@ -103,8 +103,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                             <div
                               className="text-3xl p-3 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110"
                               style={{
-                                backgroundColor: `${colors.primary}10`,
-                                borderColor: `${colors.primary}20`,
+                                backgroundColor: colors.primary[50],
+                                borderColor: colors.primary[100],
                               }}
                             >
                               {section.icon}
@@ -140,7 +140,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                 className="w-fit rounded-lg transition-all duration-200 hover:shadow-sm"
                 style={{ 
                   color: colors.textSecondary,
-                  backgroundColor: colors.surfaceHover
+                  backgroundColor: colors.neutral[50]
                 }}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -157,7 +157,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
             </div>
 
             {/* Content */}
-            <div className="animate-in slide-in-from-bottom-4 duration-300">
+            <div className="animate-slide-in-up">
               {children}
             </div>
           </div>

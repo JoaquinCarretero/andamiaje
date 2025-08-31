@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Calendar, Save, Send, TrendingUp, Target, CheckCircle } from "lucide-react"
+import colors from "@/lib/colors"
 
 export function MonthlyReportForm() {
   const [currentSection, setCurrentSection] = useState(1)
@@ -22,14 +23,27 @@ export function MonthlyReportForm() {
   ]
 
   return (
-    <Card className="w-full">
+    <Card 
+      className="w-full shadow-soft border-0"
+      style={{ 
+        backgroundColor: colors.surface,
+        borderColor: colors.border 
+      }}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-secondary" />
-            Reporte Mensual
+            <Calendar className="h-5 w-5" style={{ color: colors.secondary[500] }} />
+            <span style={{ color: colors.text }}>Reporte Mensual</span>
           </CardTitle>
-          <Badge variant="outline">
+          <Badge 
+            variant="outline"
+            style={{ 
+              backgroundColor: colors.secondary[50], 
+              color: colors.secondary[700],
+              borderColor: colors.secondary[200]
+            }}
+          >
             Sección {currentSection} de {totalSections}
           </Badge>
         </div>
@@ -37,7 +51,13 @@ export function MonthlyReportForm() {
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between text-xs text-muted-foreground">
             {sections.map((section) => (
-              <span key={section.id} className={currentSection >= section.id ? "text-secondary font-medium" : ""}>
+              <span 
+                key={section.id} 
+                className={currentSection >= section.id ? "font-medium" : ""}
+                style={{ 
+                  color: currentSection >= section.id ? colors.secondary[500] : colors.textMuted 
+                }}
+              >
                 {section.title}
               </span>
             ))}
@@ -46,18 +66,21 @@ export function MonthlyReportForm() {
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+        <div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-lg"
+          style={{ backgroundColor: colors.neutral[50] }}
+        >
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">Estudiante</p>
-            <p className="font-medium">Juan Pérez</p>
+            <p className="text-sm" style={{ color: colors.textMuted }}>Estudiante</p>
+            <p className="font-medium" style={{ color: colors.text }}>Juan Pérez</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">Mes</p>
-            <p className="font-medium">Enero 2024</p>
+            <p className="text-sm" style={{ color: colors.textMuted }}>Mes</p>
+            <p className="font-medium" style={{ color: colors.text }}>Enero 2024</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-muted-foreground">Sesiones</p>
-            <p className="font-medium">12 realizadas</p>
+            <p className="text-sm" style={{ color: colors.textMuted }}>Sesiones</p>
+            <p className="font-medium" style={{ color: colors.text }}>12 realizadas</p>
           </div>
         </div>
 
@@ -195,12 +218,22 @@ export function MonthlyReportForm() {
             variant="outline"
             onClick={() => setCurrentSection(Math.max(1, currentSection - 1))}
             disabled={currentSection === 1}
+            style={{
+              borderColor: colors.border,
+              color: colors.textSecondary
+            }}
           >
             Anterior
           </Button>
 
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              style={{
+                borderColor: colors.border,
+                color: colors.textSecondary
+              }}
+            >
               <Save className="h-4 w-4 mr-2" />
               Guardar Borrador
             </Button>
@@ -208,9 +241,18 @@ export function MonthlyReportForm() {
             {currentSection < totalSections ? (
               <Button onClick={() => setCurrentSection(Math.min(totalSections, currentSection + 1))}>
                 Siguiente
+                style={{
+                  backgroundColor: colors.secondary[500],
+                  color: colors.surface
+                }}
               </Button>
             ) : (
-              <Button>
+              <Button
+                style={{
+                  backgroundColor: colors.secondary[500],
+                  color: colors.surface
+                }}
+              >
                 <Send className="h-4 w-4 mr-2" />
                 Enviar Reporte
               </Button>

@@ -25,7 +25,7 @@ const roleStats = {
       value: 12, 
       subtitle: "8 en progreso", 
       icon: Users, 
-      color: colors.primary, 
+      color: colors.primary[500], 
       progress: 67,
       trend: "up" as const
     },
@@ -34,7 +34,7 @@ const roleStats = {
       value: 48, 
       subtitle: "3 pendientes", 
       icon: Calendar, 
-      color: colors.accent, 
+      color: colors.accent[500], 
       progress: 94,
       trend: "up" as const
     },
@@ -43,7 +43,7 @@ const roleStats = {
       value: 3, 
       subtitle: "1 vence hoy", 
       icon: FileText, 
-      color: colors.warning, 
+      color: colors.warning[500], 
       progress: 33,
       trend: "stable" as const
     },
@@ -52,7 +52,7 @@ const roleStats = {
       value: "85%", 
       subtitle: "Este mes", 
       icon: CheckCircle, 
-      color: colors.success, 
+      color: colors.success[500], 
       progress: 85,
       trend: "up" as const
     },
@@ -63,7 +63,7 @@ const roleStats = {
       value: 8, 
       subtitle: "6 en seguimiento", 
       icon: Users, 
-      color: colors.primary, 
+      color: colors.primary[500], 
       progress: 75,
       trend: "up" as const
     },
@@ -72,7 +72,7 @@ const roleStats = {
       value: 7, 
       subtitle: "1 pendiente", 
       icon: Calendar, 
-      color: colors.accent, 
+      color: colors.accent[500], 
       progress: 88,
       trend: "up" as const
     },
@@ -81,7 +81,7 @@ const roleStats = {
       value: 24, 
       subtitle: "Esta semana", 
       icon: TrendingUp, 
-      color: colors.success, 
+      color: colors.success[500], 
       progress: 100,
       trend: "up" as const
     },
@@ -90,7 +90,7 @@ const roleStats = {
       value: "92%", 
       subtitle: "Completado", 
       icon: Upload, 
-      color: colors.primary, 
+      color: colors.primary[500], 
       progress: 92,
       trend: "stable" as const
     },
@@ -155,7 +155,7 @@ export function DashboardStats({ role }: DashboardStatsProps) {
                 <div className="space-y-2">
                   <div
                     className="w-full rounded-full h-2 overflow-hidden"
-                    style={{ backgroundColor: colors.surfaceSecondary }}
+                    style={{ backgroundColor: colors.neutral[100] }}
                   >
                     <div
                       className="h-2 rounded-full transition-all duration-500 ease-out"

@@ -13,9 +13,10 @@ interface NavbarProps {
     title: string
     role: string
   }
+  onNavigate?: (view: string) => void
 }
 
-export function Navbar({ userData }: NavbarProps) {
+export function Navbar({ userData, onNavigate }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const getQuickActions = () => {
@@ -32,6 +33,13 @@ export function Navbar({ userData }: NavbarProps) {
         { id: "reporte-mensual", title: "Reporte Mensual", icon: Calendar },
         { id: "facturas", title: "Facturas", icon: Upload },
       ]
+    }
+  }
+
+  const handleMobileNavigation = (actionId: string) => {
+    setIsMobileMenuOpen(false)
+    if (onNavigate) {
+      onNavigate(actionId)
     }
   }
 
@@ -67,15 +75,12 @@ export function Navbar({ userData }: NavbarProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="relative rounded-full transition-all duration-200"
-                style={{ 
-                  color: colors.textSecondary,
-                  ':hover': { backgroundColor: colors.surfaceHover }
-                }}
+                className="relative rounded-full transition-all duration-200 hover:bg-neutral-100"
+                style={{ color: colors.textSecondary }}
               >
                 <Bell className="h-5 w-5" />
                 <Badge
-                  style={{ backgroundColor: colors.accent, color: colors.surface }}
+                  style={{ backgroundColor: colors.accent[500], color: colors.surface }}
                   className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs font-medium"
                 >
                   3
@@ -98,7 +103,7 @@ export function Navbar({ userData }: NavbarProps) {
                   className="rounded-full transition-all duration-200"
                   style={{ 
                     color: colors.textSecondary,
-                    backgroundColor: colors.surfaceSecondary
+                    backgroundColor: colors.neutral[100]
                   }}
                 >
                   <User className="h-5 w-5" />
@@ -140,13 +145,13 @@ export function Navbar({ userData }: NavbarProps) {
             onClick={() => setIsMobileMenuOpen(false)}
           />
           <div 
-            className="fixed right-0 top-0 h-full w-80 max-w-[85vw] shadow-xl"
+            className="fixed right-0 top-0 h-full w-80 max-w-[85vw] shadow-xl overflow-y-auto"
             style={{ backgroundColor: colors.surface }}
           >
             <div className="flex flex-col h-full">
               {/* Header */}
               <div 
-                className="flex items-center justify-between p-6 border-b"
+                className="flex items-center justify-between p-6 border-b flex-shrink-0"
                 style={{ borderColor: colors.border }}
               >
                 <h2 className="text-lg font-semibold" style={{ color: colors.text }}>
@@ -165,15 +170,15 @@ export function Navbar({ userData }: NavbarProps) {
 
               {/* User info */}
               <div 
-                className="p-6 border-b"
+                className="p-6 border-b flex-shrink-0"
                 style={{ borderColor: colors.border }}
               >
                 <div className="flex items-center space-x-3">
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: colors.surfaceSecondary }}
+                    style={{ backgroundColor: colors.primary[50] }}
                   >
-                    <User className="h-6 w-6" style={{ color: colors.primary }} />
+                    <User className="h-6 w-6" style={{ color: colors.primary[500] }} />
                   </div>
                   <div>
                     <p className="font-medium" style={{ color: colors.text }}>
@@ -186,57 +191,56 @@ export function Navbar({ userData }: NavbarProps) {
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="flex-1 p-6">
-                <h3 className="text-sm font-medium mb-4" style={{ color: colors.textSecondary }}>
-                  Acciones Rápidas
-                </h3>
-                <div className="space-y-2">
-                  {getQuickActions().map((action) => {
-                    const Icon = action.icon
-                    return (
-                      <button
-                        key={action.id}
-                        onClick={() => {
-                          setIsMobileMenuOpen(false)
-                          // Aquí iría la navegación
-                        }}
-                        className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200"
-                        style={{ 
-                          backgroundColor: colors.surfaceHover,
-                          ':hover': { backgroundColor: colors.surfaceSecondary }
-                        }}
-                      >
-                        <Icon className="h-5 w-5" style={{ color: colors.primary }} />
-                        <span className="text-sm font-medium" style={{ color: colors.text }}>
-                          {action.title}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
+              {/* Quick Actions - Scrollable */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-6">
+                  <h3 className="text-sm font-medium mb-4" style={{ color: colors.textSecondary }}>
+                    Acciones Rápidas
+                  </h3>
+                  <div className="space-y-2">
+                    {getQuickActions().map((action) => {
+                      const Icon = action.icon
+                      return (
+                        <button
+                          key={action.id}
+                          onClick={() => handleMobileNavigation(action.id)}
+                          className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                          style={{ 
+                            backgroundColor: colors.neutral[50],
+                            ':hover': { backgroundColor: colors.neutral[100] }
+                          }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                          <span className="text-sm font-medium" style={{ color: colors.text }}>
+                            {action.title}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
 
-                {/* Dashboard link */}
-                <div className="mt-6 pt-6 border-t" style={{ borderColor: colors.border }}>
-                  <button
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200"
-                    style={{ 
-                      backgroundColor: colors.surfaceHover,
-                      ':hover': { backgroundColor: colors.surfaceSecondary }
-                    }}
-                  >
-                    <Home className="h-5 w-5" style={{ color: colors.primary }} />
-                    <span className="text-sm font-medium" style={{ color: colors.text }}>
-                      Dashboard
-                    </span>
-                  </button>
+                  {/* Dashboard link */}
+                  <div className="mt-6 pt-6 border-t" style={{ borderColor: colors.border }}>
+                    <button
+                      onClick={() => handleMobileNavigation("dashboard")}
+                      className="w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{ 
+                        backgroundColor: colors.neutral[50],
+                        ':hover': { backgroundColor: colors.neutral[100] }
+                      }}
+                    >
+                      <Home className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                      <span className="text-sm font-medium" style={{ color: colors.text }}>
+                        Dashboard
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Footer actions */}
               <div 
-                className="p-6 border-t"
+                className="p-6 border-t flex-shrink-0"
                 style={{ borderColor: colors.border }}
               >
                 <div className="flex items-center justify-between">
@@ -248,7 +252,7 @@ export function Navbar({ userData }: NavbarProps) {
                     <Bell className="h-5 w-5" />
                     <span>Notificaciones</span>
                     <Badge
-                      style={{ backgroundColor: colors.accent, color: colors.surface }}
+                      style={{ backgroundColor: colors.accent[500], color: colors.surface }}
                       className="ml-2 text-xs"
                     >
                       3

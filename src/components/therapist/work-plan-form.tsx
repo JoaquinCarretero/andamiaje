@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { FileText, Save, Send, User, Target, Activity, CheckCircle } from "lucide-react"
+import colors from "@/lib/colors"
 
 export function WorkPlanForm() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -23,14 +24,26 @@ export function WorkPlanForm() {
   ]
 
   return (
-    <Card className="w-full">
+    <Card 
+      className="w-full shadow-soft border-0"
+      style={{ 
+        backgroundColor: colors.surface,
+        borderColor: colors.border 
+      }}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Plan de Trabajo
+            <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
+            <span style={{ color: colors.text }}>Plan de Trabajo</span>
           </CardTitle>
-          <Badge variant="secondary">
+          <Badge 
+            variant="secondary"
+            style={{ 
+              backgroundColor: colors.primary[50], 
+              color: colors.primary[700] 
+            }}
+          >
             Paso {currentStep} de {totalSteps}
           </Badge>
         </div>
@@ -38,7 +51,13 @@ export function WorkPlanForm() {
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between text-xs text-muted-foreground">
             {steps.map((step) => (
-              <span key={step.id} className={currentStep >= step.id ? "text-primary font-medium" : ""}>
+              <span 
+                key={step.id} 
+                className={currentStep >= step.id ? "font-medium" : ""}
+                style={{ 
+                  color: currentStep >= step.id ? colors.primary[500] : colors.textMuted 
+                }}
+              >
                 {step.title}
               </span>
             ))}
@@ -51,12 +70,33 @@ export function WorkPlanForm() {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="patient-name">Nombre del Paciente</Label>
-                <Input id="patient-name" placeholder="Ej: Juan Pérez" />
+                <Label htmlFor="patient-name" style={{ color: colors.text }}>
+                  Nombre del Paciente
+                </Label>
+                <Input 
+                  id="patient-name" 
+                  placeholder="Ej: Juan Pérez"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="patient-age">Edad</Label>
-                <Input id="patient-age" type="number" placeholder="Ej: 8" />
+                <Label htmlFor="patient-age" style={{ color: colors.text }}>
+                  Edad
+                </Label>
+                <Input 
+                  id="patient-age" 
+                  type="number" 
+                  placeholder="Ej: 8"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,20 +216,43 @@ export function WorkPlanForm() {
             variant="outline"
             onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
             disabled={currentStep === 1}
+            style={{
+              borderColor: colors.border,
+              color: colors.textSecondary
+            }}
           >
             Anterior
           </Button>
 
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button 
+              variant="outline"
+              style={{
+                borderColor: colors.border,
+                color: colors.textSecondary
+              }}
+            >
               <Save className="h-4 w-4 mr-2" />
               Guardar Borrador
             </Button>
 
             {currentStep < totalSteps ? (
-              <Button onClick={() => setCurrentStep(Math.min(totalSteps, currentStep + 1))}>Siguiente</Button>
+              <Button 
+                onClick={() => setCurrentStep(Math.min(totalSteps, currentStep + 1))}
+                style={{
+                  backgroundColor: colors.primary[500],
+                  color: colors.surface
+                }}
+              >
+                Siguiente
+              </Button>
             ) : (
-              <Button>
+              <Button
+                style={{
+                  backgroundColor: colors.primary[500],
+                  color: colors.surface
+                }}
+              >
                 <Send className="h-4 w-4 mr-2" />
                 Enviar Plan
               </Button>

@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter, Poppins } from "next/font/google"
+import { Inter, Poppins, Playfair_Display } from "next/font/google"
 import colors from "@/lib/colors"
 import "./globals.css"
 
@@ -16,6 +16,13 @@ const poppins = Poppins({
   display: "swap",
   variable: "--font-poppins",
   weight: ["300", "400", "500", "600", "700"],
+})
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
 })
 
 export const metadata: Metadata = {
@@ -34,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="es" className={`${inter.variable} ${poppins.variable} ${playfair.variable}`}>
       <body
         style={{ backgroundColor: colors.background, color: colors.text }}
         className="font-sans antialiased min-h-screen"

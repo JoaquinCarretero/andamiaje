@@ -20,15 +20,15 @@ interface QuickActionsProps {
 
 const roleActions = {
   terapeuta: [
-    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo paciente", icon: Plus, buttonText: "Crear" },
-    { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de Juan Pérez", icon: FileText, urgent: true, buttonText: "Completar" },
-    { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Registrar" },
-    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Subir" },
+    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo paciente", icon: Plus, buttonText: "Ir" },
+    { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de Juan Pérez", icon: FileText, urgent: true, buttonText: "Ir" },
+    { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
+    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
   ],
   acompanante: [
-    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Crear" },
-    { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Completar" },
-    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Subir" },
+    { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Ir" },
+    { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Ir" },
+    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
   ],
 }
 
@@ -48,7 +48,7 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
         <div className="flex items-center space-x-3 mb-6">
           <div
             className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: colors.primary }}
+            style={{ backgroundColor: colors.primary[500] }}
           />
           <h2 
             className="text-lg font-semibold font-display" 
@@ -70,55 +70,55 @@ export function QuickActions({ role, onNavigate }: QuickActionsProps) {
                   borderColor: colors.border,
                 }}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 flex-1 min-w-0">
-                    <div
-                      className="p-2.5 rounded-lg transition-colors duration-200"
+                <div className="flex items-center gap-4">
+                  <div
+                    className="p-2.5 rounded-lg transition-colors duration-200 flex-shrink-0"
+                    style={{ 
+                      backgroundColor: action.urgent ? colors.error[50] : colors.primary[50]
+                    }}
+                  >
+                    <Icon
+                      className="w-5 h-5"
                       style={{ 
-                        backgroundColor: action.urgent ? colors.errorLight : colors.surfaceSecondary 
+                        color: action.urgent ? colors.error[500] : colors.primary[500]
                       }}
-                    >
-                      <Icon
-                        className="w-5 h-5"
-                        style={{ 
-                          color: action.urgent ? colors.error : colors.primary 
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <h3
-                          className="text-sm font-medium truncate"
-                          style={{ color: colors.text }}
-                        >
-                          {action.title}
-                        </h3>
-                        {action.urgent && (
-                          <span
-                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
-                            style={{
-                              backgroundColor: colors.errorLight,
-                              color: colors.error,
-                            }}
-                          >
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            Urgente
-                          </span>
-                        )}
-                      </div>
-                      <p
-                        className="text-sm truncate"
-                        style={{ color: colors.textMuted }}
-                      >
-                        {action.subtitle}
-                      </p>
-                    </div>
+                    />
                   </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3
+                        className="text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        {action.title}
+                      </h3>
+                      {action.urgent && (
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
+                          style={{
+                            backgroundColor: colors.error[50],
+                            color: colors.error[600],
+                          }}
+                        >
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Urgente
+                        </span>
+                      )}
+                    </div>
+                    <p
+                      className="text-sm"
+                      style={{ color: colors.textMuted }}
+                    >
+                      {action.subtitle}
+                    </p>
+                  </div>
+                  
                   <button
                     onClick={() => onNavigate(action.id)}
-                    className="ml-4 px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm transform hover:scale-105 whitespace-nowrap"
+                    className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm transform hover:scale-105 whitespace-nowrap flex-shrink-0"
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.primary[500],
                       color: colors.surface,
                     }}
                   >

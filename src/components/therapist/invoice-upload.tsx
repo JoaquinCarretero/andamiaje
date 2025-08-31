@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Upload, FileText, Trash2, CheckCircle, Calendar, DollarSign } from "lucide-react"
+import colors from "@/lib/colors"
 
 export function InvoiceUpload() {
   const [uploadedFiles, setUploadedFiles] = useState([
@@ -43,18 +44,24 @@ export function InvoiceUpload() {
   return (
     <div className="space-y-6">
       {/* Resumen anual */}
-      <Card>
+      <Card 
+        className="shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-primary" />
-            Resumen de Facturas 2024
+            <DollarSign className="h-5 w-5" style={{ color: colors.primary[500] }} />
+            <span style={{ color: colors.text }}>Resumen de Facturas 2024</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Progreso anual</span>
-              <span className="text-sm font-medium">{uploadedCount}/12 meses</span>
+              <span className="text-sm" style={{ color: colors.textMuted }}>Progreso anual</span>
+              <span className="text-sm font-medium" style={{ color: colors.text }}>{uploadedCount}/12 meses</span>
             </div>
             <Progress value={progress} className="h-3" />
 
@@ -74,11 +81,17 @@ export function InvoiceUpload() {
       </Card>
 
       {/* Subir nueva factura */}
-      <Card>
+      <Card 
+        className="shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-secondary" />
-            Subir Nueva Factura
+            <Upload className="h-5 w-5" style={{ color: colors.secondary[500] }} />
+            <span style={{ color: colors.text }}>Subir Nueva Factura</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -122,11 +135,17 @@ export function InvoiceUpload() {
       </Card>
 
       {/* Facturas subidas */}
-      <Card>
+      <Card 
+        className="shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Facturas Subidas
+            <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
+            <span style={{ color: colors.text }}>Facturas Subidas</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
