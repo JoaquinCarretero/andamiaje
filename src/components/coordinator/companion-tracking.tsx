@@ -4,8 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Users, Search, Download, Eye, Edit, Calendar, FileText, CheckCircle, Clock, AlertTriangle } from "lucide-react"
+import { Users, Search, Download, Eye, Edit, Calendar, FileText } from "lucide-react"
 import colors from "@/lib/colors"
 
 interface CompanionReport {
@@ -14,13 +13,11 @@ interface CompanionReport {
   studentName: string
   reportType: string
   date: string
-  status: "completed" | "pending" | "review"
   month?: string
 }
 
 export function CompanionTracking() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
   const [filterType, setFilterType] = useState("all")
 
   const [reports] = useState<CompanionReport[]>([
@@ -29,8 +26,7 @@ export function CompanionTracking() {
       companionName: "Prof. Ana Martínez",
       studentName: "Juan Pérez",
       reportType: "Plan de Trabajo",
-      date: "2024-01-15",
-      status: "completed"
+      date: "2024-01-15"
     },
     {
       id: 2,
@@ -38,7 +34,6 @@ export function CompanionTracking() {
       studentName: "María González",
       reportType: "Reporte Mensual",
       date: "2024-01-30",
-      status: "pending",
       month: "Enero 2024"
     },
     {
@@ -46,8 +41,7 @@ export function CompanionTracking() {
       companionName: "Prof. Carlos López",
       studentName: "Pedro Rodríguez",
       reportType: "Plan de Trabajo",
-      date: "2024-01-20",
-      status: "review"
+      date: "2024-01-20"
     },
     {
       id: 4,
@@ -55,7 +49,6 @@ export function CompanionTracking() {
       studentName: "Ana Silva",
       reportType: "Reporte Mensual",
       date: "2024-01-28",
-      status: "completed",
       month: "Enero 2024"
     },
     {
@@ -63,65 +56,25 @@ export function CompanionTracking() {
       companionName: "Prof. Laura Fernández",
       studentName: "Diego Morales",
       reportType: "Plan de Trabajo",
-      date: "2024-01-25",
-      status: "pending"
+      date: "2024-01-25"
+    },
+    {
+      id: 6,
+      companionName: "Prof. Laura Fernández",
+      studentName: "Sofía Martín",
+      reportType: "Reporte Mensual",
+      date: "2024-01-29",
+      month: "Enero 2024"
     }
   ])
 
   const filteredReports = reports.filter(report => {
     const matchesSearch = report.companionName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          report.studentName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = filterStatus === "all" || report.status === filterStatus
     const matchesType = filterType === "all" || report.reportType === filterType
     
-    return matchesSearch && matchesStatus && matchesType
+    return matchesSearch && matchesType
   })
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.success[50],
-              color: colors.success[700],
-              borderColor: colors.success[200]
-            }}
-          >
-            <CheckCircle className="h-3 w-3 mr-1" />
-            Completado
-          </Badge>
-        )
-      case "pending":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.warning[50],
-              color: colors.warning[700],
-              borderColor: colors.warning[200]
-            }}
-          >
-            <Clock className="h-3 w-3 mr-1" />
-            Pendiente
-          </Badge>
-        )
-      case "review":
-        return (
-          <Badge
-            style={{
-              backgroundColor: colors.error[50],
-              color: colors.error[700],
-              borderColor: colors.error[200]
-            }}
-          >
-            <AlertTriangle className="h-3 w-3 mr-1" />
-            En Revisión
-          </Badge>
-        )
-      default:
-        return null
-    }
-  }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -174,28 +127,7 @@ export function CompanionTracking() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Estado
-              </label>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="flex h-10 w-full rounded-md border px-3 py-2 text-sm"
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  color: colors.text
-                }}
-              >
-                <option value="all">Todos los estados</option>
-                <option value="completed">Completados</option>
-                <option value="pending">Pendientes</option>
-                <option value="review">En Revisión</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Tipo
+                Tipo de Documento
               </label>
               <select
                 value={filterType}
@@ -211,6 +143,20 @@ export function CompanionTracking() {
                 <option value="Plan de Trabajo">Planes de Trabajo</option>
                 <option value="Reporte Mensual">Reportes Mensuales</option>
               </select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium" style={{ color: colors.text }}>
+                Estadísticas
+              </label>
+              <div className="flex items-center gap-4 text-sm">
+                <span style={{ color: colors.textMuted }}>
+                  Total: <span className="font-medium" style={{ color: colors.text }}>{reports.length}</span>
+                </span>
+                <span style={{ color: colors.primary[500] }}>
+                  Documentos: <span className="font-medium">{filteredReports.length}</span>
+                </span>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -241,20 +187,9 @@ export function CompanionTracking() {
         }}
       >
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle style={{ color: colors.text }}>
-              Reportes y Documentos ({filteredReports.length})
-            </CardTitle>
-            <Badge
-              style={{
-                backgroundColor: colors.primary[50],
-                color: colors.primary[700],
-                borderColor: colors.primary[200]
-              }}
-            >
-              {filteredReports.filter(r => r.status === "pending").length} pendientes
-            </Badge>
-          </div>
+          <CardTitle style={{ color: colors.text }}>
+            Reportes y Documentos ({filteredReports.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {filteredReports.length === 0 ? (
@@ -285,7 +220,6 @@ export function CompanionTracking() {
                         <h3 className="font-medium text-sm" style={{ color: colors.text }}>
                           {report.reportType}
                         </h3>
-                        {getStatusBadge(report.status)}
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs" style={{ color: colors.textSecondary }}>

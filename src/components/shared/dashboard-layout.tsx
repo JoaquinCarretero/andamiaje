@@ -51,10 +51,10 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: "📋", description: "Crear y gestionar planes" },
         { id: "informe-inicial", title: "Informe Inicial", icon: "📝", description: "Evaluación inicial del paciente" },
         { id: "informe-semestral", title: "Informe Semestral", icon: "📊", description: "Reportes de progreso" },
-        { id: "seguimiento-acompanantes", title: "Seguimiento Acompañantes", icon: "👥", description: "Gestionar acompañantes externos" },
         { id: "actas", title: "Actas de Reunión", icon: "👥", description: "Registrar reuniones" },
         { id: "facturas", title: "Gestión de Facturas", icon: "📄", description: "Subir documentos" },
         { id: "reporte-mensual", title: "Reporte Mensual", icon: "📊", description: "Informes mensuales" },
+        { id: "seguimiento-flia", title: "Seguimiento Familias", icon: "👨‍👩‍👧‍👦", description: "Gestionar comunicación familiar" },
       ]
     } else {
       return [
