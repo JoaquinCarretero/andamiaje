@@ -29,7 +29,6 @@ const roleActions = {
   acompanante: [
     { id: "plan-trabajo", title: "Nuevo Plan de Trabajo", subtitle: "Crear plan para nuevo estudiante", icon: Plus, buttonText: "Ir" },
     { id: "reporte-mensual", title: "Completar Reporte", subtitle: "Reporte mensual de enero 2025", icon: FileText, urgent: true, buttonText: "Ir" },
-    { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
   ],
   coordinador: [
     { id: "informe-semestral", title: "Completar Informe", subtitle: "Informe semestral de María López", icon: FileText, urgent: true, buttonText: "Ir" },
