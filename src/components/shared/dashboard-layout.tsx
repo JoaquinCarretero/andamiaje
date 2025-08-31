@@ -112,7 +112,6 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                           style={{
                             backgroundColor: colors.surface,
                             borderColor: section.id === "seguimiento-acompanantes" ? colors.secondary[300] : colors.border,
-                            ringColor: section.id === "seguimiento-acompanantes" ? colors.secondary[200] : undefined,
                             boxShadow: section.id === "seguimiento-acompanantes" ? `0 8px 25px ${colors.secondary[500]}20` : undefined,
                           }}
                           onClick={() => onNavigate(section.id)}
@@ -141,10 +140,10 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                                 {section.title}
                                 {section.id === "seguimiento-acompanantes" && (
                                   <span className="ml-1 text-xs font-normal px-1.5 py-0.5 rounded-full" style={{
-                                    backgroundColor: colors.secondary[100],
-                                    color: colors.secondary[600]
+                                    // backgroundColor: colors.secondary[100],
+                                    // color: colors.secondary[600]
                                   }}>
-                                    Prioritario
+                                    {/* Prioritario */}
                                   </span>
                                 )}
                               </h3>
