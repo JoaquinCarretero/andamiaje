@@ -76,7 +76,7 @@ export function StaffOverview() {
       lastActivity: "2024-01-25",
       performance: "needs_attention"
     }
-  ]
+  ])
 
   const getPerformanceBadge = (performance: string) => {
     switch (performance) {
