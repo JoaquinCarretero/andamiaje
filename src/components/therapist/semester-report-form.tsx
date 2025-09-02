@@ -354,28 +354,54 @@ export default function SemesterReportForm() {
               Datos del Profesional
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="professional-name" style={{ color: colors.text }}>
-                Profesional (Nombre Completo) *
-              </Label>
-              <Input 
-                id="professional-name" 
-                placeholder="Ej: Dr. María González López"
-                value={formData.professionalName}
-                onChange={(e) => handleInputChange('professionalName', e.target.value)}
-                className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.professionalName ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.professionalName && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.professionalName}
-                </div>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="professional-name" style={{ color: colors.text }}>
+                  Profesional (Nombre Completo) *
+                </Label>
+                <Input 
+                  id="professional-name" 
+                  placeholder="Ej: Dr. María González López"
+                  value={formData.professionalName}
+                  onChange={(e) => handleInputChange('professionalName', e.target.value)}
+                  className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.professionalName ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.professionalName && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.professionalName}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="attention-period" style={{ color: colors.text }}>
+                  Período de Atención *
+                </Label>
+                <Input 
+                  id="attention-period" 
+                  placeholder="Ej: Primer semestre 2024, Enero - Junio 2024"
+                  value={formData.attentionPeriod}
+                  onChange={(e) => handleInputChange('attentionPeriod', e.target.value)}
+                  className={`h-11 ${errors.attentionPeriod ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.attentionPeriod ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.attentionPeriod && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.attentionPeriod}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -426,30 +452,6 @@ export default function SemesterReportForm() {
                 )}
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="attention-period" style={{ color: colors.text }}>
-                Período de Atención *
-              </Label>
-              <Input 
-                id="attention-period" 
-                placeholder="Ej: Primer semestre 2024, Enero - Junio 2024"
-                value={formData.attentionPeriod}
-                onChange={(e) => handleInputChange('attentionPeriod', e.target.value)}
-                className={`h-11 ${errors.attentionPeriod ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.attentionPeriod ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.attentionPeriod && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.attentionPeriod}
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Información del Informe */}
@@ -464,76 +466,78 @@ export default function SemesterReportForm() {
               Información del Informe
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="characterization" style={{ color: colors.text }}>
-                Caracterización *
-              </Label>
-              <Textarea
-                id="characterization"
-                placeholder="Describe las características actuales del paciente, su estado general, habilidades desarrolladas, fortalezas identificadas y aspectos relevantes observados durante el período..."
-                value={formData.characterization}
-                onChange={(e) => handleInputChange('characterization', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.characterization ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.characterization && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.characterization}
-                </div>
-              )}
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="characterization" style={{ color: colors.text }}>
+                  Caracterización *
+                </Label>
+                <Textarea
+                  id="characterization"
+                  placeholder="Describe las características actuales del paciente, su estado general, habilidades desarrolladas, fortalezas identificadas y aspectos relevantes observados durante el período..."
+                  value={formData.characterization}
+                  onChange={(e) => handleInputChange('characterization', e.target.value)}
+                  className={`min-h-[140px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.characterization ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.characterization && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.characterization}
+                  </div>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="period-evolution" style={{ color: colors.text }}>
-                Evolución del Período *
-              </Label>
-              <Textarea
-                id="period-evolution"
-                placeholder="Detalla la evolución del paciente durante el período evaluado. Incluye logros alcanzados, mejoras observadas, dificultades superadas, cambios en el comportamiento y progreso en las áreas trabajadas..."
-                value={formData.periodEvolution}
-                onChange={(e) => handleInputChange('periodEvolution', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.periodEvolution ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.periodEvolution ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.periodEvolution && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.periodEvolution}
-                </div>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="period-evolution" style={{ color: colors.text }}>
+                  Evolución del Período *
+                </Label>
+                <Textarea
+                  id="period-evolution"
+                  placeholder="Detalla la evolución del paciente durante el período evaluado. Incluye logros alcanzados, mejoras observadas, dificultades superadas, cambios en el comportamiento y progreso en las áreas trabajadas..."
+                  value={formData.periodEvolution}
+                  onChange={(e) => handleInputChange('periodEvolution', e.target.value)}
+                  className={`min-h-[140px] resize-none ${errors.periodEvolution ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.periodEvolution ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.periodEvolution && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.periodEvolution}
+                  </div>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="suggestions" style={{ color: colors.text }}>
-                Sugerencias *
-              </Label>
-              <Textarea
-                id="suggestions"
-                placeholder="Proporciona sugerencias para el próximo período, recomendaciones para la familia, ajustes en el tratamiento, objetivos futuros y cualquier consideración importante para la continuidad del proceso terapéutico..."
-                value={formData.suggestions}
-                onChange={(e) => handleInputChange('suggestions', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.suggestions ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.suggestions ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.suggestions && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.suggestions}
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="suggestions" style={{ color: colors.text }}>
+                  Sugerencias *
+                </Label>
+                <Textarea
+                  id="suggestions"
+                  placeholder="Proporciona sugerencias para el próximo período, recomendaciones para la familia, ajustes en el tratamiento, objetivos futuros y cualquier consideración importante para la continuidad del proceso terapéutico..."
+                  value={formData.suggestions}
+                  onChange={(e) => handleInputChange('suggestions', e.target.value)}
+                  className={`min-h-[140px] resize-none ${errors.suggestions ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.suggestions ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.suggestions && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.suggestions}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

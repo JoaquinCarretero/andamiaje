@@ -395,28 +395,54 @@ export function WorkPlanForm() {
               Datos del Profesional
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="professional-name" style={{ color: colors.text }}>
-                Profesional (Nombre Completo) *
-              </Label>
-              <Input 
-                id="professional-name" 
-                placeholder="Ej: Dr. María González López"
-                value={formData.professionalName}
-                onChange={(e) => handleInputChange('professionalName', e.target.value)}
-                className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.professionalName ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.professionalName && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.professionalName}
-                </div>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="professional-name" style={{ color: colors.text }}>
+                  Profesional (Nombre Completo) *
+                </Label>
+                <Input 
+                  id="professional-name" 
+                  placeholder="Ej: Dr. María González López"
+                  value={formData.professionalName}
+                  onChange={(e) => handleInputChange('professionalName', e.target.value)}
+                  className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.professionalName ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.professionalName && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.professionalName}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="period" style={{ color: colors.text }}>
+                  Período *
+                </Label>
+                <Input 
+                  id="period" 
+                  placeholder="Ej: Primer semestre 2024, Ciclo lectivo 2024, etc."
+                  value={formData.period}
+                  onChange={(e) => handleInputChange('period', e.target.value)}
+                  className={`h-11 ${errors.period ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.period ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.period && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.period}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -466,30 +492,6 @@ export function WorkPlanForm() {
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="period" style={{ color: colors.text }}>
-                Período *
-              </Label>
-              <Input 
-                id="period" 
-                placeholder="Ej: Primer semestre 2024, Ciclo lectivo 2024, etc."
-                value={formData.period}
-                onChange={(e) => handleInputChange('period', e.target.value)}
-                className={`h-11 ${errors.period ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.period ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.period && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.period}
-                </div>
-              )}
             </div>
           </div>
 
@@ -677,9 +679,8 @@ export function WorkPlanForm() {
                 onClick={() => setShowPDFPreview(true)}
                 disabled={!formData.patientName || !formData.professionalName}
                 style={{
-                  borderColor: colors.border,
-                  color: colors.textSecondary,
-                  backgroundColor: colors.surface
+                  borderColor: colors.primary[300],
+                  color: colors.primary[600]
                 }}
               >
                 <Eye className="h-4 w-4 mr-2" />

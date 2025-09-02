@@ -318,58 +318,60 @@ export function InitialReportForm() {
               Información Clínica
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="introduction" style={{ color: colors.text }}>
-                Introducción *
-              </Label>
-              <Textarea
-                id="introduction"
-                placeholder="Describe el motivo de consulta, antecedentes relevantes y contexto del paciente. Incluye información sobre el entorno familiar, escolar y social que consideres importante para el tratamiento..."
-                value={formData.introduction}
-                onChange={(e) => handleInputChange('introduction', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.introduction ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.introduction ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.introduction && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.introduction}
-                </div>
-              )}
-              <p className="text-xs" style={{ color: colors.textMuted }}>
-                Proporciona un contexto completo sobre la situación del paciente
-              </p>
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="introduction" style={{ color: colors.text }}>
+                  Introducción *
+                </Label>
+                <Textarea
+                  id="introduction"
+                  placeholder="Describe el motivo de consulta, antecedentes relevantes y contexto del paciente. Incluye información sobre el entorno familiar, escolar y social que consideres importante para el tratamiento..."
+                  value={formData.introduction}
+                  onChange={(e) => handleInputChange('introduction', e.target.value)}
+                  className={`min-h-[140px] resize-none ${errors.introduction ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.introduction ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.introduction && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.introduction}
+                  </div>
+                )}
+                <p className="text-xs" style={{ color: colors.textMuted }}>
+                  Proporciona un contexto completo sobre la situación del paciente
+                </p>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="characterization" style={{ color: colors.text }}>
-                Caracterización *
-              </Label>
-              <Textarea
-                id="characterization"
-                placeholder="Describe las características principales del paciente: fortalezas, dificultades, patrones de comportamiento, habilidades desarrolladas, áreas de oportunidad, estilo de aprendizaje, intereses y motivaciones..."
-                value={formData.characterization}
-                onChange={(e) => handleInputChange('characterization', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.characterization ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.characterization && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.characterization}
-                </div>
-              )}
-              <p className="text-xs" style={{ color: colors.textMuted }}>
-                Incluye una descripción detallada del perfil del paciente
-              </p>
+              <div className="space-y-2">
+                <Label htmlFor="characterization" style={{ color: colors.text }}>
+                  Caracterización *
+                </Label>
+                <Textarea
+                  id="characterization"
+                  placeholder="Describe las características principales del paciente: fortalezas, dificultades, patrones de comportamiento, habilidades desarrolladas, áreas de oportunidad, estilo de aprendizaje, intereses y motivaciones..."
+                  value={formData.characterization}
+                  onChange={(e) => handleInputChange('characterization', e.target.value)}
+                  className={`min-h-[140px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.characterization ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.characterization && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.characterization}
+                  </div>
+                )}
+                <p className="text-xs" style={{ color: colors.textMuted }}>
+                  Incluye una descripción detallada del perfil del paciente
+                </p>
+              </div>
             </div>
           </div>
 
