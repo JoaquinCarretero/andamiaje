@@ -301,6 +301,16 @@ export default function LoginPage() {
                   >
                     ¿Olvidaste tu contraseña?
                   </Link>
+                  <Link 
+                    href="/director" 
+                    className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: colors.neutral[700],
+                      color: colors.surface
+                    }}
+                  >
+                    Demo Director
+                  </Link>
                 </div>
 
                 <Button
