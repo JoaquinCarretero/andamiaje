@@ -26,6 +26,8 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.15.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.2",
     "lottie-web": "^5.12.2",
     "lucide-react": "^0.462.0",
     "next": "15.0.3",
@@ -33,7 +35,9 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
     "react-intersection-observer": "^9.16.0",
+    "react-modal": "^3.16.3",
     "react-phone-input-2": "^2.15.1",
+    "react-signature-canvas": "^1.1.0-alpha.2",
     "tailwind-merge": "^2.5.5",
     "tailwind-variants": "^0.3.0",
     "tailwindcss-animate": "^1.0.7"

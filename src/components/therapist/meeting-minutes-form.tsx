@@ -7,10 +7,15 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Users, Save, Send, Clock, AlertCircle } from "lucide-react"
+import { Users, Save, Send, Clock, AlertCircle, Eye } from "lucide-react"
+import { PDFPreviewModal } from "@/components/ui/pdf-preview-modal"
+import { PDFContent } from "@/components/ui/pdf-generator"
+import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 
 export function MeetingMinutesForm() {
+  const { getSignature } = useSignature()
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
   const [formData, setFormData] = useState({
     patientName: "",
     meetingDate: new Date().toISOString().split('T')[0],
@@ -53,11 +58,34 @@ export function MeetingMinutesForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      console.log("Formulario válido:", formData)
+      // Mostrar vista previa antes de enviar
+      setShowPDFPreview(true)
     }
   }
 
+  const signature = getSignature()
+
+  // Contenido para el PDF
+  const pdfContent = (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Información de la Reunión</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><strong>Paciente:</strong> {formData.patientName}</div>
+          <div><strong>Fecha:</strong> {formData.meetingDate}</div>
+          <div><strong>Modalidad:</strong> {formData.modality}</div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Asunto de la Reunión</h3>
+        <p>{formData.subject}</p>
+      </div>
+    </div>
+  )
+
   return (
+    <>
     <Card 
       className="w-full shadow-soft border-0"
       style={{ 
@@ -206,17 +234,33 @@ export function MeetingMinutesForm() {
 
           {/* Botones de acción */}
           <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
-            <Button 
-              type="button"
-              variant="outline"
-              style={{
-                borderColor: colors.border,
-                color: colors.textSecondary
-              }}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Guardar Borrador
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                variant="outline"
+                style={{
+                  borderColor: colors.border,
+                  color: colors.textSecondary
+                }}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Guardar Borrador
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPDFPreview(true)}
+                disabled={!formData.patientName}
+                style={{
+                  borderColor: colors.primary[300],
+                  color: colors.primary[600]
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Vista Previa
+              </Button>
+            </div>
 
             <Button
               type="submit"
@@ -232,5 +276,17 @@ export function MeetingMinutesForm() {
         </form>
       </CardContent>
     </Card>
+
+    {/* Modal de Vista Previa PDF */}
+    <PDFPreviewModal
+      isOpen={showPDFPreview}
+      onClose={() => setShowPDFPreview(false)}
+      title="Acta de Reunión"
+      content={pdfContent}
+      patientName={formData.patientName}
+      professionalName="Dr. María González" // Esto vendría del usuario logueado
+      date={formData.meetingDate}
+    />
+    </>
   )
 }

@@ -8,10 +8,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Calendar, Save, Send, TrendingUp, Target, CheckCircle } from "lucide-react"
+import { Calendar, Save, Send, TrendingUp, Target, CheckCircle, Eye } from "lucide-react"
+import { PDFPreviewModal } from "@/components/ui/pdf-preview-modal"
+import { PDFContent } from "@/components/ui/pdf-generator"
+import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 
 export function MonthlyReportForm() {
+  const { getSignature } = useSignature()
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
   const [currentSection, setCurrentSection] = useState(1)
   const totalSections = 3
   const progress = (currentSection / totalSections) * 100
@@ -22,7 +27,40 @@ export function MonthlyReportForm() {
     { id: 3, title: "Observaciones", icon: CheckCircle },
   ]
 
+  const signature = getSignature()
+
+  // Contenido para el PDF (ejemplo con datos del formulario)
+  const pdfContent = (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Información del Reporte</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><strong>Estudiante:</strong> Juan Pérez</div>
+          <div><strong>Mes:</strong> Enero 2024</div>
+          <div><strong>Sesiones Realizadas:</strong> 12</div>
+          <div><strong>Acompañante:</strong> Prof. Ana Martínez</div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Actividades Realizadas</h3>
+        <p>Descripción de las actividades de acompañamiento realizadas durante el mes...</p>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Progreso del Estudiante</h3>
+        <p>Evaluación del progreso académico, comportamental y social del estudiante...</p>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Observaciones</h3>
+        <p>Observaciones generales, comunicación con la familia y recomendaciones...</p>
+      </div>
+    </div>
+  )
+
   return (
+    <>
     <Card 
       className="w-full shadow-soft border-0"
       style={{ 
@@ -227,16 +265,31 @@ export function MonthlyReportForm() {
           </Button>
 
           <div className="flex gap-2">
-            <Button 
-              variant="outline"
-              style={{
-                borderColor: colors.border,
-                color: colors.textSecondary
-              }}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Guardar Borrador
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                style={{
+                  borderColor: colors.border,
+                  color: colors.textSecondary
+                }}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Guardar Borrador
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPDFPreview(true)}
+                style={{
+                  borderColor: colors.primary[300],
+                  color: colors.primary[600]
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Vista Previa
+              </Button>
+            </div>
 
             {currentSection < totalSections ? (
               <Button
@@ -263,5 +316,17 @@ export function MonthlyReportForm() {
         </div>
       </CardContent>
     </Card>
+
+    {/* Modal de Vista Previa PDF */}
+    <PDFPreviewModal
+      isOpen={showPDFPreview}
+      onClose={() => setShowPDFPreview(false)}
+      title="Reporte Mensual"
+      content={pdfContent}
+      patientName="Juan Pérez"
+      professionalName="Prof. Ana Martínez"
+      date="Enero 2024"
+    />
+    </>
   )
 }

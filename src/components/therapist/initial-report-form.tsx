@@ -6,10 +6,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { FileText, Save, Send, AlertCircle } from "lucide-react"
+import { FileText, Save, Send, AlertCircle, Eye } from "lucide-react"
+import { PDFPreviewModal } from "@/components/ui/pdf-preview-modal"
+import { PDFContent } from "@/components/ui/pdf-generator"
+import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 
 export function InitialReportForm() {
+  const { getSignature } = useSignature()
+  const [showPDFPreview, setShowPDFPreview] = useState(false)
   const [formData, setFormData] = useState({
     patientName: "",
     dni: "",
@@ -91,14 +96,49 @@ export function InitialReportForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      // Aquí se enviaría el formulario
-      console.log("Formulario válido:", formData)
+      // Mostrar vista previa antes de enviar
+      setShowPDFPreview(true)
     }
   }
 
   const calculatedAge = calculateAge(formData.birthDate)
+  const signature = getSignature()
+
+  // Contenido para el PDF
+  const pdfContent = (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Datos del Paciente</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div><strong>Nombre:</strong> {formData.patientName}</div>
+          <div><strong>DNI:</strong> {formData.dni}</div>
+          <div><strong>Fecha de Nacimiento:</strong> {formData.birthDate}</div>
+          <div><strong>Edad:</strong> {calculatedAge}</div>
+        </div>
+        <div className="mt-4">
+          <p><strong>Diagnóstico (según CUD):</strong></p>
+          <p className="mt-2">{formData.diagnosis}</p>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Información Clínica</h3>
+        
+        <div className="mb-6">
+          <h4 className="font-semibold mb-2">Introducción:</h4>
+          <p>{formData.introduction}</p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">Caracterización:</h4>
+          <p>{formData.characterization}</p>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
+    <>
     <Card 
       className="w-full shadow-soft border-0"
       style={{ 
@@ -335,17 +375,33 @@ export function InitialReportForm() {
 
           {/* Botones de acción */}
           <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
-            <Button 
-              type="button"
-              variant="outline"
-              style={{
-                borderColor: colors.border,
-                color: colors.textSecondary
-              }}
-            >
-              <Save className="h-4 w-4 mr-2" />
-              Guardar Borrador
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                type="button"
+                variant="outline"
+                style={{
+                  borderColor: colors.border,
+                  color: colors.textSecondary
+                }}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Guardar Borrador
+              </Button>
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowPDFPreview(true)}
+                disabled={!formData.patientName}
+                style={{
+                  borderColor: colors.primary[300],
+                  color: colors.primary[600]
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Vista Previa
+              </Button>
+            </div>
 
             <Button
               type="submit"
@@ -361,5 +417,17 @@ export function InitialReportForm() {
         </form>
       </CardContent>
     </Card>
+
+    {/* Modal de Vista Previa PDF */}
+    <PDFPreviewModal
+      isOpen={showPDFPreview}
+      onClose={() => setShowPDFPreview(false)}
+      title="Informe Inicial"
+      content={pdfContent}
+      patientName={formData.patientName}
+      professionalName="Dr. María González" // Esto vendría del usuario logueado
+      date={formData.reportDate}
+    />
+    </>
   )
 }

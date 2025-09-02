@@ -4,12 +4,12 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Eye, EyeOff, CreditCard, Lock, User, Mail, UserPlus, Sparkles, Stethoscope, GraduationCap, BookOpen } from "lucide-react"
+import { Eye, EyeOff, CreditCard, Lock, User, Mail, UserPlus, Sparkles, PenTool } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FloatingCard, FloatingIcon, AnimatedBackground } from "@/components/ui/floating-elements"
+import { SignatureModal } from "@/components/ui/signature-modal"
 import PhoneInput from "react-phone-input-2"
 import "react-phone-input-2/lib/style.css"
 import Image from "next/image"
@@ -20,226 +20,191 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [phone, setPhone] = useState("")
+  const [showSignatureModal, setShowSignatureModal] = useState(false)
+  const [signature, setSignature] = useState<string | null>(null)
+  const [signatureName, setSignatureName] = useState("")
   const router = useRouter()
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    dni: "",
+    email: "",
+    role: "",
+    password: "",
+    confirmPassword: ""
+  })
+
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }))
+    }
+  }
+
+  const handleDniChange = (value: string) => {
+    const numericValue = value.replace(/\D/g, '')
+    handleInputChange('dni', numericValue)
+  }
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "El nombre es obligatorio"
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "El apellido es obligatorio"
+    }
+
+    if (!formData.dni.trim()) {
+      newErrors.dni = "El DNI es obligatorio"
+    } else if (formData.dni.length < 7 || formData.dni.length > 8) {
+      newErrors.dni = "El DNI debe tener entre 7 y 8 dígitos"
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "El email es obligatorio"
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "El email no es válido"
+    }
+
+    if (!phone.trim()) {
+      newErrors.phone = "El teléfono es obligatorio"
+    }
+
+    if (!formData.role) {
+      newErrors.role = "Debe seleccionar un rol"
+    }
+
+    if (!formData.password) {
+      newErrors.password = "La contraseña es obligatoria"
+    } else if (formData.password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres"
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Las contraseñas no coinciden"
+    }
+
+    if (!signature) {
+      newErrors.signature = "La firma digital es obligatoria"
+    }
+
+    if (!signatureName.trim()) {
+      newErrors.signatureName = "La aclaración de firma es obligatoria"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSignatureConfirm = (signatureData: string, name: string) => {
+    setSignature(signatureData)
+    setSignatureName(name)
+    setShowSignatureModal(false)
+    // Limpiar errores relacionados con la firma
+    setErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors.signature
+      delete newErrors.signatureName
+      return newErrors
+    })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    
-    // Simular registro
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Redirigir al login después del registro
-    router.push('/login')
-    setIsLoading(false)
+    if (validateForm()) {
+      setIsLoading(true)
+      
+      // Simular registro con firma
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Guardar firma en localStorage para uso posterior
+      if (signature && signatureName) {
+        localStorage.setItem('userSignature', JSON.stringify({
+          signature,
+          name: signatureName,
+          timestamp: new Date().toISOString()
+        }))
+      }
+      
+      router.push('/login')
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Lado izquierdo - Imagen y elementos flotantes */}
-      <div 
-        className="hidden lg:flex lg:w-3/5 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${colors.secondary[500]}20 0%, ${colors.accent[500]}15 50%, ${colors.primary[500]}20 100%)`,
-          backgroundColor: colors.secondary[50]
-        }}
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: colors.background }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-2xl"
       >
-        {/* Imagen de fondo difuminada - aquí puedes poner tu imagen */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{
-            backgroundImage: "url('https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')",
-            filter: "blur(2px)"
+        <Card 
+          className="border-0 shadow-xl"
+          style={{ 
+            backgroundColor: colors.surface,
+            boxShadow: `0 20px 40px ${colors.shadowLarge}`
           }}
-        />
-        
-        {/* Overlay gradient */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(135deg, ${colors.secondary[500]}40 0%, ${colors.accent[500]}30 50%, ${colors.primary[500]}40 100%)`
-          }}
-        />
+        >
+          <CardHeader className="space-y-4 text-center pb-8">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="w-40 h-28 relative mx-auto mb-4"
+            >
+              <Image
+                src="/LogotipoFinalWEBJPEG.png"
+                alt="Andamiaje Logo"
+                fill
+                className="object-contain"
+              />
+            </motion.div>
+            
+            <div className="space-y-2">
+              <CardTitle 
+                className="text-3xl font-display font-bold flex items-center justify-center gap-2"
+                style={{ color: colors.text }}
+              >
+                <UserPlus className="h-6 w-6" style={{ color: colors.secondary[500] }} />
+                Registro Profesional
+              </CardTitle>
+              <CardDescription 
+                className="text-base"
+                style={{ color: colors.textMuted }}
+              >
+                Complete sus datos para unirse a nuestra plataforma
+              </CardDescription>
+            </div>
+          </CardHeader>
 
-        {/* Elementos flotantes animados */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <FloatingIcon
-            icon={
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Datos Personales */}
               <div 
-                className="w-16 h-16 rounded-full opacity-20"
-                style={{ backgroundColor: colors.secondary[300] }}
-              />
-            }
-            className="top-32 left-24"
-            delay={0}
-            duration={4500}
-          />
-          <FloatingIcon
-            icon={
-              <div 
-                className="w-20 h-20 rounded-full opacity-15"
-                style={{ backgroundColor: colors.accent[300] }}
-              />
-            }
-            className="top-20 right-40"
-            delay={1500}
-            duration={5500}
-          />
-          <FloatingIcon
-            icon={
-              <div 
-                className="w-12 h-12 rounded-full opacity-25"
-                style={{ backgroundColor: colors.primary[300] }}
-              />
-            }
-            className="bottom-40 left-32"
-            delay={2500}
-            duration={4000}
-          />
-        </div>
-
-        {/* Contenido central flotante */}
-        <div className="relative z-10 flex items-center justify-center w-full p-12">
-          <div className="text-center max-w-lg">
-            <FloatingCard delay={200}>
-              <div 
-                className="glass rounded-2xl p-8 backdrop-blur-xl"
-                style={{
-                  background: `rgba(255, 255, 255, 0.15)`,
-                  border: `1px solid rgba(255, 255, 255, 0.2)`,
-                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.1)`
+                className="p-6 rounded-lg border-l-4 space-y-4"
+                style={{ 
+                  backgroundColor: colors.primary[50],
+                  borderLeftColor: colors.primary[500]
                 }}
               >
-                <motion.h1 
-                  className="text-4xl font-serif font-bold mb-4"
-                  style={{ color: colors.text }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                  Únete a Nuestro Equipo
-                </motion.h1>
-                
-                <motion.p 
-                  className="text-lg mb-8 leading-relaxed"
-                  style={{ color: colors.textSecondary }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.8 }}
-                >
-                  Forma parte de una comunidad dedicada al crecimiento y desarrollo integral
-                </motion.p>
+                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                  Datos Personales
+                </h3>
 
-                <motion.div 
-                  className="grid grid-cols-1 gap-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9, duration: 0.8 }}
-                >
-                  <FloatingCard delay={1000}>
-                    <div 
-                      className="flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium"
-                      style={{
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
-                      }}
-                    >
-                      <Stethoscope className="w-4 h-4" style={{ color: colors.primary[500] }} />
-                      Profesionales de la Salud
-                    </div>
-                  </FloatingCard>
-                  
-                  <FloatingCard delay={1200}>
-                    <div 
-                      className="flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium"
-                      style={{
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
-                      }}
-                    >
-                      <GraduationCap className="w-4 h-4" style={{ color: colors.secondary[500] }} />
-                      Acompañantes Educativos
-                    </div>
-                  </FloatingCard>
-                  
-                  <FloatingCard delay={1400}>
-                    <div 
-                      className="flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium"
-                      style={{
-                        backgroundColor: colors.surface,
-                        color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
-                      }}
-                    >
-                      <BookOpen className="w-4 h-4" style={{ color: colors.accent[500] }} />
-                      Especialistas en Desarrollo
-                    </div>
-                  </FloatingCard>
-                </motion.div>
-              </div>
-            </FloatingCard>
-          </div>
-        </div>
-      </div>
-
-      {/* Lado derecho - Formulario de registro */}
-      <div 
-        className="w-full lg:w-2/5 flex items-center justify-center p-8"
-        style={{ backgroundColor: colors.background }}
-      >
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-md"
-        >
-          <Card 
-            className="border-0 shadow-xl"
-            style={{ 
-              backgroundColor: colors.surface,
-              boxShadow: `0 20px 40px ${colors.shadowLarge}`
-            }}
-          >
-            <CardHeader className="space-y-4 text-center pb-6">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="w-24 h-18 relative mx-auto mb-4"
-              >
-                <Image
-                  src="/LogotipoFinalWEBJPEG.png"
-                  alt="Andamiaje Logo"
-                  fill
-                  className="object-contain"
-                />
-              </motion.div>
-              
-              <div className="space-y-2">
-                <CardTitle 
-                  className="text-2xl font-display font-bold flex items-center justify-center gap-2"
-                  style={{ color: colors.text }}
-                >
-                  <UserPlus className="h-5 w-5" style={{ color: colors.secondary[500] }} />
-                  Crear cuenta
-                </CardTitle>
-                <CardDescription 
-                  className="text-base"
-                  style={{ color: colors.textMuted }}
-                >
-                  Únete a nuestra plataforma profesional
-                </CardDescription>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName" style={{ color: colors.text }}>
-                      Nombre
+                      Nombre *
                     </Label>
                     <div className="relative">
                       <User 
@@ -249,19 +214,27 @@ export default function RegisterPage() {
                       <Input
                         id="firstName"
                         placeholder="Juan"
-                        className="pl-10 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange('firstName', e.target.value)}
+                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.firstName ? 'border-red-500' : ''}`}
                         style={{
                           backgroundColor: colors.surface,
-                          borderColor: colors.border,
+                          borderColor: errors.firstName ? colors.error[500] : colors.border,
                           color: colors.text
                         }}
                         required
                       />
                     </div>
+                    {errors.firstName && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.firstName}
+                      </p>
+                    )}
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="lastName" style={{ color: colors.text }}>
-                      Apellido
+                      Apellido *
                     </Label>
                     <div className="relative">
                       <User 
@@ -271,21 +244,28 @@ export default function RegisterPage() {
                       <Input
                         id="lastName"
                         placeholder="Pérez"
-                        className="pl-10 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange('lastName', e.target.value)}
+                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.lastName ? 'border-red-500' : ''}`}
                         style={{
                           backgroundColor: colors.surface,
-                          borderColor: colors.border,
+                          borderColor: errors.lastName ? colors.error[500] : colors.border,
                           color: colors.text
                         }}
                         required
                       />
                     </div>
+                    {errors.lastName && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.lastName}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="dni" style={{ color: colors.text }}>
-                    DNI
+                    DNI *
                   </Label>
                   <div className="relative">
                     <CreditCard 
@@ -295,20 +275,28 @@ export default function RegisterPage() {
                     <Input
                       id="dni"
                       placeholder="12345678"
-                      className="pl-10 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      value={formData.dni}
+                      onChange={(e) => handleDniChange(e.target.value)}
+                      maxLength={8}
+                      className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.dni ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
                     />
                   </div>
+                  {errors.dni && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.dni}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email" style={{ color: colors.text }}>
-                    Correo electrónico
+                    Correo electrónico *
                   </Label>
                   <div className="relative">
                     <Mail 
@@ -319,46 +307,60 @@ export default function RegisterPage() {
                       id="email"
                       type="email"
                       placeholder="tu@email.com"
-                      className="pl-10 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.email ? 'border-red-500' : ''}`}
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.email ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
                     />
                   </div>
+                  {errors.email && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone" style={{ color: colors.text }}>
-                    Teléfono
+                    Teléfono *
                   </Label>
                   <PhoneInput
                     country={'ar'}
                     value={phone}
                     onChange={phone => setPhone(phone)}
-                    inputClass="!w-full !h-11 !pl-[48px] !rounded-lg !text-base !border-2"
+                    inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
                     containerClass="!w-full"
                     buttonClass="!border-0 !border-r !rounded-l-lg"
                     inputStyle={{
                       backgroundColor: colors.surface,
-                      borderColor: colors.border,
+                      borderColor: errors.phone ? colors.error[500] : colors.border,
                       color: colors.text
                     }}
                   />
+                  {errors.phone && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.phone}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="role" style={{ color: colors.text }}>
-                    Rol profesional
+                    Rol profesional *
                   </Label>
                   <select 
                     id="role"
-                    className="flex h-11 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 focus:scale-105"
+                    value={formData.role}
+                    onChange={(e) => handleInputChange('role', e.target.value)}
+                    className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${errors.role ? 'border-red-500' : ''}`}
                     style={{
                       backgroundColor: colors.surface,
-                      borderColor: colors.border,
+                      borderColor: errors.role ? colors.error[500] : colors.border,
                       color: colors.text
                     }}
                     required
@@ -366,12 +368,31 @@ export default function RegisterPage() {
                     <option value="">Seleccionar rol</option>
                     <option value="terapeuta">Terapeuta</option>
                     <option value="acompanante">Acompañante Externo</option>
+                    <option value="coordinador">Coordinador</option>
                   </select>
+                  {errors.role && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.role}
+                    </p>
+                  )}
                 </div>
+              </div>
+
+              {/* Credenciales */}
+              <div 
+                className="p-6 rounded-lg border-l-4 space-y-4"
+                style={{ 
+                  backgroundColor: colors.secondary[50],
+                  borderLeftColor: colors.secondary[500]
+                }}
+              >
+                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                  Credenciales de Acceso
+                </h3>
 
                 <div className="space-y-2">
                   <Label htmlFor="password" style={{ color: colors.text }}>
-                    Contraseña
+                    Contraseña *
                   </Label>
                   <div className="relative">
                     <Lock 
@@ -381,10 +402,12 @@ export default function RegisterPage() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      className="pl-10 pr-12 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.password ? 'border-red-500' : ''}`}
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.password ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
@@ -393,7 +416,7 @@ export default function RegisterPage() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-md"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -403,11 +426,16 @@ export default function RegisterPage() {
                       )}
                     </Button>
                   </div>
+                  {errors.password && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
-                    Confirmar contraseña
+                    Confirmar contraseña *
                   </Label>
                   <div className="relative">
                     <Lock 
@@ -417,10 +445,12 @@ export default function RegisterPage() {
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      className="pl-10 pr-12 h-11 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                      className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
@@ -429,7 +459,7 @@ export default function RegisterPage() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 rounded-md"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -439,72 +469,199 @@ export default function RegisterPage() {
                       )}
                     </Button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-sm" style={{ color: colors.error[500] }}>
+                      {errors.confirmPassword}
+                    </p>
+                  )}
                 </div>
+              </div>
 
+              {/* Firma Digital */}
+              <div 
+                className="p-6 rounded-lg border-l-4 space-y-4"
+                style={{ 
+                  backgroundColor: colors.accent[50],
+                  borderLeftColor: colors.accent[500]
+                }}
+              >
+                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                  Firma Digital
+                </h3>
+                
                 <div 
-                  className="flex items-start space-x-3 p-4 rounded-lg" 
-                  style={{ backgroundColor: colors.neutral[50] }}
+                  className="p-4 rounded-lg border-2 border-dashed"
+                  style={{ 
+                    backgroundColor: colors.warning[50],
+                    borderColor: colors.warning[300]
+                  }}
                 >
-                  <input
-                    id="terms"
-                    type="checkbox"
-                    className="mt-1 rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
-                    style={{ borderColor: colors.border }}
-                    required
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="terms" className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
-                      Acepto los{" "}
-                      <Link href="/terms" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
-                        términos y condiciones
-                      </Link>{" "}
-                      y la{" "}
-                      <Link href="/privacy" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
-                        política de privacidad
-                      </Link>
-                    </Label>
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: colors.warning[500] }} />
+                    <div className="text-sm space-y-1">
+                      <p className="font-medium" style={{ color: colors.warning[700] }}>
+                        Aviso Legal Importante
+                      </p>
+                      <p style={{ color: colors.warning[600] }}>
+                        Su firma digital será utilizada para validar documentos oficiales y reportes profesionales. 
+                        Esta firma tiene validez legal y será asociada permanentemente a su cuenta profesional.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 rounded-lg font-medium text-base transition-all duration-200 hover:scale-105 hover:shadow-medium"
-                  style={{
-                    backgroundColor: colors.secondary[500],
-                    color: colors.surface,
-                  }}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creando cuenta...
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>
+                      Firma Digital *
+                    </Label>
+                    <div 
+                      className={`border-2 rounded-lg p-4 transition-all duration-200 ${signature ? 'border-green-300 bg-green-50' : errors.signature ? 'border-red-500 bg-red-50' : 'border-dashed'}`}
+                      style={{ 
+                        borderColor: signature ? colors.success[300] : errors.signature ? colors.error[500] : colors.border,
+                        backgroundColor: signature ? colors.success[50] : errors.signature ? colors.error[50] : colors.surface
+                      }}
+                    >
+                      {signature ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium" style={{ color: colors.success[700] }}>
+                              ✓ Firma registrada correctamente
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowSignatureModal(true)}
+                              className="text-xs"
+                            >
+                              Cambiar firma
+                            </Button>
+                          </div>
+                          <div className="flex items-center justify-center p-4 bg-white rounded border">
+                            <img 
+                              src={signature} 
+                              alt="Firma digital" 
+                              className="max-h-16 max-w-full object-contain"
+                            />
+                          </div>
+                          <p className="text-sm text-center font-medium" style={{ color: colors.text }}>
+                            {signatureName}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center space-y-3">
+                          <PenTool className="h-8 w-8 mx-auto" style={{ color: colors.textMuted }} />
+                          <div>
+                            <p className="text-sm font-medium mb-1" style={{ color: colors.text }}>
+                              Registre su firma digital
+                            </p>
+                            <p className="text-xs" style={{ color: colors.textMuted }}>
+                              Esta firma será utilizada en todos sus documentos oficiales
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            onClick={() => setShowSignatureModal(true)}
+                            className="w-full"
+                            style={{
+                              backgroundColor: colors.accent[500],
+                              color: colors.surface
+                            }}
+                          >
+                            <PenTool className="h-4 w-4 mr-2" />
+                            Crear Firma Digital
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      Crear cuenta
-                    </div>
-                  )}
-                </Button>
-              </form>
-            </CardContent>
+                    {errors.signature && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.signature}
+                      </p>
+                    )}
+                    {errors.signatureName && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.signatureName}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-            <CardFooter className="justify-center pt-6">
-              <p className="text-sm" style={{ color: colors.textMuted }}>
-                ¿Ya tienes una cuenta?{" "}
-                <Link 
-                  href="/login" 
-                  className="font-medium hover:underline transition-colors duration-200"
-                  style={{ color: colors.primary[500] }}
-                >
-                  Inicia sesión aquí
-                </Link>
-              </p>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
+              {/* Términos y Condiciones */}
+              <div 
+                className="flex items-start space-x-3 p-6 rounded-lg" 
+                style={{ backgroundColor: colors.neutral[50] }}
+              >
+                <input
+                  id="terms"
+                  type="checkbox"
+                  className="mt-1 rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
+                  style={{ borderColor: colors.border }}
+                  required
+                />
+                <div className="flex-1">
+                  <Label htmlFor="terms" className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
+                    Acepto los{" "}
+                    <Link href="/terms" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
+                      términos y condiciones
+                    </Link>{" "}
+                    y la{" "}
+                    <Link href="/privacy" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
+                      política de privacidad
+                    </Link>
+                    . Confirmo que mi firma digital será utilizada para validar documentos oficiales.
+                  </Label>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full h-14 rounded-lg font-medium text-base transition-all duration-200 hover:scale-105 hover:shadow-medium"
+                style={{
+                  backgroundColor: colors.secondary[500],
+                  color: colors.surface,
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Creando cuenta...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5" />
+                    Crear Cuenta Profesional
+                  </div>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+
+          <CardFooter className="justify-center pt-6">
+            <p className="text-sm" style={{ color: colors.textMuted }}>
+              ¿Ya tienes una cuenta?{" "}
+              <Link 
+                href="/login" 
+                className="font-medium hover:underline transition-colors duration-200"
+                style={{ color: colors.primary[500] }}
+              >
+                Inicia sesión aquí
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+
+        {/* Modal de Firma */}
+        <SignatureModal
+          isOpen={showSignatureModal}
+          onClose={() => setShowSignatureModal(false)}
+          onConfirm={handleSignatureConfirm}
+          initialName={`${formData.firstName} ${formData.lastName}`.trim()}
+        />
+      </motion.div>
     </div>
   )
 }
