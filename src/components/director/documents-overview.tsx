@@ -93,7 +93,7 @@ export function DocumentsOverview() {
       status: "pending",
       priority: "high"
     }
-  ]
+  ])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
