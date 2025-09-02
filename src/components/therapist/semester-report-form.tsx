@@ -175,6 +175,7 @@ export default function SemesterReportForm() {
 
   return (
     <>
+      {/* Layout horizontal optimizado - 3 columnas */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Datos del Paciente */}
         <Card 
@@ -377,52 +378,53 @@ export default function SemesterReportForm() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="specialty" style={{ color: colors.text }}>
-                Especialidad *
-              </Label>
-              <Input 
-                id="specialty" 
-                placeholder="Terapia Ocupacional"
-                value={formData.specialty}
-                onChange={(e) => handleInputChange('specialty', e.target.value)}
-                className={`h-11 ${errors.specialty ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.specialty ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.specialty && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.specialty}
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="license" style={{ color: colors.text }}>
-                Matrícula *
-              </Label>
-              <Input 
-                id="license" 
-                placeholder="MP 12345"
-                value={formData.license}
-                onChange={(e) => handleInputChange('license', e.target.value)}
-                className={`h-11 ${errors.license ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.license ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.license && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.license}
-                </div>
-              )}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="specialty" style={{ color: colors.text }}>
+                  Especialidad *
+                </Label>
+                <Input 
+                  id="specialty" 
+                  placeholder="Terapia Ocupacional"
+                  value={formData.specialty}
+                  onChange={(e) => handleInputChange('specialty', e.target.value)}
+                  className={`h-11 ${errors.specialty ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.specialty ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.specialty && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.specialty}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="license" style={{ color: colors.text }}>
+                  Matrícula *
+                </Label>
+                <Input 
+                  id="license" 
+                  placeholder="MP 12345"
+                  value={formData.license}
+                  onChange={(e) => handleInputChange('license', e.target.value)}
+                  className={`h-11 ${errors.license ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.license ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.license && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.license}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">

@@ -304,16 +304,18 @@ h1, h2, h3, h4, h5, h6 {
   
   /* Mejorar tipografía en PDF */
   * {
-    font-family: "Arial", "Helvetica", sans-serif !important;
-    letter-spacing: 0.5px !important;
+    font-family: "Segoe UI", "Arial", "Helvetica Neue", "Helvetica", sans-serif !important;
+    letter-spacing: 0.3px !important;
+    word-spacing: 0.5px !important;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    letter-spacing: 0.8px !important;
-    word-spacing: 1px !important;
+    letter-spacing: 0.5px !important;
+    word-spacing: 0.8px !important;
   }
   
   p, div, span {
-    word-spacing: 0.5px !important;
+    word-spacing: 0.3px !important;
+    line-height: 1.5 !important;
   }
 }

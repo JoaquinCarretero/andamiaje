@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Users, Save, Send, Clock, AlertCircle, Eye } from "lucide-react"
+import { Users, Save, Send, AlertCircle, Eye } from "lucide-react"
 import { PDFPreviewModal } from "@/components/ui/pdf-preview-modal"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
@@ -83,6 +82,7 @@ export function MeetingMinutesForm() {
 
   return (
     <>
+      {/* Layout horizontal optimizado - 2 columnas */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Información de la Reunión */}
         <Card 
@@ -93,29 +93,15 @@ export function MeetingMinutesForm() {
           }}
         >
           <CardHeader className="pb-4">
-            <div className="flex items-center justify-between">
-              <CardTitle 
-                className="text-lg border-l-4 pl-4"
-                style={{ 
-                  color: colors.text,
-                  borderLeftColor: colors.primary[500]
-                }}
-              >
-                Información de la Reunión
-              </CardTitle>
-              <Badge 
-                variant="outline" 
-                className="flex items-center gap-1"
-                style={{ 
-                  backgroundColor: colors.accent[50], 
-                  color: colors.accent[700],
-                  borderColor: colors.accent[200]
-                }}
-              >
-                <Clock className="h-3 w-3" />
-                En progreso
-              </Badge>
-            </div>
+            <CardTitle 
+              className="text-lg border-l-4 pl-4"
+              style={{ 
+                color: colors.text,
+                borderLeftColor: colors.primary[500]
+              }}
+            >
+              Información de la Reunión
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">

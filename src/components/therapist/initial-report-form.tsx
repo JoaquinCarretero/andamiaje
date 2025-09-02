@@ -135,6 +135,7 @@ export function InitialReportForm() {
 
   return (
     <>
+      {/* Layout horizontal optimizado - 2 columnas */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Datos del Paciente */}
         <Card 

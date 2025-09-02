@@ -197,7 +197,7 @@ export function PDFPreviewModal({
               {/* Firma */}
               {storedSignature && (
                 <div className="mt-16 pt-8 border-t-2" style={{ borderColor: colors.border }}>
-                  <div className="flex justify-center">
+                  <div className="flex justify-center mb-8">
                     <div className="flex items-end gap-16 w-full max-w-2xl">
                       <div className="flex-1 text-center">
                         <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
@@ -218,7 +218,7 @@ export function PDFPreviewModal({
                     </div>
                   </div>
                   
-                  <div className="mt-8 text-center">
+                  <div className="text-center">
                     <p className="text-xs text-gray-500">
                       Documento firmado digitalmente el {new Date().toLocaleDateString('es-AR')} a las {new Date().toLocaleTimeString('es-AR')}
                     </p>
