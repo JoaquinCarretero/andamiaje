@@ -189,29 +189,22 @@ export default function RegisterPage() {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Layout horizontal optimizado - 2 columnas principales */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Layout horizontal optimizado - 3 columnas como en la imagen */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Datos Personales */}
-                <Card 
-                  className="shadow-soft border-0"
+                <div 
+                  className="p-6 rounded-lg border-l-4 space-y-4"
                   style={{ 
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border 
+                    backgroundColor: colors.primary[50],
+                    borderLeftColor: colors.primary[500]
                   }}
                 >
-                  <CardHeader className="pb-4">
-                    <CardTitle 
-                      className="text-lg border-l-4 pl-4"
-                      style={{ 
-                        color: colors.text,
-                        borderLeftColor: colors.primary[500]
-                      }}
-                    >
-                      Datos Personales
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                    Datos Personales
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="firstName" style={{ color: colors.text }}>
                           Nombre *
@@ -271,9 +264,7 @@ export default function RegisterPage() {
                           </p>
                         )}
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="dni" style={{ color: colors.text }}>
                           DNI *
@@ -332,9 +323,7 @@ export default function RegisterPage() {
                           </p>
                         )}
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="email" style={{ color: colors.text }}>
                           Correo electrónico *
@@ -365,6 +354,7 @@ export default function RegisterPage() {
                           </p>
                         )}
                       </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="phone" style={{ color: colors.text }}>
                           Teléfono *
@@ -389,29 +379,22 @@ export default function RegisterPage() {
                         )}
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {/* Credenciales de Acceso */}
-                <Card 
-                  className="shadow-soft border-0"
+                <div 
+                  className="p-6 rounded-lg border-l-4 space-y-4"
                   style={{ 
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border 
+                    backgroundColor: colors.secondary[50],
+                    borderLeftColor: colors.secondary[500]
                   }}
                 >
-                  <CardHeader className="pb-4">
-                    <CardTitle 
-                      className="text-lg border-l-4 pl-4"
-                      style={{ 
-                        color: colors.text,
-                        borderLeftColor: colors.secondary[500]
-                      }}
-                    >
-                      Credenciales de Acceso
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                  <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                    Credenciales de Acceso
+                  </h3>
+
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="password" style={{ color: colors.text }}>
                         Contraseña *
@@ -497,30 +480,21 @@ export default function RegisterPage() {
                         </p>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </div>
 
-              {/* Firma Digital - Ancho completo para resaltar importancia */}
-              <Card 
-                className="shadow-soft border-0"
-                style={{ 
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border 
-                }}
-              >
-                <CardHeader className="pb-4">
-                  <CardTitle 
-                    className="text-lg border-l-4 pl-4"
-                    style={{ 
-                      color: colors.text,
-                      borderLeftColor: colors.accent[500]
-                    }}
-                  >
+                {/* Firma Digital */}
+                <div 
+                  className="p-6 rounded-lg border-l-4 space-y-4"
+                  style={{ 
+                    backgroundColor: colors.accent[50],
+                    borderLeftColor: colors.accent[500]
+                  }}
+                >
+                  <h3 className="font-medium text-lg" style={{ color: colors.text }}>
                     Firma Digital
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </h3>
+                  
                   <div 
                     className="p-4 rounded-lg border-2 border-dashed"
                     style={{ 
@@ -542,83 +516,85 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>
-                      Firma Digital *
-                    </Label>
-                    <div 
-                      className={`border-2 rounded-lg p-4 transition-all duration-200 ${signature ? 'border-green-300 bg-green-50' : errors.signature ? 'border-red-500 bg-red-50' : 'border-dashed'}`}
-                      style={{ 
-                        borderColor: signature ? colors.success[300] : errors.signature ? colors.error[500] : colors.border,
-                        backgroundColor: signature ? colors.success[50] : errors.signature ? colors.error[50] : colors.surface
-                      }}
-                    >
-                      {signature ? (
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium" style={{ color: colors.success[700] }}>
-                              ✓ Firma registrada correctamente
-                            </span>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label style={{ color: colors.text }}>
+                        Firma Digital *
+                      </Label>
+                      <div 
+                        className={`border-2 rounded-lg p-4 transition-all duration-200 ${signature ? 'border-green-300 bg-green-50' : errors.signature ? 'border-red-500 bg-red-50' : 'border-dashed'}`}
+                        style={{ 
+                          borderColor: signature ? colors.success[300] : errors.signature ? colors.error[500] : colors.border,
+                          backgroundColor: signature ? colors.success[50] : errors.signature ? colors.error[50] : colors.surface
+                        }}
+                      >
+                        {signature ? (
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium" style={{ color: colors.success[700] }}>
+                                ✓ Firma registrada correctamente
+                              </span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowSignatureModal(true)}
+                                className="text-xs"
+                              >
+                                Cambiar firma
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-center p-4 bg-white rounded border">
+                              <img 
+                                src={signature} 
+                                alt="Firma digital" 
+                                className="max-h-16 max-w-full object-contain"
+                              />
+                            </div>
+                            <p className="text-sm text-center font-medium" style={{ color: colors.text }}>
+                              {signatureName}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="text-center space-y-3">
+                            <PenTool className="h-8 w-8 mx-auto" style={{ color: colors.textMuted }} />
+                            <div>
+                              <p className="text-sm font-medium mb-1" style={{ color: colors.text }}>
+                                Registre su firma digital
+                              </p>
+                              <p className="text-xs" style={{ color: colors.textMuted }}>
+                                Esta firma será utilizada en todos sus documentos oficiales
+                              </p>
+                            </div>
                             <Button
                               type="button"
-                              variant="outline"
-                              size="sm"
                               onClick={() => setShowSignatureModal(true)}
-                              className="text-xs"
+                              className="w-full"
+                              style={{
+                                backgroundColor: colors.accent[500],
+                                color: colors.surface
+                              }}
                             >
-                              Cambiar firma
+                              <PenTool className="h-4 w-4 mr-2" />
+                              Crear Firma Digital
                             </Button>
                           </div>
-                          <div className="flex items-center justify-center p-4 bg-white rounded border">
-                            <img 
-                              src={signature} 
-                              alt="Firma digital" 
-                              className="max-h-16 max-w-full object-contain"
-                            />
-                          </div>
-                          <p className="text-sm text-center font-medium" style={{ color: colors.text }}>
-                            {signatureName}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="text-center space-y-3">
-                          <PenTool className="h-8 w-8 mx-auto" style={{ color: colors.textMuted }} />
-                          <div>
-                            <p className="text-sm font-medium mb-1" style={{ color: colors.text }}>
-                              Registre su firma digital
-                            </p>
-                            <p className="text-xs" style={{ color: colors.textMuted }}>
-                              Esta firma será utilizada en todos sus documentos oficiales
-                            </p>
-                          </div>
-                          <Button
-                            type="button"
-                            onClick={() => setShowSignatureModal(true)}
-                            className="w-full"
-                            style={{
-                              backgroundColor: colors.accent[500],
-                              color: colors.surface
-                            }}
-                          >
-                            <PenTool className="h-4 w-4 mr-2" />
-                            Crear Firma Digital
-                          </Button>
-                        </div>
+                        )}
+                      </div>
+                      {errors.signature && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.signature}
+                        </p>
+                      )}
+                      {errors.signatureName && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.signatureName}
+                        </p>
                       )}
                     </div>
-                    {errors.signature && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.signature}
-                      </p>
-                    )}
-                    {errors.signatureName && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.signatureName}
-                      </p>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* Términos y Condiciones */}
               <div 
