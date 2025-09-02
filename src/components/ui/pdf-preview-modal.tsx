@@ -147,9 +147,10 @@ export function PDFPreviewModal({
               ref={contentRef}
               className="p-8 bg-white"
               style={{ 
-                fontFamily: 'Arial, sans-serif',
+                fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
                 lineHeight: '1.6',
-                color: '#000000'
+                color: '#000000',
+                letterSpacing: '0.3px'
               }}
             >
               {/* Header del documento */}
@@ -198,24 +199,19 @@ export function PDFPreviewModal({
               {/* Firma */}
               {storedSignature && (
                 <div className="mt-12 pt-8 border-t-2" style={{ borderColor: colors.border }}>
-                  <div className="grid grid-cols-2 gap-8">
-                    <div className="text-center">
-                      <div className="border-b-2 pb-2 mb-2" style={{ borderColor: colors.text }}>
+                  <div className="flex justify-center">
+                    <div className="text-center w-80">
+                      <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
                         <img 
                           src={storedSignature.signature} 
                           alt="Firma digital" 
-                          className="max-h-16 mx-auto object-contain"
+                          className="max-h-16 max-w-full object-contain"
                         />
                       </div>
-                      <p className="text-sm font-medium">Firma del Profesional</p>
-                      <p className="text-xs text-gray-600 mt-1">{storedSignature.name}</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="border-b-2 pb-2 mb-2 h-16 flex items-end" style={{ borderColor: colors.text }}>
-                        <p className="text-sm font-medium w-full">{storedSignature.name}</p>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">Firma del Profesional</p>
+                        <p className="text-xs text-gray-600">{storedSignature.name}</p>
                       </div>
-                      <p className="text-sm font-medium">Aclaración</p>
-                      <p className="text-xs text-gray-600 mt-1">Nombre y Apellido</p>
                     </div>
                   </div>
                   
@@ -224,7 +220,7 @@ export function PDFPreviewModal({
                       Documento firmado digitalmente el {new Date().toLocaleDateString('es-AR')} a las {new Date().toLocaleTimeString('es-AR')}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Esta firma digital tiene validez legal según la normativa vigente
+                      Esta firma digital tiene validez legal según la Ley 25.506 de Firma Digital
                     </p>
                   </div>
                 </div>

@@ -558,8 +558,9 @@ export default function SemesterReportForm() {
                 onClick={() => setShowPDFPreview(true)}
                 disabled={!formData.patientName || !formData.professionalName}
                 style={{
-                  borderColor: colors.primary[300],
-                  color: colors.primary[600]
+                  borderColor: colors.border,
+                  color: colors.textSecondary,
+                  backgroundColor: colors.surface
                 }}
               >
                 <Eye className="h-4 w-4 mr-2" />

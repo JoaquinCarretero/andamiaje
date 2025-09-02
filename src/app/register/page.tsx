@@ -263,35 +263,65 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="dni" style={{ color: colors.text }}>
-                    DNI *
-                  </Label>
-                  <div className="relative">
-                    <CreditCard 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                      style={{ color: colors.textMuted }}
-                    />
-                    <Input
-                      id="dni"
-                      placeholder="12345678"
-                      value={formData.dni}
-                      onChange={(e) => handleDniChange(e.target.value)}
-                      maxLength={8}
-                      className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dni" style={{ color: colors.text }}>
+                      DNI *
+                    </Label>
+                    <div className="relative">
+                      <CreditCard 
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                        style={{ color: colors.textMuted }}
+                      />
+                      <Input
+                        id="dni"
+                        placeholder="12345678"
+                        value={formData.dni}
+                        onChange={(e) => handleDniChange(e.target.value)}
+                        maxLength={8}
+                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: errors.dni ? colors.error[500] : colors.border,
+                          color: colors.text
+                        }}
+                        required
+                      />
+                    </div>
+                    {errors.dni && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.dni}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="role" style={{ color: colors.text }}>
+                      Rol profesional *
+                    </Label>
+                    <select 
+                      id="role"
+                      value={formData.role}
+                      onChange={(e) => handleInputChange('role', e.target.value)}
+                      className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${errors.role ? 'border-red-500' : ''}`}
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: errors.dni ? colors.error[500] : colors.border,
+                        borderColor: errors.role ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
-                    />
+                    >
+                      <option value="">Seleccionar rol</option>
+                      <option value="terapeuta">Terapeuta</option>
+                      <option value="acompanante">Acompañante Externo</option>
+                      <option value="coordinador">Coordinador</option>
+                    </select>
+                    {errors.role && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.role}
+                      </p>
+                    )}
                   </div>
-                  {errors.dni && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.dni}
-                    </p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -348,34 +378,6 @@ export default function RegisterPage() {
                     </p>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="role" style={{ color: colors.text }}>
-                    Rol profesional *
-                  </Label>
-                  <select 
-                    id="role"
-                    value={formData.role}
-                    onChange={(e) => handleInputChange('role', e.target.value)}
-                    className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${errors.role ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.role ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                    required
-                  >
-                    <option value="">Seleccionar rol</option>
-                    <option value="terapeuta">Terapeuta</option>
-                    <option value="acompanante">Acompañante Externo</option>
-                    <option value="coordinador">Coordinador</option>
-                  </select>
-                  {errors.role && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.role}
-                    </p>
-                  )}
-                </div>
               </div>
 
               {/* Credenciales */}
@@ -390,90 +392,92 @@ export default function RegisterPage() {
                   Credenciales de Acceso
                 </h3>
 
-                <div className="space-y-2">
-                  <Label htmlFor="password" style={{ color: colors.text }}>
-                    Contraseña *
-                  </Label>
-                  <div className="relative">
-                    <Lock 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                      style={{ color: colors.textMuted }}
-                    />
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.password ? 'border-red-500' : ''}`}
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: errors.password ? colors.error[500] : colors.border,
-                        color: colors.text
-                      }}
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
-                      ) : (
-                        <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
-                      )}
-                    </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" style={{ color: colors.text }}>
+                      Contraseña *
+                    </Label>
+                    <div className="relative">
+                      <Lock 
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                        style={{ color: colors.textMuted }}
+                      />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.password ? 'border-red-500' : ''}`}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: errors.password ? colors.error[500] : colors.border,
+                          color: colors.text
+                        }}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        ) : (
+                          <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        )}
+                      </Button>
+                    </div>
+                    {errors.password && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.password}
+                      </p>
+                    )}
                   </div>
-                  {errors.password && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
-                    Confirmar contraseña *
-                  </Label>
-                  <div className="relative">
-                    <Lock 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                      style={{ color: colors.textMuted }}
-                    />
-                    <Input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
-                        color: colors.text
-                      }}
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
-                      ) : (
-                        <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
-                      )}
-                    </Button>
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
+                      Confirmar contraseña *
+                    </Label>
+                    <div className="relative">
+                      <Lock 
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                        style={{ color: colors.textMuted }}
+                      />
+                      <Input
+                        id="confirmPassword"
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={formData.confirmPassword}
+                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
+                          color: colors.text
+                        }}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        ) : (
+                          <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        )}
+                      </Button>
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.confirmPassword}
+                      </p>
+                    )}
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.confirmPassword}
-                    </p>
-                  )}
                 </div>
               </div>
 

@@ -24,10 +24,11 @@ export function PDFContent({
     <div 
       className="bg-white p-8 min-h-[297mm]"
       style={{ 
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
         lineHeight: '1.6',
         color: '#000000',
-        fontSize: '14px'
+        fontSize: '14px',
+        letterSpacing: '0.3px'
       }}
     >
       {/* Header del documento */}
