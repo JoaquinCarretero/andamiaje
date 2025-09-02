@@ -128,7 +128,8 @@ export function MeetingMinutesForm() {
               Información de la Reunión
             </h3>
 
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="md:col-span-2 lg:col-span-3 space-y-2">
               <Label htmlFor="patient-name" style={{ color: colors.text }}>
                 Paciente *
               </Label>
@@ -177,9 +178,8 @@ export function MeetingMinutesForm() {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="modality" style={{ color: colors.text }}>
                   Modalidad *
-                </Label>
+            <div className="md:col-span-2 lg:col-span-3 space-y-2">
                 <select 
                   id="modality"
                   value={formData.modality}
@@ -201,9 +201,8 @@ export function MeetingMinutesForm() {
                     {errors.modality}
                   </div>
                 )}
-              </div>
             </div>
-
+            </div>
             <div className="space-y-2">
               <Label htmlFor="subject" style={{ color: colors.text }}>
                 Asunto *
@@ -230,6 +229,7 @@ export function MeetingMinutesForm() {
                 Incluye todos los detalles relevantes sobre el propósito y contenido de la reunión
               </p>
             </div>
+          </div>
           </div>
 
           {/* Botones de acción */}

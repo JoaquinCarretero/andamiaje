@@ -28,7 +28,7 @@ export function PDFContent({
         lineHeight: '1.6',
         color: '#000000',
         fontSize: '14px',
-        letterSpacing: '0.3px'
+        letterSpacing: '0.5px'
       }}
     >
       {/* Header del documento */}
@@ -40,10 +40,10 @@ export function PDFContent({
             className="w-full h-full object-contain"
           />
         </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500] }}>
+        <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500], letterSpacing: '0.8px' }}>
           ANDAMIAJE - CENTRO DE REHABILITACIÓN
         </h1>
-        <h2 className="text-xl font-semibold" style={{ color: colors.text }}>
+        <h2 className="text-xl font-semibold" style={{ color: colors.text, letterSpacing: '0.6px' }}>
           {title}
         </h2>
       </div>
@@ -76,24 +76,24 @@ export function PDFContent({
       {/* Firma */}
       {signature && (
         <div className="mt-16 pt-8 border-t-2" style={{ borderColor: colors.border }}>
-          <div className="grid grid-cols-2 gap-8">
-            <div className="text-center">
-              <div className="border-b-2 pb-2 mb-2 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
-                <img 
-                  src={signature.signature} 
-                  alt="Firma digital" 
-                  className="max-h-16 max-w-full object-contain"
-                />
+          <div className="flex justify-center">
+            <div className="flex items-end gap-16 w-full max-w-2xl">
+              <div className="flex-1 text-center">
+                <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
+                  <img 
+                    src={signature.signature} 
+                    alt="Firma digital" 
+                    className="max-h-16 max-w-full object-contain"
+                  />
+                </div>
+                <p className="text-sm font-medium">Firma del Profesional</p>
               </div>
-              <p className="text-sm font-medium">Firma del Profesional</p>
-              <p className="text-xs text-gray-600 mt-1">{signature.name}</p>
-            </div>
-            <div className="text-center">
-              <div className="border-b-2 pb-2 mb-2 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
-                <p className="text-sm font-medium">{signature.name}</p>
+              <div className="flex-1 text-center">
+                <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
+                  <p className="text-sm font-medium">{signature.name}</p>
+                </div>
+                <p className="text-sm font-medium">Aclaración</p>
               </div>
-              <p className="text-sm font-medium">Aclaración</p>
-              <p className="text-xs text-gray-600 mt-1">Nombre y Apellido</p>
             </div>
           </div>
           

@@ -124,7 +124,7 @@ export function MonthlyReportForm() {
 
         {currentSection === 1 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
               <Label htmlFor="activities-performed">Actividades Realizadas</Label>
               <Textarea
@@ -165,7 +165,7 @@ export function MonthlyReportForm() {
 
         {currentSection === 2 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
               <Label htmlFor="academic-progress">Progreso Académico</Label>
               <Textarea
@@ -183,7 +183,7 @@ export function MonthlyReportForm() {
               />
             </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
               <Label htmlFor="social-progress">Progreso Social</Label>
               <Textarea
@@ -212,7 +212,7 @@ export function MonthlyReportForm() {
 
         {currentSection === 3 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
               <Label htmlFor="general-observations">Observaciones Generales</Label>
               <Textarea
@@ -230,7 +230,7 @@ export function MonthlyReportForm() {
               />
             </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
               <Label htmlFor="recommendations">Recomendaciones</Label>
               <Textarea

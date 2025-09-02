@@ -167,7 +167,8 @@ export function InitialReportForm() {
               Datos del Paciente
             </h3>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="md:col-span-2 lg:col-span-3 space-y-2">
               <Label htmlFor="patient-name" style={{ color: colors.text }}>
                 Paciente (Nombre Completo) *
               </Label>
@@ -189,9 +190,8 @@ export function InitialReportForm() {
                   {errors.patientName}
                 </div>
               )}
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="patient-dni" style={{ color: colors.text }}>
                   DNI (Número) *
@@ -239,9 +239,7 @@ export function InitialReportForm() {
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="patient-age" style={{ color: colors.text }}>
                   Edad
@@ -278,7 +276,7 @@ export function InitialReportForm() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="md:col-span-2 lg:col-span-3 space-y-2">
               <Label htmlFor="diagnosis-cud" style={{ color: colors.text }}>
                 Diagnóstico (según CUD) *
               </Label>
@@ -303,7 +301,6 @@ export function InitialReportForm() {
               <p className="text-xs" style={{ color: colors.textMuted }}>
                 Incluye toda la información relevante del CUD del paciente
               </p>
-            </div>
           </div>
 
           {/* Información Clínica */}
@@ -318,7 +315,7 @@ export function InitialReportForm() {
               Información Clínica
             </h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="introduction" style={{ color: colors.text }}>
                   Introducción *

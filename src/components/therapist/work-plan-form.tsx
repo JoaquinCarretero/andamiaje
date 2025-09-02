@@ -247,31 +247,30 @@ export function WorkPlanForm() {
               Datos del Paciente
             </h3>
 
-            <div className="space-y-2">
-              <Label htmlFor="patient-name" style={{ color: colors.text }}>
-                Paciente (Nombre Completo) *
-              </Label>
-              <Input 
-                id="patient-name" 
-                placeholder="Ej: Juan Carlos Pérez González"
-                value={formData.patientName}
-                onChange={(e) => handleInputChange('patientName', e.target.value)}
-                className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.patientName ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.patientName && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.patientName}
-                </div>
-              )}
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2 space-y-2">
+                <Label htmlFor="patient-name" style={{ color: colors.text }}>
+                  Paciente (Nombre Completo) *
+                </Label>
+                <Input 
+                  id="patient-name" 
+                  placeholder="Ej: Juan Carlos Pérez González"
+                  value={formData.patientName}
+                  onChange={(e) => handleInputChange('patientName', e.target.value)}
+                  className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.patientName ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.patientName && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.patientName}
+                  </div>
+                )}
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="patient-dni" style={{ color: colors.text }}>
                   DNI (Número) *
@@ -319,9 +318,6 @@ export function WorkPlanForm() {
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="patient-age" style={{ color: colors.text }}>
                   Edad
@@ -356,9 +352,8 @@ export function WorkPlanForm() {
                   }}
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
+            <div className="md:col-span-2 space-y-2">
               <Label htmlFor="diagnosis-cud" style={{ color: colors.text }}>
                 Diagnóstico (según CUD) *
               </Label>
@@ -380,7 +375,10 @@ export function WorkPlanForm() {
                   {errors.diagnosis}
                 </div>
               )}
-            </div>
+              <p className="text-xs" style={{ color: colors.textMuted }}>
+                Incluye toda la información relevante del CUD del paciente
+              </p>
+          </div>
           </div>
 
           {/* Datos del Profesional */}
@@ -395,7 +393,7 @@ export function WorkPlanForm() {
               Datos del Profesional
             </h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="professional-name" style={{ color: colors.text }}>
                   Profesional (Nombre Completo) *
@@ -443,9 +441,6 @@ export function WorkPlanForm() {
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="specialty" style={{ color: colors.text }}>
                   Especialidad *
@@ -469,6 +464,9 @@ export function WorkPlanForm() {
                   </div>
                 )}
               </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="license" style={{ color: colors.text }}>
                   Matrícula *
@@ -492,43 +490,29 @@ export function WorkPlanForm() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Plan de Trabajo */}
-          <div 
-            className="p-4 rounded-lg border-l-4 space-y-4"
-            style={{ 
-              backgroundColor: colors.secondary[50],
-              borderLeftColor: colors.secondary[500]
-            }}
-          >
-            <h3 className="font-medium" style={{ color: colors.text }}>
-              Plan de Trabajo
-            </h3>
-
-            <div className="space-y-2">
-              <Label htmlFor="rationale" style={{ color: colors.text }}>
-                Fundamentación *
-              </Label>
-              <Textarea
-                id="rationale"
-                placeholder="Describe la fundamentación teórica y práctica del plan de trabajo. Incluye el marco conceptual, metodología y justificación del abordaje propuesto..."
-                value={formData.rationale}
-                onChange={(e) => handleInputChange('rationale', e.target.value)}
-                className={`min-h-[120px] resize-none ${errors.rationale ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.rationale ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.rationale && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.rationale}
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="rationale" style={{ color: colors.text }}>
+                  Fundamentación *
+                </Label>
+                <Textarea
+                  id="rationale"
+                  placeholder="Describe la fundamentación teórica y práctica del plan de trabajo. Incluye el marco conceptual, metodología y justificación del abordaje propuesto..."
+                  value={formData.rationale}
+                  onChange={(e) => handleInputChange('rationale', e.target.value)}
+                  className={`min-h-[120px] resize-none ${errors.rationale ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.rationale ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.rationale && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.rationale}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Objetivos Generales */}
@@ -655,8 +639,8 @@ export function WorkPlanForm() {
                   {errors.approach}
                 </div>
               )}
-            </div>
           </div>
+        </div>
 
           {/* Botones de acción */}
           <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>

@@ -206,7 +206,8 @@ export default function SemesterReportForm() {
               Datos del Paciente
             </h3>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="md:col-span-2 lg:col-span-3 space-y-2">
               <Label htmlFor="patient-name" style={{ color: colors.text }}>
                 Paciente (Nombre Completo) *
               </Label>
@@ -228,9 +229,8 @@ export default function SemesterReportForm() {
                   {errors.patientName}
                 </div>
               )}
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="patient-dni" style={{ color: colors.text }}>
                   DNI (Número) *
@@ -278,9 +278,7 @@ export default function SemesterReportForm() {
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="patient-age" style={{ color: colors.text }}>
                   Edad
@@ -317,7 +315,7 @@ export default function SemesterReportForm() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="md:col-span-2 lg:col-span-3 space-y-2">
               <Label htmlFor="diagnosis-cud" style={{ color: colors.text }}>
                 Diagnóstico (según CUD) *
               </Label>
@@ -339,7 +337,6 @@ export default function SemesterReportForm() {
                   {errors.diagnosis}
                 </div>
               )}
-            </div>
           </div>
 
           {/* Datos del Profesional */}
@@ -354,7 +351,7 @@ export default function SemesterReportForm() {
               Datos del Profesional
             </h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="professional-name" style={{ color: colors.text }}>
                   Profesional (Nombre Completo) *
@@ -401,10 +398,8 @@ export default function SemesterReportForm() {
                     {errors.attentionPeriod}
                   </div>
                 )}
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="specialty" style={{ color: colors.text }}>
                   Especialidad *
@@ -428,6 +423,9 @@ export default function SemesterReportForm() {
                   </div>
                 )}
               </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="license" style={{ color: colors.text }}>
                   Matrícula *
@@ -451,6 +449,9 @@ export default function SemesterReportForm() {
                   </div>
                 )}
               </div>
+              <div className="space-y-2">
+                {/* Espacio para mantener alineación */}
+              </div>
             </div>
           </div>
 
@@ -466,7 +467,7 @@ export default function SemesterReportForm() {
               Información del Informe
             </h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="characterization" style={{ color: colors.text }}>
                   Caracterización *

@@ -203,6 +203,7 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
+                  <div className="space-y-2">
                     <Label htmlFor="firstName" style={{ color: colors.text }}>
                       Nombre *
                     </Label>
@@ -260,6 +261,7 @@ export default function RegisterPage() {
                         {errors.lastName}
                       </p>
                     )}
+                  </div>
                   </div>
                 </div>
 
@@ -324,7 +326,8 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                   <Label htmlFor="email" style={{ color: colors.text }}>
                     Correo electrónico *
                   </Label>
@@ -353,9 +356,9 @@ export default function RegisterPage() {
                       {errors.email}
                     </p>
                   )}
-                </div>
-
-                <div className="space-y-2">
+                  </div>
+                  </div>
+                  <div className="space-y-2">
                   <Label htmlFor="phone" style={{ color: colors.text }}>
                     Teléfono *
                   </Label>
@@ -377,6 +380,7 @@ export default function RegisterPage() {
                       {errors.phone}
                     </p>
                   )}
+                  </div>
                 </div>
               </div>
 

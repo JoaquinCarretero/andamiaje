@@ -90,7 +90,7 @@ export function InvoiceUpload() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="invoice-month" style={{ color: colors.text }}>
                   Mes de la Factura *
@@ -125,7 +125,7 @@ export function InvoiceUpload() {
                   </div>
                 )}
               </div>
-              <div className="space-y-2">
+              <div className="md:col-span-2 space-y-2">
                 <Label htmlFor="invoice-description" style={{ color: colors.text }}>
                   Descripción (Opcional)
                 </Label>
