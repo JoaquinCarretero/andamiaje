@@ -23,19 +23,9 @@ export function DirectorDashboard({ userData }: DirectorDashboardProps) {
     switch (currentView) {
       case "documents":
         return <DocumentsOverview />
-      case "staff":
-        return <StaffOverview />
-      case "stats":
-        return <SystemStats />
       default:
         return (
-          <div className="space-y-8">
-            <SystemStats />
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-              <DocumentsOverview />
-              <StaffOverview />
-            </div>
-          </div>
+          <DocumentsOverview />
         )
     }
   }

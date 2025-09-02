@@ -23,8 +23,6 @@ export function DirectorNavbar({ userData, currentView, onNavigate }: DirectorNa
   const navigationItems = [
     { id: "overview", title: "Vista General", icon: Home },
     { id: "documents", title: "Documentos", icon: FileText },
-    { id: "staff", title: "Personal", icon: Users },
-    { id: "stats", title: "Estadísticas", icon: BarChart3 },
   ]
 
   const handleMobileNavigation = (viewId: string) => {
