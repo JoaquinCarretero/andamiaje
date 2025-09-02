@@ -178,7 +178,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                 }}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver al Dashboard
+                Volver al Inicio
               </Button>
               
               <h1 className="font-display text-3xl lg:text-4xl font-bold" style={{ color: colors.text }}>

@@ -258,6 +258,7 @@ export default function LoginPage() {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
+                      placeholder="**********"
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 focus:scale-105"
                       style={{
                         backgroundColor: colors.surface,
