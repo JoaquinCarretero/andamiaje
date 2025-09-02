@@ -44,7 +44,7 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 scale-110"
           style={{
-            backgroundImage: "url('/LogotipoFinalWEBJPEG.png')",
+            backgroundImage: "url('/Gemini_Generated_Image_6h9jd6h9jd6h9jd6.png')",
             filter: "blur(2px)"
           }}
         />
@@ -193,7 +193,7 @@ export default function LoginPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="w-48 h-32 relative mx-auto mb-4 overflow-hidden"
+                className="w-64 h-40 relative mx-auto mb-0 overflow-hidden"
               >
                 <Image
                   src="/LogotipoFinalWEBJPEG.png"
