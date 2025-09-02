@@ -42,9 +42,9 @@ export default function LoginPage() {
       >
         {/* Imagen de fondo difuminada - aquí puedes poner tu imagen */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-30 scale-110"
           style={{
-            backgroundImage: "url('/LogotipoFinalWEBJPEG.jpg')",
+            backgroundImage: "url('/LogotipoFinalWEBJPEG.png')",
             filter: "blur(2px)"
           }}
         />
@@ -193,13 +193,13 @@ export default function LoginPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="w-48 h-32 relative mx-auto mb-4"
+                className="w-48 h-32 relative mx-auto mb-4 overflow-hidden"
               >
                 <Image
                   src="/LogotipoFinalWEBJPEG.png"
                   alt="Andamiaje Logo"
                   fill
-                  className="object-contain"
+                  className="object-contain scale-150"
                 />
               </motion.div>
               
