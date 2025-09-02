@@ -125,7 +125,7 @@ export function InvoiceUpload() {
                   </div>
                 )}
               </div>
-              <div className="md:col-span-2 space-y-2">
+              <div className="col-span-2 space-y-2">
                 <Label htmlFor="invoice-description" style={{ color: colors.text }}>
                   Descripción (Opcional)
                 </Label>

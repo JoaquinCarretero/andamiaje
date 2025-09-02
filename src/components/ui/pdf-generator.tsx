@@ -1,6 +1,7 @@
 "use client"
 
 import { StoredSignature } from "@/lib/signature-storage"
+import Image from "next/image"
 import colors from "@/lib/colors"
 
 interface PDFContentProps {
@@ -24,20 +25,22 @@ export function PDFContent({
     <div 
       className="bg-white p-8 min-h-[297mm]"
       style={{ 
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+        fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
         lineHeight: '1.6',
         color: '#000000',
         fontSize: '14px',
-        letterSpacing: '0.5px'
+        letterSpacing: '0.5px',
+        wordSpacing: '0.5px'
       }}
     >
       {/* Header del documento */}
       <div className="text-center mb-8 pb-6 border-b-2" style={{ borderColor: colors.primary[500] }}>
         <div className="w-32 h-24 relative mx-auto mb-4">
-          <img
+          <Image
             src="/LogotipoFinalWEBJPEG.png"
             alt="Andamiaje Logo"
-            className="w-full h-full object-contain"
+            fill
+            className="object-contain"
           />
         </div>
         <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500], letterSpacing: '0.8px' }}>

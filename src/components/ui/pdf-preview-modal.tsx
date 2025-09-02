@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { X, Download, FileText, PenTool } from "lucide-react"
+import { X, Download, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import Image from "next/image"
 import colors from "@/lib/colors"
 
 interface PDFPreviewModalProps {
@@ -30,7 +31,6 @@ export function PDFPreviewModal({
   const [isGenerating, setIsGenerating] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  // Obtener firma del localStorage
   const getStoredSignature = () => {
     try {
       const stored = localStorage.getItem('userSignature')
@@ -88,13 +88,11 @@ export function PDFPreviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Overlay */}
       <div 
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
       <Card 
         className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden border-0 shadow-2xl"
         style={{ 
@@ -147,10 +145,10 @@ export function PDFPreviewModal({
               ref={contentRef}
               className="p-8 bg-white"
               style={{ 
-                fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+                fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
                 lineHeight: '1.6',
                 color: '#000000',
-                letterSpacing: '0.3px'
+                letterSpacing: '0.5px'
               }}
             >
               {/* Header del documento */}
@@ -163,7 +161,7 @@ export function PDFPreviewModal({
                     className="object-contain"
                   />
                 </div>
-                <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500] }}>
+                <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500], letterSpacing: '0.8px' }}>
                   ANDAMIAJE - CENTRO DE REHABILITACIÓN
                 </h1>
                 <h2 className="text-xl font-semibold" style={{ color: colors.text, letterSpacing: '0.6px' }}>
@@ -234,114 +232,6 @@ export function PDFPreviewModal({
           </div>
         </CardContent>
       </Card>
-    </div>
-  )
-}
-
-interface PDFContentProps {
-  title: string
-  patientName: string
-  professionalName: string
-  date: string
-  content: React.ReactNode
-  signature?: StoredSignature | null
-}
-
-export function PDFContent({ 
-  title, 
-  patientName, 
-  professionalName, 
-  date, 
-  content, 
-  signature 
-}: PDFContentProps) {
-  return (
-    <div 
-      className="bg-white p-8 min-h-[297mm]"
-      style={{ 
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-        lineHeight: '1.6',
-        color: '#000000',
-        fontSize: '14px',
-        letterSpacing: '0.5px'
-      }}
-    >
-      {/* Header del documento */}
-      <div className="text-center mb-8 pb-6 border-b-2" style={{ borderColor: colors.primary[500] }}>
-        <div className="w-32 h-24 relative mx-auto mb-4">
-          <img
-            src="/LogotipoFinalWEBJPEG.png"
-            alt="Andamiaje Logo"
-            className="w-full h-full object-contain"
-          />
-        </div>
-        <h1 className="text-2xl font-bold mb-2" style={{ color: colors.primary[500], letterSpacing: '0.8px' }}>
-          ANDAMIAJE - CENTRO DE REHABILITACIÓN
-        </h1>
-        <h2 className="text-xl font-semibold" style={{ color: colors.text, letterSpacing: '0.6px' }}>
-          {title}
-        </h2>
-      </div>
-
-      {/* Información del documento */}
-      <div className="grid grid-cols-2 gap-4 mb-8 p-4 bg-gray-50 rounded">
-        <div>
-          <p className="text-sm font-medium text-gray-600">Paciente:</p>
-          <p className="font-semibold">{patientName}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-600">Fecha:</p>
-          <p className="font-semibold">{date}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-600">Profesional:</p>
-          <p className="font-semibold">{professionalName}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-600">Documento:</p>
-          <p className="font-semibold">{title}</p>
-        </div>
-      </div>
-
-      {/* Contenido del documento */}
-      <div className="mb-16">
-        {content}
-      </div>
-
-      {/* Firma */}
-      {signature && (
-        <div className="mt-16 pt-8 border-t-2" style={{ borderColor: colors.border }}>
-          <div className="flex justify-center">
-            <div className="flex items-end gap-16 w-full max-w-2xl">
-              <div className="flex-1 text-center">
-                <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
-                  <img 
-                    src={signature.signature} 
-                    alt="Firma digital" 
-                    className="max-h-16 max-w-full object-contain"
-                  />
-                </div>
-                <p className="text-sm font-medium">Firma del Profesional</p>
-              </div>
-              <div className="flex-1 text-center">
-                <div className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center" style={{ borderColor: colors.text }}>
-                  <p className="text-sm font-medium">{signature.name}</p>
-                </div>
-                <p className="text-sm font-medium">Aclaración</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <p className="text-xs text-gray-500">
-              Documento firmado digitalmente el {new Date().toLocaleDateString('es-AR')} a las {new Date().toLocaleTimeString('es-AR')}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Esta firma digital tiene validez legal según la Ley 25.506 de Firma Digital
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

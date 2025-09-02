@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Users, Save, Send, Clock, AlertCircle, Eye } from "lucide-react"
 import { PDFPreviewModal } from "@/components/ui/pdf-preview-modal"
-import { PDFContent } from "@/components/ui/pdf-generator"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 
@@ -58,14 +57,12 @@ export function MeetingMinutesForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      // Mostrar vista previa antes de enviar
       setShowPDFPreview(true)
     }
   }
 
   const signature = getSignature()
 
-  // Contenido para el PDF
   const pdfContent = (
     <div className="space-y-6">
       <div>
@@ -86,210 +83,210 @@ export function MeetingMinutesForm() {
 
   return (
     <>
-    <Card 
-      className="w-full shadow-soft border-0"
-      style={{ 
-        backgroundColor: colors.surface,
-        borderColor: colors.border 
-      }}
-    >
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" style={{ color: colors.primary[500] }} />
-            <span style={{ color: colors.text }}>Acta de Reunión</span>
-          </CardTitle>
-          <Badge 
-            variant="outline" 
-            className="flex items-center gap-1"
-            style={{ 
-              backgroundColor: colors.accent[50], 
-              color: colors.accent[700],
-              borderColor: colors.accent[200]
-            }}
-          >
-            <Clock className="h-3 w-3" />
-            En progreso
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Información de la Reunión */}
-          <div 
-            className="p-4 rounded-lg border-l-4 space-y-4"
-            style={{ 
-              backgroundColor: colors.primary[50],
-              borderLeftColor: colors.primary[500]
-            }}
-          >
-            <h3 className="font-medium" style={{ color: colors.text }}>
-              Información de la Reunión
-            </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="md:col-span-2 lg:col-span-3 space-y-2">
-              <Label htmlFor="patient-name" style={{ color: colors.text }}>
-                Paciente *
-              </Label>
-              <Input 
-                id="patient-name" 
-                placeholder="Ej: Juan Carlos Pérez González"
-                value={formData.patientName}
-                onChange={(e) => handleInputChange('patientName', e.target.value)}
-                className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.patientName ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.patientName && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.patientName}
-                </div>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="meeting-date" style={{ color: colors.text }}>
-                  Fecha *
-                </Label>
-                <Input 
-                  id="meeting-date" 
-                  type="date"
-                  value={formData.meetingDate}
-                  onChange={(e) => handleInputChange('meetingDate', e.target.value)}
-                  className={`h-11 ${errors.meetingDate ? 'border-red-500' : ''}`}
-                  style={{
-                    backgroundColor: colors.surface,
-                    borderColor: errors.meetingDate ? colors.error[500] : colors.border,
-                    color: colors.text
-                  }}
-                />
-                {errors.meetingDate && (
-                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.meetingDate}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                  Modalidad *
-            <div className="md:col-span-2 lg:col-span-3 space-y-2">
-                <select 
-                  id="modality"
-                  value={formData.modality}
-                  onChange={(e) => handleInputChange('modality', e.target.value)}
-                  className={`flex h-11 w-full rounded-md border px-3 py-2 text-sm transition-all duration-200 ${errors.modality ? 'border-red-500' : ''}`}
-                  style={{
-                    backgroundColor: colors.surface,
-                    borderColor: errors.modality ? colors.error[500] : colors.border,
-                    color: colors.text
-                  }}
-                >
-                  <option value="">Seleccionar modalidad</option>
-                  <option value="presencial">Presencial</option>
-                  <option value="virtual">Virtual</option>
-                </select>
-                {errors.modality && (
-                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                    <AlertCircle className="h-4 w-4" />
-                    {errors.modality}
-                  </div>
-                )}
-            </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="subject" style={{ color: colors.text }}>
-                Asunto *
-              </Label>
-              <Textarea
-                id="subject"
-                placeholder="Describe el asunto principal de la reunión, temas a tratar, objetivos de la reunión y cualquier información relevante sobre el propósito del encuentro..."
-                value={formData.subject}
-                onChange={(e) => handleInputChange('subject', e.target.value)}
-                className={`min-h-[140px] resize-none ${errors.subject ? 'border-red-500' : ''}`}
-                style={{
-                  backgroundColor: colors.surface,
-                  borderColor: errors.subject ? colors.error[500] : colors.border,
-                  color: colors.text
-                }}
-              />
-              {errors.subject && (
-                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                  <AlertCircle className="h-4 w-4" />
-                  {errors.subject}
-                </div>
-              )}
-              <p className="text-xs" style={{ color: colors.textMuted }}>
-                Incluye todos los detalles relevantes sobre el propósito y contenido de la reunión
-              </p>
-            </div>
-          </div>
-          </div>
-
-          {/* Botones de acción */}
-          <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
-            <div className="flex gap-2">
-              <Button 
-                type="button"
-                variant="outline"
-                style={{
-                  borderColor: colors.border,
-                  color: colors.textSecondary
-                }}
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Guardar Borrador
-              </Button>
-              
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowPDFPreview(true)}
-                disabled={!formData.patientName}
-                style={{
-                  borderColor: colors.border,
-                  color: colors.textSecondary,
-                  backgroundColor: colors.surface
-                }}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Vista Previa
-              </Button>
-            </div>
-
-            <Button
-              type="submit"
-              style={{
-                backgroundColor: colors.primary[500],
-                color: colors.surface
+      <Card 
+        className="w-full shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" style={{ color: colors.primary[500] }} />
+              <span style={{ color: colors.text }}>Acta de Reunión</span>
+            </CardTitle>
+            <Badge 
+              variant="outline" 
+              className="flex items-center gap-1"
+              style={{ 
+                backgroundColor: colors.accent[50], 
+                color: colors.accent[700],
+                borderColor: colors.accent[200]
               }}
             >
-              <Send className="h-4 w-4 mr-2" />
-              Finalizar Acta
-            </Button>
+              <Clock className="h-3 w-3" />
+              En progreso
+            </Badge>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        </CardHeader>
 
-    {/* Modal de Vista Previa PDF */}
-    <PDFPreviewModal
-      isOpen={showPDFPreview}
-      onClose={() => setShowPDFPreview(false)}
-      title="Acta de Reunión"
-      content={pdfContent}
-      patientName={formData.patientName}
-      professionalName="Dr. María González" // Esto vendría del usuario logueado
-      date={formData.meetingDate}
-    />
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Información de la Reunión */}
+            <div 
+              className="p-6 rounded-lg border-l-4 space-y-4"
+              style={{ 
+                backgroundColor: colors.primary[50],
+                borderLeftColor: colors.primary[500]
+              }}
+            >
+              <h3 className="font-medium text-lg" style={{ color: colors.text }}>
+                Información de la Reunión
+              </h3>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="patient-name" style={{ color: colors.text }}>
+                      Paciente *
+                    </Label>
+                    <Input 
+                      id="patient-name" 
+                      placeholder="Ej: Juan Carlos Pérez González"
+                      value={formData.patientName}
+                      onChange={(e) => handleInputChange('patientName', e.target.value)}
+                      className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
+                      style={{
+                        backgroundColor: colors.surface,
+                        borderColor: errors.patientName ? colors.error[500] : colors.border,
+                        color: colors.text
+                      }}
+                    />
+                    {errors.patientName && (
+                      <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                        <AlertCircle className="h-4 w-4" />
+                        {errors.patientName}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="meeting-date" style={{ color: colors.text }}>
+                        Fecha *
+                      </Label>
+                      <Input 
+                        id="meeting-date" 
+                        type="date"
+                        value={formData.meetingDate}
+                        onChange={(e) => handleInputChange('meetingDate', e.target.value)}
+                        className={`h-11 ${errors.meetingDate ? 'border-red-500' : ''}`}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: errors.meetingDate ? colors.error[500] : colors.border,
+                          color: colors.text
+                        }}
+                      />
+                      {errors.meetingDate && (
+                        <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                          <AlertCircle className="h-4 w-4" />
+                          {errors.meetingDate}
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="modality" style={{ color: colors.text }}>
+                        Modalidad *
+                      </Label>
+                      <select 
+                        id="modality"
+                        value={formData.modality}
+                        onChange={(e) => handleInputChange('modality', e.target.value)}
+                        className={`flex h-11 w-full rounded-md border px-3 py-2 text-sm transition-all duration-200 ${errors.modality ? 'border-red-500' : ''}`}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: errors.modality ? colors.error[500] : colors.border,
+                          color: colors.text
+                        }}
+                      >
+                        <option value="">Seleccionar modalidad</option>
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                      </select>
+                      {errors.modality && (
+                        <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                          <AlertCircle className="h-4 w-4" />
+                          {errors.modality}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="subject" style={{ color: colors.text }}>
+                    Asunto *
+                  </Label>
+                  <Textarea
+                    id="subject"
+                    placeholder="Describe el asunto principal de la reunión, temas a tratar, objetivos de la reunión..."
+                    value={formData.subject}
+                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    className={`min-h-[160px] resize-none ${errors.subject ? 'border-red-500' : ''}`}
+                    style={{
+                      backgroundColor: colors.surface,
+                      borderColor: errors.subject ? colors.error[500] : colors.border,
+                      color: colors.text
+                    }}
+                  />
+                  {errors.subject && (
+                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                      <AlertCircle className="h-4 w-4" />
+                      {errors.subject}
+                    </div>
+                  )}
+                  <p className="text-xs" style={{ color: colors.textMuted }}>
+                    Incluye todos los detalles relevantes sobre el propósito y contenido de la reunión
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
+              <div className="flex gap-2">
+                <Button 
+                  type="button"
+                  variant="outline"
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.textSecondary
+                  }}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Guardar Borrador
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowPDFPreview(true)}
+                  disabled={!formData.patientName}
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.textSecondary
+                  }}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Vista Previa
+                </Button>
+              </div>
+
+              <Button
+                type="submit"
+                style={{
+                  backgroundColor: colors.primary[500],
+                  color: colors.surface
+                }}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Finalizar Acta
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <PDFPreviewModal
+        isOpen={showPDFPreview}
+        onClose={() => setShowPDFPreview(false)}
+        title="Acta de Reunión"
+        content={pdfContent}
+        patientName={formData.patientName}
+        professionalName="Dr. María González"
+        date={formData.meetingDate}
+      />
     </>
-  )
-}
   )
 }

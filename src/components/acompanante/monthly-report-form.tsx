@@ -124,15 +124,15 @@ export function MonthlyReportForm() {
 
         {currentSection === 1 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
-              <Label htmlFor="activities-performed">Actividades Realizadas</Label>
-              <Textarea
-                id="activities-performed"
-                placeholder="Describe las actividades de acompañamiento realizadas durante el mes..."
-                className="min-h-[120px]"
-              />
-            </div>
+                <Label htmlFor="activities-performed">Actividades Realizadas</Label>
+                <Textarea
+                  id="activities-performed"
+                  placeholder="Describe las actividades de acompañamiento realizadas durante el mes..."
+                  className="min-h-[120px]"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="challenges-faced">Desafíos Enfrentados</Label>
                 <Textarea
@@ -142,7 +142,7 @@ export function MonthlyReportForm() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="academic-support">Apoyo Académico</Label>
                 <Textarea
@@ -165,33 +165,33 @@ export function MonthlyReportForm() {
 
         {currentSection === 2 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
-              <Label htmlFor="academic-progress">Progreso Académico</Label>
-              <Textarea
-                id="academic-progress"
-                placeholder="Evalúa el progreso académico del estudiante..."
-                className="min-h-[120px]"
-              />
-            </div>
-              <div className="space-y-2">
-              <Label htmlFor="behavioral-progress">Progreso Comportamental</Label>
-              <Textarea
-                id="behavioral-progress"
-                placeholder="Describe los cambios comportamentales observados..."
+                <Label htmlFor="academic-progress">Progreso Académico</Label>
+                <Textarea
+                  id="academic-progress"
+                  placeholder="Evalúa el progreso académico del estudiante..."
                   className="min-h-[120px]"
-              />
-            </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                />
+              </div>
               <div className="space-y-2">
-              <Label htmlFor="social-progress">Progreso Social</Label>
-              <Textarea
-                id="social-progress"
-                placeholder="Evalúa el desarrollo de habilidades sociales..."
+                <Label htmlFor="behavioral-progress">Progreso Comportamental</Label>
+                <Textarea
+                  id="behavioral-progress"
+                  placeholder="Describe los cambios comportamentales observados..."
                   className="min-h-[120px]"
-              />
+                />
+              </div>
             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="social-progress">Progreso Social</Label>
+                <Textarea
+                  id="social-progress"
+                  placeholder="Evalúa el desarrollo de habilidades sociales..."
+                  className="min-h-[120px]"
+                />
+              </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="attendance-rate">Tasa de Asistencia</Label>
@@ -212,33 +212,33 @@ export function MonthlyReportForm() {
 
         {currentSection === 3 && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
-              <Label htmlFor="general-observations">Observaciones Generales</Label>
-              <Textarea
-                id="general-observations"
-                placeholder="Comparte observaciones importantes del mes..."
-                className="min-h-[120px]"
-              />
-            </div>
-              <div className="space-y-2">
-              <Label htmlFor="family-communication">Comunicación con la Familia</Label>
-              <Textarea
-                id="family-communication"
-                placeholder="Describe la comunicación mantenida con la familia..."
+                <Label htmlFor="general-observations">Observaciones Generales</Label>
+                <Textarea
+                  id="general-observations"
+                  placeholder="Comparte observaciones importantes del mes..."
                   className="min-h-[120px]"
-              />
-            </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                />
+              </div>
               <div className="space-y-2">
-              <Label htmlFor="recommendations">Recomendaciones</Label>
-              <Textarea
-                id="recommendations"
-                placeholder="Proporciona recomendaciones para el próximo mes..."
+                <Label htmlFor="family-communication">Comunicación con la Familia</Label>
+                <Textarea
+                  id="family-communication"
+                  placeholder="Describe la comunicación mantenida con la familia..."
                   className="min-h-[120px]"
-              />
+                />
+              </div>
             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="recommendations">Recomendaciones</Label>
+                <Textarea
+                  id="recommendations"
+                  placeholder="Proporciona recomendaciones para el próximo mes..."
+                  className="min-h-[120px]"
+                />
+              </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="next-goals">Objetivos para el Próximo Mes</Label>
@@ -293,8 +293,7 @@ export function MonthlyReportForm() {
                 onClick={() => setShowPDFPreview(true)}
                 style={{
                   borderColor: colors.border,
-                  color: colors.textSecondary,
-                  backgroundColor: colors.surface
+                  color: colors.textSecondary
                 }}
               >
                 <Eye className="h-4 w-4 mr-2" />
