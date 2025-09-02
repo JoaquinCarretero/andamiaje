@@ -181,21 +181,16 @@ export default function RegisterPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="w-64 h-40 relative overflow-hidden" // mantiene el tamaño fijo
+              className="w-80 h-48 relative overflow-hidden" // mantiene el tamaño fijo
             >
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                className="absolute inset-0 flex items-center justify-center" // imagen centrada
-              >
+              <div className="absolute inset-0 flex items-center justify-center">
                 <Image
                   src="/LogotipoFinalWEBJPEG.png"
                   alt="Andamiaje Logo"
                   fill
                   className="object-contain"
                 />
-              </motion.div>
+              </div>
             </motion.div>
 
             <div className="text-right space-y-1">

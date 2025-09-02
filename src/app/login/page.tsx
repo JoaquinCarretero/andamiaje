@@ -44,7 +44,7 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
-            backgroundImage: "url('https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')",
+            backgroundImage: "url('/LogotipoFinalWEBJPEG.jpg')",
             filter: "blur(2px)"
           }}
         />
@@ -193,7 +193,7 @@ export default function LoginPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="w-32 h-24 relative mx-auto mb-4"
+                className="w-48 h-32 relative mx-auto mb-4"
               >
                 <Image
                   src="/LogotipoFinalWEBJPEG.png"

@@ -59,7 +59,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
             {/* Logo y nombre */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-32 h-12 relative">
+                <div className="w-40 h-16 relative">
                   <Image
                     src="/LogotipoFinalWEBJPEG.png"
                     alt="Andamiaje Logo"
