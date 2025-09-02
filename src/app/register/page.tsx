@@ -189,335 +189,359 @@ export default function RegisterPage() {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Datos Personales */}
-              <div 
-                className="p-6 rounded-lg border-l-4 space-y-4"
-                style={{ 
-                  backgroundColor: colors.primary[50],
-                  borderLeftColor: colors.primary[500]
-                }}
-              >
-                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                  Datos Personales
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName" style={{ color: colors.text }}>
-                      Nombre *
-                    </Label>
-                    <div className="relative">
-                      <User 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                        style={{ color: colors.textMuted }}
-                      />
-                      <Input
-                        id="firstName"
-                        placeholder="Juan"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.firstName ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.firstName ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                        required
-                      />
-                    </div>
-                    {errors.firstName && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.firstName}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName" style={{ color: colors.text }}>
-                      Apellido *
-                    </Label>
-                    <div className="relative">
-                      <User 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                        style={{ color: colors.textMuted }}
-                      />
-                      <Input
-                        id="lastName"
-                        placeholder="Pérez"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.lastName ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.lastName ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                        required
-                      />
-                    </div>
-                    {errors.lastName && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.lastName}
-                      </p>
-                    )}
-                  </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="dni" style={{ color: colors.text }}>
-                      DNI *
-                    </Label>
-                    <div className="relative">
-                      <CreditCard 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                        style={{ color: colors.textMuted }}
-                      />
-                      <Input
-                        id="dni"
-                        placeholder="12345678"
-                        value={formData.dni}
-                        onChange={(e) => handleDniChange(e.target.value)}
-                        maxLength={8}
-                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.dni ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                        required
-                      />
-                    </div>
-                    {errors.dni && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.dni}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="role" style={{ color: colors.text }}>
-                      Rol profesional *
-                    </Label>
-                    <select 
-                      id="role"
-                      value={formData.role}
-                      onChange={(e) => handleInputChange('role', e.target.value)}
-                      className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${errors.role ? 'border-red-500' : ''}`}
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: errors.role ? colors.error[500] : colors.border,
-                        color: colors.text
-                      }}
-                      required
-                    >
-                      <option value="">Seleccionar rol</option>
-                      <option value="terapeuta">Terapeuta</option>
-                      <option value="acompanante">Acompañante Externo</option>
-                      <option value="coordinador">Coordinador</option>
-                    </select>
-                    {errors.role && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.role}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                  <Label htmlFor="email" style={{ color: colors.text }}>
-                    Correo electrónico *
-                  </Label>
-                  <div className="relative">
-                    <Mail 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                      style={{ color: colors.textMuted }}
-                    />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.email ? 'border-red-500' : ''}`}
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: errors.email ? colors.error[500] : colors.border,
-                        color: colors.text
-                      }}
-                      required
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.email}
-                    </p>
-                  )}
-                  </div>
-                  <div className="space-y-2">
-                  <Label htmlFor="phone" style={{ color: colors.text }}>
-                    Teléfono *
-                  </Label>
-                  <PhoneInput
-                    country={'ar'}
-                    value={phone}
-                    onChange={phone => setPhone(phone)}
-                    inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
-                    containerClass="!w-full"
-                    buttonClass="!border-0 !border-r !rounded-l-lg"
-                    inputStyle={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.phone ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.phone && (
-                    <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.phone}
-                    </p>
-                  )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Credenciales */}
-              <div 
-                className="p-6 rounded-lg border-l-4 space-y-4"
-                style={{ 
-                  backgroundColor: colors.secondary[50],
-                  borderLeftColor: colors.secondary[500]
-                }}
-              >
-                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                  Credenciales de Acceso
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password" style={{ color: colors.text }}>
-                      Contraseña *
-                    </Label>
-                    <div className="relative">
-                      <Lock 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                        style={{ color: colors.textMuted }}
-                      />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
-                        className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.password ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.password ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
-                        ) : (
-                          <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
-                        )}
-                      </Button>
-                    </div>
-                    {errors.password && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.password}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
-                      Confirmar contraseña *
-                    </Label>
-                    <div className="relative">
-                      <Lock 
-                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                        style={{ color: colors.textMuted }}
-                      />
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                        className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
-                        ) : (
-                          <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
-                        )}
-                      </Button>
-                    </div>
-                    {errors.confirmPassword && (
-                      <p className="text-sm" style={{ color: colors.error[500] }}>
-                        {errors.confirmPassword}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Firma Digital */}
-              <div 
-                className="p-6 rounded-lg border-l-4 space-y-4"
-                style={{ 
-                  backgroundColor: colors.accent[50],
-                  borderLeftColor: colors.accent[500]
-                }}
-              >
-                <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                  Firma Digital
-                </h3>
-                
-                <div 
-                  className="p-4 rounded-lg border-2 border-dashed"
+              {/* Layout horizontal optimizado - 2 columnas principales */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Datos Personales */}
+                <Card 
+                  className="shadow-soft border-0"
                   style={{ 
-                    backgroundColor: colors.warning[50],
-                    borderColor: colors.warning[300]
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border 
                   }}
                 >
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: colors.warning[500] }} />
-                    <div className="text-sm space-y-1">
-                      <p className="font-medium" style={{ color: colors.warning[700] }}>
-                        Aviso Legal Importante
-                      </p>
-                      <p style={{ color: colors.warning[600] }}>
-                        Su firma digital será utilizada para validar documentos oficiales y reportes profesionales. 
-                        Esta firma tiene validez legal y será asociada permanentemente a su cuenta profesional.
-                      </p>
+                  <CardHeader className="pb-4">
+                    <CardTitle 
+                      className="text-lg border-l-4 pl-4"
+                      style={{ 
+                        color: colors.text,
+                        borderLeftColor: colors.primary[500]
+                      }}
+                    >
+                      Datos Personales
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName" style={{ color: colors.text }}>
+                          Nombre *
+                        </Label>
+                        <div className="relative">
+                          <User 
+                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                            style={{ color: colors.textMuted }}
+                          />
+                          <Input
+                            id="firstName"
+                            placeholder="Juan"
+                            value={formData.firstName}
+                            onChange={(e) => handleInputChange('firstName', e.target.value)}
+                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.firstName ? 'border-red-500' : ''}`}
+                            style={{
+                              backgroundColor: colors.surface,
+                              borderColor: errors.firstName ? colors.error[500] : colors.border,
+                              color: colors.text
+                            }}
+                            required
+                          />
+                        </div>
+                        {errors.firstName && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.firstName}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName" style={{ color: colors.text }}>
+                          Apellido *
+                        </Label>
+                        <div className="relative">
+                          <User 
+                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                            style={{ color: colors.textMuted }}
+                          />
+                          <Input
+                            id="lastName"
+                            placeholder="Pérez"
+                            value={formData.lastName}
+                            onChange={(e) => handleInputChange('lastName', e.target.value)}
+                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.lastName ? 'border-red-500' : ''}`}
+                            style={{
+                              backgroundColor: colors.surface,
+                              borderColor: errors.lastName ? colors.error[500] : colors.border,
+                              color: colors.text
+                            }}
+                            required
+                          />
+                        </div>
+                        {errors.lastName && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.lastName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="dni" style={{ color: colors.text }}>
+                          DNI *
+                        </Label>
+                        <div className="relative">
+                          <CreditCard 
+                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                            style={{ color: colors.textMuted }}
+                          />
+                          <Input
+                            id="dni"
+                            placeholder="12345678"
+                            value={formData.dni}
+                            onChange={(e) => handleDniChange(e.target.value)}
+                            maxLength={8}
+                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
+                            style={{
+                              backgroundColor: colors.surface,
+                              borderColor: errors.dni ? colors.error[500] : colors.border,
+                              color: colors.text
+                            }}
+                            required
+                          />
+                        </div>
+                        {errors.dni && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.dni}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="role" style={{ color: colors.text }}>
+                          Rol profesional *
+                        </Label>
+                        <select 
+                          id="role"
+                          value={formData.role}
+                          onChange={(e) => handleInputChange('role', e.target.value)}
+                          className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${errors.role ? 'border-red-500' : ''}`}
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: errors.role ? colors.error[500] : colors.border,
+                            color: colors.text
+                          }}
+                          required
+                        >
+                          <option value="">Seleccionar rol</option>
+                          <option value="terapeuta">Terapeuta</option>
+                          <option value="acompanante">Acompañante Externo</option>
+                          <option value="coordinador">Coordinador</option>
+                        </select>
+                        {errors.role && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.role}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email" style={{ color: colors.text }}>
+                          Correo electrónico *
+                        </Label>
+                        <div className="relative">
+                          <Mail 
+                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                            style={{ color: colors.textMuted }}
+                          />
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="tu@email.com"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.email ? 'border-red-500' : ''}`}
+                            style={{
+                              backgroundColor: colors.surface,
+                              borderColor: errors.email ? colors.error[500] : colors.border,
+                              color: colors.text
+                            }}
+                            required
+                          />
+                        </div>
+                        {errors.email && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.email}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" style={{ color: colors.text }}>
+                          Teléfono *
+                        </Label>
+                        <PhoneInput
+                          country={'ar'}
+                          value={phone}
+                          onChange={phone => setPhone(phone)}
+                          inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
+                          containerClass="!w-full"
+                          buttonClass="!border-0 !border-r !rounded-l-lg"
+                          inputStyle={{
+                            backgroundColor: colors.surface,
+                            borderColor: errors.phone ? colors.error[500] : colors.border,
+                            color: colors.text
+                          }}
+                        />
+                        {errors.phone && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.phone}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Credenciales de Acceso */}
+                <Card 
+                  className="shadow-soft border-0"
+                  style={{ 
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border 
+                  }}
+                >
+                  <CardHeader className="pb-4">
+                    <CardTitle 
+                      className="text-lg border-l-4 pl-4"
+                      style={{ 
+                        color: colors.text,
+                        borderLeftColor: colors.secondary[500]
+                      }}
+                    >
+                      Credenciales de Acceso
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="password" style={{ color: colors.text }}>
+                        Contraseña *
+                      </Label>
+                      <div className="relative">
+                        <Lock 
+                          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                          style={{ color: colors.textMuted }}
+                        />
+                        <Input
+                          id="password"
+                          type={showPassword ? "text" : "password"}
+                          value={formData.password}
+                          onChange={(e) => handleInputChange('password', e.target.value)}
+                          className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.password ? 'border-red-500' : ''}`}
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: errors.password ? colors.error[500] : colors.border,
+                            color: colors.text
+                          }}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          ) : (
+                            <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.password && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.password}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
+                        Confirmar contraseña *
+                      </Label>
+                      <div className="relative">
+                        <Lock 
+                          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                          style={{ color: colors.textMuted }}
+                        />
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={formData.confirmPassword}
+                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                          className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
+                            color: colors.text
+                          }}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          ) : (
+                            <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.confirmPassword && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Firma Digital - Ancho completo para resaltar importancia */}
+              <Card 
+                className="shadow-soft border-0"
+                style={{ 
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border 
+                }}
+              >
+                <CardHeader className="pb-4">
+                  <CardTitle 
+                    className="text-lg border-l-4 pl-4"
+                    style={{ 
+                      color: colors.text,
+                      borderLeftColor: colors.accent[500]
+                    }}
+                  >
+                    Firma Digital
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div 
+                    className="p-4 rounded-lg border-2 border-dashed"
+                    style={{ 
+                      backgroundColor: colors.warning[50],
+                      borderColor: colors.warning[300]
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Sparkles className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: colors.warning[500] }} />
+                      <div className="text-sm space-y-1">
+                        <p className="font-medium" style={{ color: colors.warning[700] }}>
+                          Aviso Legal Importante
+                        </p>
+                        <p style={{ color: colors.warning[600] }}>
+                          Su firma digital será utilizada para validar documentos oficiales y reportes profesionales. 
+                          Esta firma tiene validez legal y será asociada permanentemente a su cuenta profesional.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>
                       Firma Digital *
@@ -593,8 +617,8 @@ export default function RegisterPage() {
                       </p>
                     )}
                   </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
               {/* Términos y Condiciones */}
               <div 
