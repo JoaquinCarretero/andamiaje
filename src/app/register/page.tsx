@@ -357,7 +357,6 @@ export default function RegisterPage() {
                     </p>
                   )}
                   </div>
-                  </div>
                   <div className="space-y-2">
                   <Label htmlFor="phone" style={{ color: colors.text }}>
                     Teléfono *
