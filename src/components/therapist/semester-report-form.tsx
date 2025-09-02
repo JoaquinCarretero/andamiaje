@@ -175,374 +175,388 @@ export default function SemesterReportForm() {
 
   return (
     <>
-      <Card 
-        className="w-full shadow-soft border-0"
-        style={{ 
-          backgroundColor: colors.surface,
-          borderColor: colors.border 
-        }}
-      >
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
-            <span style={{ color: colors.text }}>Informe Semestral</span>
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Datos del Paciente */}
-            <div 
-              className="p-6 rounded-lg border-l-4 space-y-4"
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Datos del Paciente */}
+        <Card 
+          className="shadow-soft border-0"
+          style={{ 
+            backgroundColor: colors.surface,
+            borderColor: colors.border 
+          }}
+        >
+          <CardHeader className="pb-4">
+            <CardTitle 
+              className="text-lg border-l-4 pl-4"
               style={{ 
-                backgroundColor: colors.primary[50],
+                color: colors.text,
                 borderLeftColor: colors.primary[500]
               }}
             >
-              <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                Datos del Paciente
-              </h3>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="patient-name" style={{ color: colors.text }}>
-                      Paciente (Nombre Completo) *
-                    </Label>
-                    <Input 
-                      id="patient-name" 
-                      placeholder="Ej: Juan Carlos Pérez González"
-                      value={formData.patientName}
-                      onChange={(e) => handleInputChange('patientName', e.target.value)}
-                      className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: errors.patientName ? colors.error[500] : colors.border,
-                        color: colors.text
-                      }}
-                    />
-                    {errors.patientName && (
-                      <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                        <AlertCircle className="h-4 w-4" />
-                        {errors.patientName}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="patient-dni" style={{ color: colors.text }}>
-                        DNI (Número) *
-                      </Label>
-                      <Input 
-                        id="patient-dni" 
-                        placeholder="Ej: 12345678"
-                        value={formData.dni}
-                        onChange={(e) => handleDniChange(e.target.value)}
-                        maxLength={8}
-                        className={`h-11 ${errors.dni ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.dni ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                      />
-                      {errors.dni && (
-                        <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                          <AlertCircle className="h-4 w-4" />
-                          {errors.dni}
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="patient-birth-date" style={{ color: colors.text }}>
-                        Fecha de Nacimiento *
-                      </Label>
-                      <Input 
-                        id="patient-birth-date" 
-                        type="date"
-                        value={formData.birthDate}
-                        onChange={(e) => handleInputChange('birthDate', e.target.value)}
-                        className={`h-11 ${errors.birthDate ? 'border-red-500' : ''}`}
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: errors.birthDate ? colors.error[500] : colors.border,
-                          color: colors.text
-                        }}
-                      />
-                      {errors.birthDate && (
-                        <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                          <AlertCircle className="h-4 w-4" />
-                          {errors.birthDate}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="patient-age" style={{ color: colors.text }}>
-                        Edad
-                      </Label>
-                      <Input 
-                        id="patient-age" 
-                        value={calculatedAge}
-                        placeholder="Se calculará automáticamente"
-                        className="h-11"
-                        style={{
-                          backgroundColor: colors.neutral[50],
-                          borderColor: colors.border,
-                          color: colors.textMuted
-                        }}
-                        readOnly
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="report-date" style={{ color: colors.text }}>
-                        Fecha *
-                      </Label>
-                      <Input 
-                        id="report-date" 
-                        type="date"
-                        value={formData.date}
-                        onChange={(e) => handleInputChange('date', e.target.value)}
-                        className="h-11"
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
-                        }}
-                      />
-                    </div>
-                  </div>
+              Datos del Paciente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="patient-name" style={{ color: colors.text }}>
+                Paciente (Nombre Completo) *
+              </Label>
+              <Input 
+                id="patient-name" 
+                placeholder="Ej: Juan Carlos Pérez González"
+                value={formData.patientName}
+                onChange={(e) => handleInputChange('patientName', e.target.value)}
+                className={`h-11 ${errors.patientName ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.patientName ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.patientName && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.patientName}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="diagnosis-cud" style={{ color: colors.text }}>
-                    Diagnóstico (según CUD) *
-                  </Label>
-                  <Textarea
-                    id="diagnosis-cud"
-                    placeholder="Describe el diagnóstico según el Certificado Único de Discapacidad..."
-                    value={formData.diagnosis}
-                    onChange={(e) => handleInputChange('diagnosis', e.target.value)}
-                    className={`min-h-[160px] resize-none ${errors.diagnosis ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.diagnosis ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.diagnosis && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.diagnosis}
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Datos del Profesional */}
-            <div 
-              className="p-6 rounded-lg border-l-4 space-y-4"
-              style={{ 
-                backgroundColor: colors.accent[50],
-                borderLeftColor: colors.accent[500]
-              }}
-            >
-              <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                Datos del Profesional
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="professional-name" style={{ color: colors.text }}>
-                    Profesional (Nombre Completo) *
-                  </Label>
-                  <Input 
-                    id="professional-name" 
-                    placeholder="Ej: Dr. María González López"
-                    value={formData.professionalName}
-                    onChange={(e) => handleInputChange('professionalName', e.target.value)}
-                    className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.professionalName ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.professionalName && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.professionalName}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="specialty" style={{ color: colors.text }}>
-                    Especialidad *
-                  </Label>
-                  <Input 
-                    id="specialty" 
-                    placeholder="Ej: Terapia Ocupacional"
-                    value={formData.specialty}
-                    onChange={(e) => handleInputChange('specialty', e.target.value)}
-                    className={`h-11 ${errors.specialty ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.specialty ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.specialty && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.specialty}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="license" style={{ color: colors.text }}>
-                    Matrícula *
-                  </Label>
-                  <Input 
-                    id="license" 
-                    placeholder="Ej: MP 12345"
-                    value={formData.license}
-                    onChange={(e) => handleInputChange('license', e.target.value)}
-                    className={`h-11 ${errors.license ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.license ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.license && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.license}
-                    </div>
-                  )}
-                </div>
-              </div>
-
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="attention-period" style={{ color: colors.text }}>
-                  Período de Atención *
+                <Label htmlFor="patient-dni" style={{ color: colors.text }}>
+                  DNI *
                 </Label>
                 <Input 
-                  id="attention-period" 
-                  placeholder="Ej: Primer semestre 2024, Enero - Junio 2024"
-                  value={formData.attentionPeriod}
-                  onChange={(e) => handleInputChange('attentionPeriod', e.target.value)}
-                  className={`h-11 ${errors.attentionPeriod ? 'border-red-500' : ''}`}
+                  id="patient-dni" 
+                  placeholder="12345678"
+                  value={formData.dni}
+                  onChange={(e) => handleDniChange(e.target.value)}
+                  maxLength={8}
+                  className={`h-11 ${errors.dni ? 'border-red-500' : ''}`}
                   style={{
                     backgroundColor: colors.surface,
-                    borderColor: errors.attentionPeriod ? colors.error[500] : colors.border,
+                    borderColor: errors.dni ? colors.error[500] : colors.border,
                     color: colors.text
                   }}
                 />
-                {errors.attentionPeriod && (
+                {errors.dni && (
                   <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
                     <AlertCircle className="h-4 w-4" />
-                    {errors.attentionPeriod}
+                    {errors.dni}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="patient-birth-date" style={{ color: colors.text }}>
+                  Fecha Nac. *
+                </Label>
+                <Input 
+                  id="patient-birth-date" 
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={(e) => handleInputChange('birthDate', e.target.value)}
+                  className={`h-11 ${errors.birthDate ? 'border-red-500' : ''}`}
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: errors.birthDate ? colors.error[500] : colors.border,
+                    color: colors.text
+                  }}
+                />
+                {errors.birthDate && (
+                  <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                    <AlertCircle className="h-4 w-4" />
+                    {errors.birthDate}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Información del Informe */}
-            <div 
-              className="p-6 rounded-lg border-l-4 space-y-4"
-              style={{ 
-                backgroundColor: colors.secondary[50],
-                borderLeftColor: colors.secondary[500]
-              }}
-            >
-              <h3 className="font-medium text-lg" style={{ color: colors.text }}>
-                Información del Informe
-              </h3>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="characterization" style={{ color: colors.text }}>
-                    Caracterización *
-                  </Label>
-                  <Textarea
-                    id="characterization"
-                    placeholder="Describe las características actuales del paciente..."
-                    value={formData.characterization}
-                    onChange={(e) => handleInputChange('characterization', e.target.value)}
-                    className={`min-h-[140px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.characterization ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.characterization && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.characterization}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="period-evolution" style={{ color: colors.text }}>
-                    Evolución del Período *
-                  </Label>
-                  <Textarea
-                    id="period-evolution"
-                    placeholder="Detalla la evolución del paciente durante el período evaluado..."
-                    value={formData.periodEvolution}
-                    onChange={(e) => handleInputChange('periodEvolution', e.target.value)}
-                    className={`min-h-[140px] resize-none ${errors.periodEvolution ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.periodEvolution ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.periodEvolution && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.periodEvolution}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="suggestions" style={{ color: colors.text }}>
-                    Sugerencias *
-                  </Label>
-                  <Textarea
-                    id="suggestions"
-                    placeholder="Proporciona sugerencias para el próximo período..."
-                    value={formData.suggestions}
-                    onChange={(e) => handleInputChange('suggestions', e.target.value)}
-                    className={`min-h-[140px] resize-none ${errors.suggestions ? 'border-red-500' : ''}`}
-                    style={{
-                      backgroundColor: colors.surface,
-                      borderColor: errors.suggestions ? colors.error[500] : colors.border,
-                      color: colors.text
-                    }}
-                  />
-                  {errors.suggestions && (
-                    <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
-                      <AlertCircle className="h-4 w-4" />
-                      {errors.suggestions}
-                    </div>
-                  )}
-                </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="patient-age" style={{ color: colors.text }}>
+                  Edad
+                </Label>
+                <Input 
+                  id="patient-age" 
+                  value={calculateAge(formData.birthDate)}
+                  placeholder="Automático"
+                  className="h-11"
+                  style={{
+                    backgroundColor: colors.neutral[50],
+                    borderColor: colors.border,
+                    color: colors.textMuted
+                  }}
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="report-date" style={{ color: colors.text }}>
+                  Fecha *
+                </Label>
+                <Input 
+                  id="report-date" 
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => handleInputChange('date', e.target.value)}
+                  className="h-11"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                />
               </div>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
+            <div className="space-y-2">
+              <Label htmlFor="diagnosis-cud" style={{ color: colors.text }}>
+                Diagnóstico (según CUD) *
+              </Label>
+              <Textarea
+                id="diagnosis-cud"
+                placeholder="Describe el diagnóstico según el CUD..."
+                value={formData.diagnosis}
+                onChange={(e) => handleInputChange('diagnosis', e.target.value)}
+                className={`min-h-[100px] resize-none ${errors.diagnosis ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.diagnosis ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.diagnosis && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.diagnosis}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Datos del Profesional */}
+        <Card 
+          className="shadow-soft border-0"
+          style={{ 
+            backgroundColor: colors.surface,
+            borderColor: colors.border 
+          }}
+        >
+          <CardHeader className="pb-4">
+            <CardTitle 
+              className="text-lg border-l-4 pl-4"
+              style={{ 
+                color: colors.text,
+                borderLeftColor: colors.accent[500]
+              }}
+            >
+              Datos del Profesional
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="professional-name" style={{ color: colors.text }}>
+                Profesional (Nombre Completo) *
+              </Label>
+              <Input 
+                id="professional-name" 
+                placeholder="Dr. María González López"
+                value={formData.professionalName}
+                onChange={(e) => handleInputChange('professionalName', e.target.value)}
+                className={`h-11 ${errors.professionalName ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.professionalName ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.professionalName && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.professionalName}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="specialty" style={{ color: colors.text }}>
+                Especialidad *
+              </Label>
+              <Input 
+                id="specialty" 
+                placeholder="Terapia Ocupacional"
+                value={formData.specialty}
+                onChange={(e) => handleInputChange('specialty', e.target.value)}
+                className={`h-11 ${errors.specialty ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.specialty ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.specialty && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.specialty}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="license" style={{ color: colors.text }}>
+                Matrícula *
+              </Label>
+              <Input 
+                id="license" 
+                placeholder="MP 12345"
+                value={formData.license}
+                onChange={(e) => handleInputChange('license', e.target.value)}
+                className={`h-11 ${errors.license ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.license ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.license && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.license}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="attention-period" style={{ color: colors.text }}>
+                Período de Atención *
+              </Label>
+              <Input 
+                id="attention-period" 
+                placeholder="Primer semestre 2024"
+                value={formData.attentionPeriod}
+                onChange={(e) => handleInputChange('attentionPeriod', e.target.value)}
+                className={`h-11 ${errors.attentionPeriod ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.attentionPeriod ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.attentionPeriod && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.attentionPeriod}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Información del Informe */}
+        <Card 
+          className="shadow-soft border-0"
+          style={{ 
+            backgroundColor: colors.surface,
+            borderColor: colors.border 
+          }}
+        >
+          <CardHeader className="pb-4">
+            <CardTitle 
+              className="text-lg border-l-4 pl-4"
+              style={{ 
+                color: colors.text,
+                borderLeftColor: colors.secondary[500]
+              }}
+            >
+              Información del Informe
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="characterization" style={{ color: colors.text }}>
+                Caracterización *
+              </Label>
+              <Textarea
+                id="characterization"
+                placeholder="Características actuales del paciente..."
+                value={formData.characterization}
+                onChange={(e) => handleInputChange('characterization', e.target.value)}
+                className={`min-h-[100px] resize-none ${errors.characterization ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.characterization ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.characterization && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.characterization}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="period-evolution" style={{ color: colors.text }}>
+                Evolución del Período *
+              </Label>
+              <Textarea
+                id="period-evolution"
+                placeholder="Evolución durante el período evaluado..."
+                value={formData.periodEvolution}
+                onChange={(e) => handleInputChange('periodEvolution', e.target.value)}
+                className={`min-h-[100px] resize-none ${errors.periodEvolution ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.periodEvolution ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.periodEvolution && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.periodEvolution}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="suggestions" style={{ color: colors.text }}>
+                Sugerencias *
+              </Label>
+              <Textarea
+                id="suggestions"
+                placeholder="Sugerencias para el próximo período..."
+                value={formData.suggestions}
+                onChange={(e) => handleInputChange('suggestions', e.target.value)}
+                className={`min-h-[100px] resize-none ${errors.suggestions ? 'border-red-500' : ''}`}
+                style={{
+                  backgroundColor: colors.surface,
+                  borderColor: errors.suggestions ? colors.error[500] : colors.border,
+                  color: colors.text
+                }}
+              />
+              {errors.suggestions && (
+                <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.suggestions}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Botones de acción */}
+      <Card 
+        className="mt-6 shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
+        <CardContent className="p-4">
+          <form onSubmit={handleSubmit}>
+            <div className="flex justify-between">
               <div className="flex gap-2">
                 <Button 
                   type="button"
