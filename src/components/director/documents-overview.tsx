@@ -39,7 +39,6 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
   const [dateTo, setDateTo] = useState("")
   const [selectedProfessional, setSelectedProfessional] = useState<any>(null)
   const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 })
-  const [collapsedCards, setCollapsedCards] = useState<Set<number>>(new Set())
 
   const [documents] = useState<Document[]>([
     {
@@ -152,15 +151,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
   }
 
   const toggleCardCollapse = (id: number) => {
-    setCollapsedCards(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet
-    })
+    // Funcionalidad removida
   }
 
   const clearFilters = () => {
@@ -376,167 +367,113 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
             <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
               {filteredDocuments.map((doc) => {
                 const roleColors = getRoleColor(doc.professionalRole)
-                const isCollapsed = collapsedCards.has(doc.id)
                 
                 return (
                   <div
                     key={doc.id}
-                    className={`border rounded-lg transition-all duration-200 hover:shadow-medium ${
-                      isCollapsed ? 'hover:scale-[1.01]' : 'hover:scale-[1.02]'
-                    }`}
+                    className="border rounded-lg transition-all duration-200 hover:shadow-medium hover:scale-[1.02]"
                     style={{ borderColor: colors.border }}
                   >
-                    {isCollapsed ? (
-                      // Vista colapsada - Solo información esencial
-                      <div className="p-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div
-                              className="p-2 rounded-lg flex-shrink-0"
-                              style={{ backgroundColor: colors.primary[50] }}
-                            >
-                              <FileText className="h-4 w-4" style={{ color: colors.primary[500] }} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-medium text-sm truncate" style={{ color: colors.text }}>
-                                {doc.title}
-                              </h3>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span 
-                                  className="px-2 py-0.5 rounded text-xs font-medium"
-                                  style={{
-                                    backgroundColor: roleColors.bg,
-                                    color: roleColors.text
-                                  }}
-                                >
-                                  {doc.professionalRole}
-                                </span>
-                                <span className="text-xs" style={{ color: colors.textMuted }}>
-                                  {doc.date}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleCardCollapse(doc.id)}
-                            className="h-8 w-8"
+                    {/* Vista única - Información completa */}
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="p-2.5 rounded-lg flex-shrink-0"
+                            style={{ backgroundColor: colors.primary[50] }}
                           >
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      // Vista expandida - Información completa
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-4 mb-4">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="p-2.5 rounded-lg flex-shrink-0"
-                              style={{ backgroundColor: colors.primary[50] }}
-                            >
-                              <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-base mb-1" style={{ color: colors.text }}>
-                                {doc.title}
-                              </h3>
-                              <span 
-                                className="px-2 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: colors.accent[50],
-                                  color: colors.accent[600]
-                                }}
-                              >
-                                {doc.type}
-                              </span>
-                            </div>
+                            <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleCardCollapse(doc.id)}
-                            className="h-8 w-8"
-                          >
-                            <ChevronUp className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-3 text-sm mb-4">
-                          {doc.patientName && (
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4" style={{ color: colors.textMuted }} />
-                              <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
-                              <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4" style={{ color: colors.textMuted }} />
-                            <span className="font-medium" style={{ color: colors.text }}>Profesional:</span>
-                            <button
-                              onClick={(e) => handleProfessionalClick(e, {
-                                name: doc.professionalName,
-                                role: doc.professionalRole,
-                                email: doc.professionalEmail,
-                                phone: doc.professionalPhone
-                              })}
-                              className="hover:underline transition-colors duration-200"
-                              style={{ color: colors.primary[500] }}
-                            >
-                              {doc.professionalName}
-                            </button>
+                          <div>
+                            <h3 className="font-semibold text-base mb-1" style={{ color: colors.text }}>
+                              {doc.title}
+                            </h3>
                             <span 
-                              className="px-2 py-0.5 rounded text-xs font-medium ml-2"
+                              className="px-2 py-1 rounded-full text-xs font-medium"
                               style={{
-                                backgroundColor: roleColors.bg,
-                                color: roleColors.text
+                                backgroundColor: colors.accent[50],
+                                color: colors.accent[600]
                               }}
                             >
-                              {doc.professionalRole}
+                              {doc.type}
                             </span>
                           </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" style={{ color: colors.textMuted }} />
-                            <span className="font-medium" style={{ color: colors.text }}>Fecha:</span>
-                            <span style={{ color: colors.textSecondary }}>{doc.date}</span>
-                          </div>
-                        </div>
-
-                        {/* Botones de acción */}
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Ver
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Editar
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="flex-1"
-                            style={{
-                              backgroundColor: colors.primary[500],
-                              color: colors.surface
-                            }}
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Descargar
-                          </Button>
                         </div>
                       </div>
-                    )}
+
+                      <div className="grid grid-cols-1 gap-3 text-sm mb-4">
+                        {doc.patientName && (
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4" style={{ color: colors.textMuted }} />
+                            <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
+                            <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          <span className="font-medium" style={{ color: colors.text }}>Profesional:</span>
+                          <button
+                            onClick={(e) => handleProfessionalClick(e, {
+                              name: doc.professionalName,
+                              role: doc.professionalRole,
+                              email: doc.professionalEmail,
+                              phone: doc.professionalPhone
+                            })}
+                            className="hover:underline transition-colors duration-200"
+                            style={{ color: colors.primary[500] }}
+                          >
+                            {doc.professionalName}
+                          </button>
+                          <span 
+                            className="px-2 py-0.5 rounded text-xs font-medium ml-2"
+                            style={{
+                              backgroundColor: roleColors.bg,
+                              color: roleColors.text
+                            }}
+                          >
+                            {doc.professionalRole}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          <span className="font-medium" style={{ color: colors.text }}>Fecha:</span>
+                          <span style={{ color: colors.textSecondary }}>{doc.date}</span>
+                        </div>
+                      </div>
+
+                      {/* Botones de acción */}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Ver
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Editar
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="flex-1"
+                          style={{
+                            backgroundColor: colors.primary[500],
+                            color: colors.surface
+                          }}
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Descargar
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 )
               })}

@@ -72,8 +72,8 @@ export function UserProfilePopover({ isOpen, onClose, professional, position }: 
         className="absolute pointer-events-auto"
         style={{
           left: `${position.x}px`,
-          top: `${position.y}px`,
-          transform: 'translateX(-50%)',
+          top: `${position.y - 10}px`,
+          transform: 'translateX(-50%) translateY(-100%)',
         }}
       >
         <Card 
