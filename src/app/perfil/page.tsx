@@ -10,11 +10,9 @@ import {
   Calendar, 
   Shield, 
   Edit, 
-  Save, 
   ArrowLeft,
   Key,
   LogOut,
-  Camera,
   MapPin,
   Briefcase,
   Award,
@@ -25,11 +23,10 @@ import {
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Navbar } from "@/components/shared/navbar"
+import { ProfileEditModal } from "@/components/ui/profile-edit-modal"
+import { ProfileCompletionBanner } from "@/components/ui/profile-completion-banner"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 
@@ -43,12 +40,12 @@ const getCurrentUser = () => {
     phone: "+54 11 1234-5678",
     role: "terapeuta",
     title: "Terapeuta Ocupacional",
-    specialty: "Terapia Ocupacional",
-    license: "MP 12345",
+    specialty: "", // Campo opcional vacío
+    license: "", // Campo opcional vacío
+    experience: "", // Campo opcional vacío
     joinDate: "2023-03-15",
     lastLogin: "2024-01-30",
-    address: "Av. Corrientes 1234, CABA",
-    bio: "Especialista en terapia ocupacional con más de 8 años de experiencia en rehabilitación neurológica y desarrollo infantil.",
+    bio: "", // Campo opcional vacío
     documentsCount: 24,
     patientsCount: 12,
     gender: "female"
@@ -58,24 +55,16 @@ const getCurrentUser = () => {
 export default function ProfilePage() {
   const router = useRouter()
   const { getSignature } = useSignature()
-  const [user] = useState(getCurrentUser())
-  const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+  const [user, setUser] = useState(getCurrentUser())
+  const [showEditModal, setShowEditModal] = useState(false)
   
-  const [editableData, setEditableData] = useState({
-    phone: user.phone,
-    address: user.address,
-    bio: user.bio
-  })
-
   const signature = getSignature()
 
-  const handleSave = async () => {
-    setIsSaving(true)
-    // Simular guardado
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setIsSaving(false)
-    setIsEditing(false)
+  const handleSaveProfile = (updatedData: any) => {
+    setUser(prev => ({
+      ...prev,
+      ...updatedData
+    }))
   }
 
   const handleChangePassword = () => {
@@ -83,6 +72,7 @@ export default function ProfilePage() {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem('userSignature')
     router.push('/login')
   }
 
@@ -100,6 +90,22 @@ export default function ProfilePage() {
   }
 
   const roleColors = getRoleColor(user.role)
+
+  // Calcular completitud del perfil
+  const getProfileCompleteness = () => {
+    const fields = [
+      user.phone,
+      user.bio,
+      user.specialty,
+      user.license,
+      user.experience
+    ]
+    const completed = fields.filter(field => field && field.trim()).length
+    return Math.round((completed / fields.length) * 100)
+  }
+
+  const profileCompleteness = getProfileCompleteness()
+  const isProfileIncomplete = profileCompleteness < 100
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
@@ -126,6 +132,16 @@ export default function ProfilePage() {
           </h1>
         </div>
 
+        {/* Banner de completar perfil */}
+        {isProfileIncomplete && (
+          <div className="mb-8">
+            <ProfileCompletionBanner 
+              completeness={profileCompleteness}
+              onComplete={() => setShowEditModal(true)}
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Información Principal */}
           <div className="lg:col-span-2 space-y-6">
@@ -140,11 +156,11 @@ export default function ProfilePage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsEditing(!isEditing)}
+                    onClick={() => setShowEditModal(true)}
                     className="flex items-center gap-2"
                   >
                     <Edit className="h-4 w-4" />
-                    {isEditing ? "Cancelar" : "Editar"}
+                    Editar
                   </Button>
                 </div>
               </CardHeader>
@@ -152,43 +168,55 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Nombre Completo</Label>
-                    <Input
-                      value={user.name}
-                      readOnly
-                      className="h-11"
+                    <div
+                      className="h-11 px-3 py-2 rounded-md border flex items-center"
                       style={{
                         backgroundColor: colors.neutral[50],
                         borderColor: colors.border,
                         color: colors.textMuted
                       }}
-                    />
+                    >
+                      {user.name}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Email</Label>
-                    <Input
-                      value={user.email}
-                      readOnly
-                      className="h-11"
+                    <div
+                      className="h-11 px-3 py-2 rounded-md border flex items-center"
                       style={{
                         backgroundColor: colors.neutral[50],
                         borderColor: colors.border,
                         color: colors.textMuted
                       }}
-                    />
+                    >
+                      {user.email}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Teléfono</Label>
-                    <Input
-                      value={isEditing ? editableData.phone : user.phone}
-                      onChange={(e) => setEditableData(prev => ({ ...prev, phone: e.target.value }))}
-                      readOnly={!isEditing}
-                      className="h-11"
-                      style={{
-                        backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                        borderColor: colors.border,
-                        color: isEditing ? colors.text : colors.textMuted
-                      }}
-                    />
+                    {user.phone ? (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          color: colors.text
+                        }}
+                      >
+                        {user.phone}
+                      </div>
+                    ) : (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.textMuted
+                        }}
+                      >
+                        <span className="text-sm">No especificado</span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Rol</Label>
@@ -208,65 +236,31 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label style={{ color: colors.text }}>Dirección</Label>
-                  <Input
-                    value={isEditing ? editableData.address : user.address}
-                    onChange={(e) => setEditableData(prev => ({ ...prev, address: e.target.value }))}
-                    readOnly={!isEditing}
-                    className="h-11"
-                    style={{
-                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                      borderColor: colors.border,
-                      color: isEditing ? colors.text : colors.textMuted
-                    }}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label style={{ color: colors.text }}>Biografía Profesional</Label>
-                  <Textarea
-                    value={isEditing ? editableData.bio : user.bio}
-                    onChange={(e) => setEditableData(prev => ({ ...prev, bio: e.target.value }))}
-                    readOnly={!isEditing}
-                    className="min-h-[100px] resize-none"
-                    style={{
-                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                      borderColor: colors.border,
-                      color: isEditing ? colors.text : colors.textMuted
-                    }}
-                  />
-                </div>
-
-                {isEditing && (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      onClick={handleSave}
-                      disabled={isSaving}
+                  {user.bio ? (
+                    <div
+                      className="min-h-[100px] p-3 rounded-md border"
                       style={{
-                        backgroundColor: colors.primary[500],
-                        color: colors.surface
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                        color: colors.text
                       }}
                     >
-                      {isSaving ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Guardando...
-                        </div>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Guardar Cambios
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
+                      {user.bio}
+                    </div>
+                  ) : (
+                    <div
+                      className="min-h-[100px] p-3 rounded-md border flex items-center justify-center"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    >
+                      <span className="text-sm">No especificada - Puede agregar su biografía profesional</span>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -282,56 +276,136 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Especialidad</Label>
-                    <Input
-                      value={user.specialty}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
+                    {user.specialty ? (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          color: colors.text
+                        }}
+                      >
+                        {user.specialty}
+                      </div>
+                    ) : (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.textMuted
+                        }}
+                      >
+                        <span className="text-sm">No especificada</span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Matrícula</Label>
-                    <Input
-                      value={user.license}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
+                    {user.license ? (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          color: colors.text
+                        }}
+                      >
+                        {user.license}
+                      </div>
+                    ) : (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.textMuted
+                        }}
+                      >
+                        <span className="text-sm">No especificada</span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label style={{ color: colors.text }}>Fecha de Ingreso</Label>
-                    <Input
-                      value={user.joinDate}
-                      readOnly
-                      className="h-11"
+                    <div
+                      className="h-11 px-3 py-2 rounded-md border flex items-center"
                       style={{
                         backgroundColor: colors.neutral[50],
                         borderColor: colors.border,
                         color: colors.textMuted
                       }}
-                    />
+                    >
+                      {user.joinDate}
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Último Acceso</Label>
-                    <Input
-                      value={user.lastLogin}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
+                    <Label style={{ color: colors.text }}>Experiencia</Label>
+                    {user.experience ? (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderColor: colors.border,
+                          color: colors.text
+                        }}
+                      >
+                        {user.experience}
+                      </div>
+                    ) : (
+                      <div
+                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.textMuted
+                        }}
+                      >
+                        <span className="text-sm">No especificada</span>
+                      </div>
+                    )}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Panel Lateral */}
+          <div className="space-y-6">
+            {/* Avatar y Acciones Principales */}
+            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+              <CardContent className="p-6 text-center">
+                <div 
+                  className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center"
+                  style={{ backgroundColor: roleColors.bg }}
+                >
+                  <User className="h-12 w-12" style={{ color: roleColors.text }} />
+                </div>
+                <h2 className="text-xl font-bold mb-1" style={{ color: colors.text }}>
+                  {user.name}
+                </h2>
+                <p className="text-sm mb-4" style={{ color: colors.textMuted }}>
+                  {user.title}
+                </p>
+                
+                <div className="space-y-3">
+                  <Button
+                    onClick={handleChangePassword}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    <Key className="h-4 w-4 mr-2" />
+                    Cambiar Contraseña
+                  </Button>
+                  
+                  <Button
+                    onClick={handleLogout}
+                    className="w-full hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                    variant="outline"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Cerrar Sesión
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -394,47 +468,6 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
-          </div>
-
-          {/* Panel Lateral */}
-          <div className="space-y-6">
-            {/* Avatar y Acciones Principales */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardContent className="p-6 text-center">
-                <div 
-                  className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: roleColors.bg }}
-                >
-                  <User className="h-12 w-12" style={{ color: roleColors.text }} />
-                </div>
-                <h2 className="text-xl font-bold mb-1" style={{ color: colors.text }}>
-                  {user.name}
-                </h2>
-                <p className="text-sm mb-4" style={{ color: colors.textMuted }}>
-                  {user.title}
-                </p>
-                
-                <div className="space-y-3">
-                  <Button
-                    onClick={handleChangePassword}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <Key className="h-4 w-4 mr-2" />
-                    Cambiar Contraseña
-                  </Button>
-                  
-                  <Button
-                    onClick={handleLogout}
-                    className="w-full hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                    variant="outline"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Cerrar Sesión
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Estadísticas */}
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
@@ -470,10 +503,10 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" style={{ color: colors.textMuted }} />
-                    <span className="text-sm" style={{ color: colors.text }}>Experiencia</span>
+                    <span className="text-sm" style={{ color: colors.text }}>Último Acceso</span>
                   </div>
                   <span className="font-bold" style={{ color: colors.accent[500] }}>
-                    8+ años
+                    {user.lastLogin}
                   </span>
                 </div>
               </CardContent>
@@ -497,13 +530,7 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-4 w-4" style={{ color: colors.textMuted }} />
                   <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {isEditing ? editableData.phone : user.phone}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4" style={{ color: colors.textMuted }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {isEditing ? editableData.address : user.address}
+                    {user.phone || "No especificado"}
                   </span>
                 </div>
               </CardContent>
@@ -511,37 +538,19 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Botón de guardar flotante cuando está editando */}
-        {isEditing && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-8 right-8 z-40"
-          >
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              size="lg"
-              className="shadow-xl rounded-full"
-              style={{
-                backgroundColor: colors.primary[500],
-                color: colors.surface
-              }}
-            >
-              {isSaving ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Guardando...
-                </div>
-              ) : (
-                <>
-                  <Save className="h-5 w-5 mr-2" />
-                  Guardar Cambios
-                </>
-              )}
-            </Button>
-          </motion.div>
-        )}
+        {/* Modal de Edición */}
+        <ProfileEditModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleSaveProfile}
+          initialData={{
+            phone: user.phone || "",
+            bio: user.bio || "",
+            specialty: user.specialty || "",
+            license: user.license || "",
+            experience: user.experience || ""
+          }}
+        />
       </main>
     </div>
   )
