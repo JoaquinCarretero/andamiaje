@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, User, LogOut, Menu, X } from "lucide-react"
 import { useAvatar } from "@/lib/avatar-system"
@@ -25,10 +25,10 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false)
   const [currentAvatarId, setCurrentAvatarId] = useState("")
 
-  // Inicializar avatar
-  useState(() => {
+  // Inicializar avatar al cargar el componente
+  useEffect(() => {
     setCurrentAvatarId(getCurrentAvatar())
-  })
+  }, [getCurrentAvatar])
 
   const handleProfileClick = () => {
     router.push('/perfil')

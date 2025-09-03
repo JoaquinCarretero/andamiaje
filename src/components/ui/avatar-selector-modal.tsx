@@ -3,11 +3,9 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Search, Check } from "lucide-react"
+import { X, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { avatarOptions, type AvatarOption } from "@/lib/avatar-system"
 import { FaUser } from "react-icons/fa"
 import colors from "@/lib/colors"
@@ -25,22 +23,7 @@ export function AvatarSelectorModal({
   onSelect, 
   currentAvatarId 
 }: AvatarSelectorModalProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-  const [searchTerm, setSearchTerm] = useState("")
   const [selectedAvatarId, setSelectedAvatarId] = useState(currentAvatarId || "")
-
-  const categories = [
-    { id: "all", name: "Todos", count: avatarOptions.length },
-    { id: "medical", name: "Médicos", count: avatarOptions.filter(a => a.category === "medical").length },
-    { id: "professional", name: "Profesionales", count: avatarOptions.filter(a => a.category === "professional").length },
-    { id: "casual", name: "Casuales", count: avatarOptions.filter(a => a.category === "casual").length }
-  ]
-
-  const filteredAvatars = avatarOptions.filter(avatar => {
-    const matchesCategory = selectedCategory === "all" || avatar.category === selectedCategory
-    const matchesSearch = avatar.name.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
 
   const handleConfirm = () => {
     if (selectedAvatarId) {
@@ -102,116 +85,164 @@ export function AvatarSelectorModal({
 
             <CardContent className="p-6">
               <div className="space-y-6">
-                {/* Búsqueda y filtros */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: colors.textMuted }} />
-                      <Input
-                        placeholder="Buscar avatar..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 h-11"
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
-                        }}
-                      />
+                {/* Grid de avatares por categorías */}
+                <div className="max-h-[60vh] overflow-y-auto">
+                  {/* Categoría Médica */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text }}>
+                      👩‍⚕️ Profesionales Médicos
+                    </h3>
+                    <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                      {avatarOptions.filter(avatar => avatar.category === 'medical').map((avatar) => {
+                        const Icon = avatar.icon
+                        const isSelected = selectedAvatarId === avatar.id
+                        
+                        return (
+                          <motion.button
+                            key={avatar.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSelectedAvatarId(avatar.id)}
+                            className={`relative p-3 rounded-xl border-2 transition-all duration-200 ${
+                              isSelected ? 'ring-2 ring-offset-2' : ''
+                            }`}
+                            style={{
+                              backgroundColor: isSelected ? `${avatar.color}10` : colors.surface,
+                              borderColor: isSelected ? avatar.color : colors.border,
+                              ringColor: isSelected ? avatar.color : 'transparent'
+                            }}
+                            title={avatar.name}
+                          >
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center mx-auto"
+                              style={{ backgroundColor: `${avatar.color}15` }}
+                            >
+                              <Icon 
+                                className="h-5 w-5" 
+                                style={{ color: avatar.color }}
+                              />
+                            </div>
+                            
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: colors.success[500] }}
+                              >
+                                <Check className="h-3 w-3 text-white" />
+                              </motion.div>
+                            )}
+                          </motion.button>
+                        )
+                      })}
                     </div>
                   </div>
-                  
-                  <div className="flex gap-2 flex-wrap">
-                    {categories.map((category) => (
-                      <Button
-                        key={category.id}
-                        variant={selectedCategory === category.id ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setSelectedCategory(category.id)}
-                        className="flex items-center gap-2"
-                        style={{
-                          backgroundColor: selectedCategory === category.id ? colors.primary[500] : "transparent",
-                          color: selectedCategory === category.id ? colors.surface : colors.textSecondary,
-                          borderColor: colors.border
-                        }}
-                      >
-                        {category.name}
-                        <Badge 
-                          variant="secondary" 
-                          className="text-xs"
-                          style={{
-                            backgroundColor: selectedCategory === category.id ? colors.surface : colors.neutral[100],
-                            color: selectedCategory === category.id ? colors.primary[500] : colors.textMuted
-                          }}
-                        >
-                          {category.count}
-                        </Badge>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
 
-                {/* Grid de avatares */}
-                <div className="max-h-[50vh] overflow-y-auto">
-                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
-                    {filteredAvatars.map((avatar) => {
-                      const Icon = avatar.icon
-                      const isSelected = selectedAvatarId === avatar.id
-                      
-                      return (
-                        <motion.button
-                          key={avatar.id}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setSelectedAvatarId(avatar.id)}
-                          className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${
-                            isSelected ? 'ring-2 ring-offset-2' : ''
-                          }`}
-                          style={{
-                            backgroundColor: isSelected ? `${avatar.color}10` : colors.surface,
-                            borderColor: isSelected ? avatar.color : colors.border,
-                            ringColor: isSelected ? avatar.color : 'transparent'
-                          }}
-                          title={avatar.name}
-                        >
-                          <div 
-                            className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2"
-                            style={{ backgroundColor: `${avatar.color}15` }}
+                  {/* Categoría Profesional */}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text }}>
+                      👔 Profesionales
+                    </h3>
+                    <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                      {avatarOptions.filter(avatar => avatar.category === 'professional').map((avatar) => {
+                        const Icon = avatar.icon
+                        const isSelected = selectedAvatarId === avatar.id
+                        
+                        return (
+                          <motion.button
+                            key={avatar.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSelectedAvatarId(avatar.id)}
+                            className={`relative p-3 rounded-xl border-2 transition-all duration-200 ${
+                              isSelected ? 'ring-2 ring-offset-2' : ''
+                            }`}
+                            style={{
+                              backgroundColor: isSelected ? `${avatar.color}10` : colors.surface,
+                              borderColor: isSelected ? avatar.color : colors.border,
+                              ringColor: isSelected ? avatar.color : 'transparent'
+                            }}
+                            title={avatar.name}
                           >
-                            <Icon 
-                              className="h-6 w-6" 
-                              style={{ color: avatar.color }}
-                            />
-                          </div>
-                          
-                          {isSelected && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              className="absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center"
-                              style={{ backgroundColor: colors.success[500] }}
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center mx-auto"
+                              style={{ backgroundColor: `${avatar.color}15` }}
                             >
-                              <Check className="h-3 w-3 text-white" />
-                            </motion.div>
-                          )}
-                          
-                          <p className="text-xs text-center font-medium truncate" style={{ color: colors.text }}>
-                            {avatar.name}
-                          </p>
-                        </motion.button>
-                      )
-                    })}
+                              <Icon 
+                                className="h-5 w-5" 
+                                style={{ color: avatar.color }}
+                              />
+                            </div>
+                            
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: colors.success[500] }}
+                              >
+                                <Check className="h-3 w-3 text-white" />
+                              </motion.div>
+                            )}
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Categoría Casual */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text }}>
+                      😊 Personas Amigables
+                    </h3>
+                    <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
+                      {avatarOptions.filter(avatar => avatar.category === 'casual').map((avatar) => {
+                        const Icon = avatar.icon
+                        const isSelected = selectedAvatarId === avatar.id
+                        
+                        return (
+                          <motion.button
+                            key={avatar.id}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setSelectedAvatarId(avatar.id)}
+                            className={`relative p-3 rounded-xl border-2 transition-all duration-200 ${
+                              isSelected ? 'ring-2 ring-offset-2' : ''
+                            }`}
+                            style={{
+                              backgroundColor: isSelected ? `${avatar.color}10` : colors.surface,
+                              borderColor: isSelected ? avatar.color : colors.border,
+                              ringColor: isSelected ? avatar.color : 'transparent'
+                            }}
+                            title={avatar.name}
+                          >
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center mx-auto"
+                              style={{ backgroundColor: `${avatar.color}15` }}
+                            >
+                              <Icon 
+                                className="h-5 w-5" 
+                                style={{ color: avatar.color }}
+                              />
+                            </div>
+                            
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: colors.success[500] }}
+                              >
+                                <Check className="h-3 w-3 text-white" />
+                              </motion.div>
+                            )}
+                          </motion.button>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
-
-                {filteredAvatars.length === 0 && (
-                  <div className="text-center py-8">
-                    <FaUser className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      No se encontraron avatares con los filtros aplicados
-                    </p>
-                  </div>
-                )}
 
                 {/* Botones de acción */}
                 <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>

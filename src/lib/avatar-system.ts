@@ -10,7 +10,7 @@ import {
   FaUserCog,
   FaUserShield,
   FaUserEdit
-} from 'react-icons/fa'
+} from "react-icons/fa"
 import { 
   GiDoctorFace, 
   GiNurseFemale, 
@@ -20,7 +20,7 @@ import {
   GiHealthIncrease,
   GiMedicines,
   GiStethoscope
-} from 'react-icons/gi'
+} from "react-icons/gi"
 import { 
   MdPerson, 
   MdPersonOutline, 
@@ -34,7 +34,7 @@ import {
   MdSentimentSatisfied,
   MdSentimentVeryDissatisfied,
   MdSentimentVerySatisfied
-} from 'react-icons/md'
+} from "react-icons/md"
 import { 
   BsPerson, 
   BsPersonFill, 
@@ -44,7 +44,7 @@ import {
   BsPersonBadge,
   BsPersonWorkspace,
   BsPersonGear
-} from 'react-icons/bs'
+} from "react-icons/bs"
 import { 
   IoPersonOutline, 
   IoPersonSharp, 
@@ -53,21 +53,21 @@ import {
   IoHappy,
   IoBodyOutline,
   IoBody
-} from 'react-icons/io5'
+} from "react-icons/io5"
 
 export interface AvatarOption {
   id: string
   name: string
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>
-  category: 'medical' | 'professional' | 'casual' | 'animals'
+  category: 'medical' | 'professional' | 'casual'
   color: string
 }
 
 export const avatarOptions: AvatarOption[] = [
-  // Categoría Médica
+  // Categoría Médica - Avatares de doctores y enfermeras
   {
     id: 'doctor-1',
-    name: 'Doctor Clásico',
+    name: 'Doctor',
     icon: FaUserMd,
     category: 'medical',
     color: '#14b8a6'
@@ -81,7 +81,7 @@ export const avatarOptions: AvatarOption[] = [
   },
   {
     id: 'doctor-face',
-    name: 'Doctor Amigable',
+    name: 'Doctor Especialista',
     icon: GiDoctorFace,
     category: 'medical',
     color: '#3b82f6'
@@ -101,79 +101,107 @@ export const avatarOptions: AvatarOption[] = [
     color: '#f59e0b'
   },
   {
-    id: 'medical-pack',
+    id: 'medical-specialist',
     name: 'Especialista Médico',
     icon: GiMedicalPack,
     category: 'medical',
     color: '#ef4444'
   },
   {
-    id: 'health-normal',
+    id: 'health-professional',
     name: 'Profesional de Salud',
     icon: GiHealthNormal,
     category: 'medical',
     color: '#8b5cf6'
   },
   {
-    id: 'stethoscope',
-    name: 'Médico Especialista',
+    id: 'therapist',
+    name: 'Terapeuta',
     icon: GiStethoscope,
     category: 'medical',
     color: '#06b6d4'
   },
+  {
+    id: 'health-increase',
+    name: 'Rehabilitador',
+    icon: GiHealthIncrease,
+    category: 'medical',
+    color: '#10b981'
+  },
+  {
+    id: 'medicines',
+    name: 'Farmacéutico',
+    icon: GiMedicines,
+    category: 'medical',
+    color: '#f97316'
+  },
 
   // Categoría Profesional
   {
-    id: 'user-tie',
-    name: 'Profesional Ejecutivo',
+    id: 'executive',
+    name: 'Ejecutivo',
     icon: FaUserTie,
     category: 'professional',
     color: '#1f2937'
   },
   {
-    id: 'user-graduate',
+    id: 'academic',
     name: 'Académico',
     icon: FaUserGraduate,
     category: 'professional',
     color: '#7c3aed'
   },
   {
-    id: 'user-check',
+    id: 'supervisor',
     name: 'Supervisor',
     icon: FaUserCheck,
     category: 'professional',
     color: '#059669'
   },
   {
-    id: 'user-cog',
+    id: 'coordinator',
     name: 'Coordinador',
     icon: FaUserCog,
     category: 'professional',
     color: '#dc2626'
   },
   {
-    id: 'user-shield',
+    id: 'director',
     name: 'Director',
     icon: FaUserShield,
     category: 'professional',
     color: '#9333ea'
   },
   {
-    id: 'person-badge',
-    name: 'Profesional Certificado',
+    id: 'certified',
+    name: 'Certificado',
     icon: BsPersonBadge,
     category: 'professional',
     color: '#0891b2'
   },
   {
-    id: 'person-workspace',
+    id: 'specialist',
     name: 'Especialista',
     icon: BsPersonWorkspace,
     category: 'professional',
     color: '#ea580c'
   },
+  {
+    id: 'editor',
+    name: 'Editor',
+    icon: FaUserEdit,
+    category: 'professional',
+    color: '#84cc16'
+  },
+  {
+    id: 'gear-person',
+    name: 'Técnico',
+    icon: BsPersonGear,
+    category: 'professional',
+    color: '#6366f1'
+  },
 
-  // Categoría Casual
+  // Categoría Casual - Avatares de personas amigables
   {
     id: 'person-happy',
     name: 'Persona Alegre',
@@ -238,25 +266,53 @@ export const avatarOptions: AvatarOption[] = [
     color: '#f43f5e'
   },
   {
-    id: 'sentiment-satisfied',
+    id: 'person-satisfied',
     name: 'Persona Satisfecha',
     icon: MdSentimentSatisfied,
     category: 'casual',
     color: '#22c55e'
   },
   {
-    id: 'sentiment-very-satisfied',
+    id: 'person-very-satisfied',
     name: 'Persona Muy Feliz',
     icon: MdSentimentVerySatisfied,
     category: 'casual',
     color: '#eab308'
   },
   {
-    id: 'emoji-people',
+    id: 'person-social',
     name: 'Persona Sociable',
     icon: MdEmojiPeople,
     category: 'casual',
     color: '#3b82f6'
+  },
+  {
+    id: 'person-fill',
+    name: 'Persona Completa',
+    icon: BsPersonFill,
+    category: 'casual',
+    color: '#64748b'
+  },
+  {
+    id: 'person-plus',
+    name: 'Persona Positiva',
+    icon: BsPersonPlus,
+    category: 'casual',
+    color: '#16a34a'
+  },
+  {
+    id: 'person-sharp',
+    name: 'Persona Decidida',
+    icon: IoPersonSharp,
+    category: 'casual',
+    color: '#dc2626'
+  },
+  {
+    id: 'person-friends',
+    name: 'Persona Amigable',
+    icon: FaUserFriends,
+    category: 'casual',
+    color: '#7c3aed'
   }
 ]
 

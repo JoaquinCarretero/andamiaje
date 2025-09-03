@@ -154,8 +154,8 @@ export default function ProfilePage() {
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Panel Lateral - Movido arriba */}
-          <div className="lg:order-2 space-y-6">
+          {/* Panel Lateral - Información del usuario */}
+          <div className="space-y-6">
             {/* Avatar y Acciones Principales */}
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardContent className="p-6 text-center">
@@ -221,7 +221,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Firma Digital - Movida arriba */}
+            {/* Firma Digital */}
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -355,7 +355,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Información Principal */}
-          <div className="lg:col-span-2 lg:order-1 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             {/* Datos Personales */}
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardHeader>
@@ -511,8 +511,8 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Información Profesional - Movida abajo */}
-          <div className="lg:col-span-2 lg:order-1 space-y-6">
+          {/* Información Profesional */}
+          <div className="lg:col-span-2 space-y-6">
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
