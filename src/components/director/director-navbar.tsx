@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Bell, User, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { NotificationsModal } from "@/components/ui/notifications-modal"
 import Image from "next/image"
 import colors from "@/lib/colors"
 
@@ -16,8 +18,18 @@ interface DirectorNavbarProps {
 }
 
 export function DirectorNavbar({ userData }: DirectorNavbarProps) {
+  const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
 
+  const handleProfileClick = () => {
+    router.push('/perfil')
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('userSignature')
+    router.push('/login')
+  }
   return (
     <>
       <nav
@@ -47,6 +59,7 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={() => setShowNotifications(true)}
                 className="relative rounded-full transition-all duration-200 hover:bg-neutral-100"
                 style={{ color: colors.textSecondary }}
               >
@@ -71,6 +84,7 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
+                  onClick={handleProfileClick}
                   className="rounded-full transition-all duration-200"
                   style={{ 
                     color: colors.textSecondary,
@@ -84,6 +98,7 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={handleLogout}
                 className="rounded-full transition-all duration-200 hover:bg-red-50 hover:text-red-600"
                 style={{ color: colors.textSecondary }}
               >
@@ -167,6 +182,7 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
                   <Button
                     variant="ghost"
                     className="flex items-center space-x-2 rounded-lg"
+                    onClick={() => setShowNotifications(true)}
                     style={{ color: colors.textSecondary }}
                   >
                     <Bell className="h-5 w-5" />
@@ -182,6 +198,7 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    onClick={handleLogout}
                     className="rounded-full hover:bg-red-50 hover:text-red-600"
                     style={{ color: colors.textSecondary }}
                   >
@@ -193,6 +210,13 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
           </div>
         </div>
       )}
+
+      {/* Modal de Notificaciones */}
+      <NotificationsModal
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        userRole={userData.role}
+      />
     </>
   )
 }

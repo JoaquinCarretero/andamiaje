@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/shared/navbar"
 import { DashboardStats } from "@/components/shared/dashboard-stats"
 import { QuickActions } from "@/components/shared/quick-actions"
@@ -22,6 +23,15 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ userData, children, currentView, onNavigate }: DashboardLayoutProps) {
+  const router = useRouter()
+
+  const handleNavigation = (view: string) => {
+    if (view === 'perfil') {
+      router.push('/perfil')
+    } else {
+      onNavigate(view)
+    }
+  }
   const getGreeting = () => {
     const hour = new Date().getHours()
     let timeGreeting = "Buenos días"
@@ -114,7 +124,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                             borderColor: section.id === "seguimiento-acompanantes" ? colors.secondary[300] : colors.border,
                             boxShadow: section.id === "seguimiento-acompanantes" ? `0 8px 25px ${colors.secondary[500]}20` : undefined,
                           }}
-                          onClick={() => onNavigate(section.id)}
+                          onClick={() => handleNavigation(section.id)}
                         >
                           <div className="space-y-3">
                             <div
@@ -160,7 +170,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
               </div>
 
               <div className="xl:col-span-1">
-                <QuickActions role={userData.role} onNavigate={onNavigate} />
+                <QuickActions role={userData.role} onNavigate={handleNavigation} />
               </div>
             </div>
           </div>

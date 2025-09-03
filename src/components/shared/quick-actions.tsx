@@ -37,6 +37,7 @@ const roleActions = {
     { id: "actas", title: "Registrar Acta", subtitle: "Reunión del 15 de enero", icon: Calendar, buttonText: "Ir" },
     { id: "facturas", title: "Subir Factura", subtitle: "Factura de diciembre 2024", icon: Upload, urgent: true, buttonText: "Ir" },
     { id: "reporte-mensual", title: "Revisar Reporte", subtitle: "Reporte mensual pendiente", icon: FileText, buttonText: "Ir" },
+    { id: "seguimiento-flia", title: "Seguimiento Familias", subtitle: "Revisar comunicación familiar", icon: Users, buttonText: "Ir" },
   ],
 }
 
