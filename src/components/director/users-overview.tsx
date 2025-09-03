@@ -184,36 +184,36 @@ export function UsersOverview() {
       </Card>
 
       {/* Lista de usuarios */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-[95vw] mx-auto">
         {filteredUsers.map((user) => {
           const roleColors = getRoleColor(user.role)
           return (
             <Card
               key={user.id}
-              className="shadow-soft border-0 transition-all duration-200 hover:shadow-medium hover:scale-[1.02]"
+              className="shadow-soft border-0 transition-all duration-200 hover:shadow-medium hover:scale-[1.01]"
               style={{ 
                 backgroundColor: colors.surface,
                 borderColor: colors.border 
               }}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-5">
                 <div className="space-y-4">
                   {/* Header del usuario */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
                       <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                         style={{ backgroundColor: roleColors.bg }}
                       >
-                        <User className="h-6 w-6" style={{ color: roleColors.text }} />
+                        <User className="h-5 w-5" style={{ color: roleColors.text }} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-lg" style={{ color: colors.text }}>
+                        <h3 className="font-semibold text-base" style={{ color: colors.text }}>
                           {user.name}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
                           <span 
-                            className="px-3 py-1 rounded-full text-sm font-medium"
+                            className="px-2 py-0.5 rounded-full text-xs font-medium"
                             style={{
                               backgroundColor: roleColors.bg,
                               color: roleColors.text
@@ -223,7 +223,7 @@ export function UsersOverview() {
                           </span>
                           {user.specialty && (
                             <span 
-                              className="px-2 py-1 rounded text-xs"
+                              className="px-2 py-0.5 rounded text-xs"
                               style={{
                                 backgroundColor: colors.neutral[100],
                                 color: colors.textMuted
@@ -238,42 +238,42 @@ export function UsersOverview() {
                   </div>
 
                   {/* Información del usuario */}
-                  <div className="grid grid-cols-1 gap-3 text-sm">
+                  <div className="grid grid-cols-1 gap-2 text-sm">
                     <div className="flex items-center gap-3">
                       <Mail className="h-4 w-4 flex-shrink-0" style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textSecondary }} className="truncate">
+                      <span style={{ color: colors.textSecondary }} className="truncate text-xs">
                         {user.email}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Phone className="h-4 w-4 flex-shrink-0" style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textSecondary }}>
+                      <span style={{ color: colors.textSecondary }} className="text-xs">
                         {user.phone}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textSecondary }}>
+                      <span style={{ color: colors.textSecondary }} className="text-xs">
                         Ingreso: {user.joinDate}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <FileText className="h-4 w-4 flex-shrink-0" style={{ color: colors.textMuted }} />
-                      <span style={{ color: colors.textSecondary }}>
+                      <span style={{ color: colors.textSecondary }} className="text-xs">
                         {user.documentsCount} documentos creados
                       </span>
                     </div>
                   </div>
 
                   {/* Acciones de contacto */}
-                  <div className="flex items-center gap-2 pt-4 border-t" style={{ borderColor: colors.border }}>
+                  <div className="flex items-center gap-2 pt-3 border-t" style={{ borderColor: colors.border }}>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => openWhatsApp(user.phone, user.name)}
                       className="flex-1 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
                     >
-                      <MessageCircle className="h-4 w-4 mr-2" />
+                      <MessageCircle className="h-3 w-3 mr-1" />
                       WhatsApp
                     </Button>
                     <Button
@@ -282,7 +282,7 @@ export function UsersOverview() {
                       onClick={() => openEmail(user.email, user.name)}
                       className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
                     >
-                      <Mail className="h-4 w-4 mr-2" />
+                      <Mail className="h-3 w-3 mr-1" />
                       Email
                     </Button>
                   </div>

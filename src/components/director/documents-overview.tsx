@@ -1,11 +1,9 @@
-"use client"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Search, Download, Eye, Edit, Calendar, User, Phone, Mail, ExternalLink } from "lucide-react"
+import { FileText, Search, Download, Eye, Edit, Calendar, User, Phone, Mail, X, ChevronDown, ChevronUp, Filter } from "lucide-react"
 import { UserProfilePopover } from "@/components/director/user-profile-popover"
 import colors from "@/lib/colors"
 
@@ -21,18 +19,33 @@ interface Document {
   date: string
 }
 
-export function DocumentsOverview() {
+interface DocumentsOverviewProps {
+  initialFilter?: string
+}
+
+// Función para normalizar texto (quitar acentos)
+const normalizeText = (text: string) => {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+}
+
+export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
-  const [sortBy, setSortBy] = useState("date")
+  const [filterRole, setFilterRole] = useState("all")
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
   const [selectedProfessional, setSelectedProfessional] = useState<any>(null)
   const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 })
+  const [collapsedCards, setCollapsedCards] = useState<Set<number>>(new Set())
 
   const [documents] = useState<Document[]>([
     {
       id: 1,
       title: "Plan de Trabajo - Desarrollo Cognitivo",
-      type: "Plan de Trabajo",
+      type: "Planes de Trabajo",
       patientName: "Juan Pérez",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
@@ -43,7 +56,7 @@ export function DocumentsOverview() {
     {
       id: 2,
       title: "Informe Inicial - Evaluación Neuropsicológica",
-      type: "Informe Inicial",
+      type: "Informes Iniciales",
       patientName: "Ana López",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
@@ -54,7 +67,7 @@ export function DocumentsOverview() {
     {
       id: 3,
       title: "Reporte Mensual - Enero 2024",
-      type: "Reporte Mensual",
+      type: "Reportes Mensuales",
       patientName: "Pedro Rodríguez",
       professionalName: "Prof. Ana Martínez",
       professionalRole: "Acompañante",
@@ -65,7 +78,7 @@ export function DocumentsOverview() {
     {
       id: 4,
       title: "Informe Semestral - Primer Semestre",
-      type: "Informe Semestral",
+      type: "Informes Semestrales",
       patientName: "María González",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
@@ -76,7 +89,7 @@ export function DocumentsOverview() {
     {
       id: 5,
       title: "Acta de Reunión - Evaluación Trimestral",
-      type: "Acta de Reunión",
+      type: "Actas de Reunión",
       patientName: "Sofía Martín",
       professionalName: "Lucre Martínez",
       professionalRole: "Coordinador",
@@ -87,14 +100,47 @@ export function DocumentsOverview() {
     {
       id: 6,
       title: "Factura Mensual - Enero",
-      type: "Factura",
+      type: "Facturas",
       professionalName: "Prof. Carlos López",
       professionalRole: "Acompañante",
       professionalEmail: "carlos.lopez@andamiaje.com",
       professionalPhone: "+54 11 4567-8901",
       date: "2024-01-22",
+    },
+    {
+      id: 7,
+      title: "Plan de Trabajo - Habilidades Sociales",
+      type: "Planes de Trabajo",
+      patientName: "Diego Morales",
+      professionalName: "Prof. Laura Fernández",
+      professionalRole: "Acompañante",
+      professionalEmail: "laura.fernandez@andamiaje.com",
+      professionalPhone: "+54 11 5678-9012",
+      date: "2024-01-18",
+    },
+    {
+      id: 8,
+      title: "Reporte Mensual - Diciembre 2023",
+      type: "Reportes Mensuales",
+      patientName: "Valentina Castro",
+      professionalName: "Prof. Ana Martínez",
+      professionalRole: "Acompañante",
+      professionalEmail: "ana.martinez@andamiaje.com",
+      professionalPhone: "+54 11 2345-6789",
+      date: "2023-12-30",
     }
   ])
+
+  // Escuchar eventos de filtro desde Vista General
+  useEffect(() => {
+    const handleDocumentFilter = (event: CustomEvent) => {
+      const { type } = event.detail
+      setFilterType(type)
+    }
+
+    window.addEventListener('applyDocumentFilter', handleDocumentFilter as EventListener)
+    return () => window.removeEventListener('applyDocumentFilter', handleDocumentFilter as EventListener)
+  }, [])
 
   const handleProfessionalClick = (event: React.MouseEvent, professional: any) => {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -105,33 +151,70 @@ export function DocumentsOverview() {
     setSelectedProfessional(professional)
   }
 
+  const toggleCardCollapse = (id: number) => {
+    setCollapsedCards(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
+  }
+
+  const clearFilters = () => {
+    setSearchTerm("")
+    setFilterType("all")
+    setFilterRole("all")
+    setDateFrom("")
+    setDateTo("")
+  }
+
+  const hasActiveFilters = searchTerm || filterType !== "all" || filterRole !== "all" || dateFrom || dateTo
+
   const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (doc.patientName && doc.patientName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                         doc.professionalName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = filterType === "all" || doc.type === filterType
+    // Búsqueda sin acentos
+    const normalizedSearch = normalizeText(searchTerm)
+    const matchesSearch = !searchTerm || 
+      normalizeText(doc.title).includes(normalizedSearch) ||
+      (doc.patientName && normalizeText(doc.patientName).includes(normalizedSearch)) ||
+      normalizeText(doc.professionalName).includes(normalizedSearch)
     
-    return matchesSearch && matchesType
+    const matchesType = filterType === "all" || doc.type === filterType
+    const matchesRole = filterRole === "all" || doc.professionalRole === filterRole
+    
+    // Filtro por fecha
+    let matchesDate = true
+    if (dateFrom || dateTo) {
+      const docDate = new Date(doc.date)
+      if (dateFrom) {
+        matchesDate = matchesDate && docDate >= new Date(dateFrom)
+      }
+      if (dateTo) {
+        matchesDate = matchesDate && docDate <= new Date(dateTo)
+      }
+    }
+    
+    return matchesSearch && matchesType && matchesRole && matchesDate
   })
 
-  const sortedDocuments = [...filteredDocuments].sort((a, b) => {
-    switch (sortBy) {
-      case "date":
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
-      case "patient":
-        return (a.patientName || "").localeCompare(b.patientName || "")
-      case "professional":
-        return a.professionalName.localeCompare(b.professionalName)
-      case "type":
-        return a.type.localeCompare(b.type)
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "Terapeuta":
+        return { bg: colors.primary[50], text: colors.primary[600] }
+      case "Coordinador":
+        return { bg: colors.secondary[50], text: colors.secondary[600] }
+      case "Acompañante":
+        return { bg: colors.accent[50], text: colors.accent[600] }
       default:
-        return 0
+        return { bg: colors.neutral[50], text: colors.neutral[600] }
     }
-  })
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Filtros y búsqueda */}
+    <div className="space-y-6 max-w-[95vw] mx-auto">
+      {/* Filtros y búsqueda - Más ancho */}
       <Card 
         className="shadow-soft border-0"
         style={{ 
@@ -140,8 +223,8 @@ export function DocumentsOverview() {
         }}
       >
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div className="md:col-span-2 space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
                 Buscar Documentos
               </label>
@@ -151,7 +234,7 @@ export function DocumentsOverview() {
                   placeholder="Buscar por título, paciente o profesional..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 h-12"
+                  className="pl-10 h-11"
                   style={{
                     backgroundColor: colors.surface,
                     borderColor: colors.border,
@@ -168,64 +251,104 @@ export function DocumentsOverview() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="flex h-12 w-full rounded-md border px-3 py-2 text-sm"
+                className="flex h-11 w-full rounded-md border px-3 py-2 text-sm"
                 style={{
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
                   color: colors.text
                 }}
               >
-                <option value="all">Todos los tipos</option>
-                <option value="Plan de Trabajo">Planes de Trabajo</option>
-                <option value="Informe Inicial">Informes Iniciales</option>
-                <option value="Informe Semestral">Informes Semestrales</option>
-                <option value="Reporte Mensual">Reportes Mensuales</option>
-                <option value="Acta de Reunión">Actas de Reunión</option>
-                <option value="Factura">Facturas</option>
+                <option value="all">Todos</option>
+                <option value="Planes de Trabajo">Planes de Trabajo</option>
+                <option value="Informes Iniciales">Informes Iniciales</option>
+                <option value="Informes Semestrales">Informes Semestrales</option>
+                <option value="Reportes Mensuales">Reportes Mensuales</option>
+                <option value="Actas de Reunión">Actas de Reunión</option>
+                <option value="Facturas">Facturas</option>
               </select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Ordenar por
+                Rol Profesional
               </label>
               <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="flex h-12 w-full rounded-md border px-3 py-2 text-sm"
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+                className="flex h-11 w-full rounded-md border px-3 py-2 text-sm"
                 style={{
                   backgroundColor: colors.surface,
                   borderColor: colors.border,
                   color: colors.text
                 }}
               >
-                <option value="date">Fecha (Más reciente)</option>
-                <option value="patient">Paciente (A-Z)</option>
-                <option value="professional">Profesional (A-Z)</option>
-                <option value="type">Tipo de Documento</option>
+                <option value="all">Todos</option>
+                <option value="Terapeuta">Terapeutas</option>
+                <option value="Coordinador">Coordinadores</option>
+                <option value="Acompañante">Acompañantes</option>
               </select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Acciones
+                Desde
               </label>
-              <Button
-                className="w-full h-12"
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-11"
                 style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  color: colors.text
                 }}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar Todo
-              </Button>
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium" style={{ color: colors.text }}>
+                Hasta
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="h-11"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                />
+                {hasActiveFilters && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={clearFilters}
+                    className="h-11 w-11 hover:bg-red-50 hover:text-red-600"
+                    title="Limpiar filtros"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
+
+          {hasActiveFilters && (
+            <div className="mt-4 flex items-center gap-2">
+              <Filter className="h-4 w-4" style={{ color: colors.primary[500] }} />
+              <span className="text-sm font-medium" style={{ color: colors.primary[600] }}>
+                Filtros activos: {filteredDocuments.length} de {documents.length} documentos
+              </span>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Lista de documentos */}
+      {/* Lista de documentos - Cards rectangulares optimizadas */}
       <Card 
         className="shadow-soft border-0"
         style={{ 
@@ -235,11 +358,11 @@ export function DocumentsOverview() {
       >
         <CardHeader>
           <CardTitle style={{ color: colors.text }}>
-            Documentos del Sistema ({sortedDocuments.length})
+            Documentos del Sistema ({filteredDocuments.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {sortedDocuments.length === 0 ? (
+        <CardContent className="p-4">
+          {filteredDocuments.length === 0 ? (
             <div className="text-center py-16">
               <FileText className="h-16 w-16 mx-auto mb-4" style={{ color: colors.textMuted }} />
               <p className="text-lg font-medium mb-2" style={{ color: colors.text }}>
@@ -250,116 +373,173 @@ export function DocumentsOverview() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {sortedDocuments.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="p-6 border rounded-xl transition-all duration-200 hover:shadow-medium hover:scale-[1.01]"
-                  style={{ borderColor: colors.border }}
-                >
-                  <div className="flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-6 flex-1 min-w-0">
-                      <div
-                        className="p-3 rounded-xl flex-shrink-0"
-                        style={{ backgroundColor: colors.primary[50] }}
-                      >
-                        <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg mb-3 truncate" style={{ color: colors.text }}>
-                          {doc.title}
-                        </h3>
-                        
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium" style={{ color: colors.text }}>Tipo:</span>
-                            <span 
-                              className="px-2 py-1 rounded-full text-xs font-medium"
-                              style={{
-                                backgroundColor: colors.accent[50],
-                                color: colors.accent[600]
-                              }}
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+              {filteredDocuments.map((doc) => {
+                const roleColors = getRoleColor(doc.professionalRole)
+                const isCollapsed = collapsedCards.has(doc.id)
+                
+                return (
+                  <div
+                    key={doc.id}
+                    className={`border rounded-lg transition-all duration-200 hover:shadow-medium ${
+                      isCollapsed ? 'hover:scale-[1.01]' : 'hover:scale-[1.02]'
+                    }`}
+                    style={{ borderColor: colors.border }}
+                  >
+                    {isCollapsed ? (
+                      // Vista colapsada - Solo información esencial
+                      <div className="p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div
+                              className="p-2 rounded-lg flex-shrink-0"
+                              style={{ backgroundColor: colors.primary[50] }}
                             >
-                              {doc.type}
-                            </span>
+                              <FileText className="h-4 w-4" style={{ color: colors.primary[500] }} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-sm truncate" style={{ color: colors.text }}>
+                                {doc.title}
+                              </h3>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span 
+                                  className="px-2 py-0.5 rounded text-xs font-medium"
+                                  style={{
+                                    backgroundColor: roleColors.bg,
+                                    color: roleColors.text
+                                  }}
+                                >
+                                  {doc.professionalRole}
+                                </span>
+                                <span className="text-xs" style={{ color: colors.textMuted }}>
+                                  {doc.date}
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleCardCollapse(doc.id)}
+                            className="h-8 w-8"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // Vista expandida - Información completa
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="p-2.5 rounded-lg flex-shrink-0"
+                              style={{ backgroundColor: colors.primary[50] }}
+                            >
+                              <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-base mb-1" style={{ color: colors.text }}>
+                                {doc.title}
+                              </h3>
+                              <span 
+                                className="px-2 py-1 rounded-full text-xs font-medium"
+                                style={{
+                                  backgroundColor: colors.accent[50],
+                                  color: colors.accent[600]
+                                }}
+                              >
+                                {doc.type}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleCardCollapse(doc.id)}
+                            className="h-8 w-8"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 text-sm mb-4">
                           {doc.patientName && (
                             <div className="flex items-center gap-2">
                               <User className="h-4 w-4" style={{ color: colors.textMuted }} />
-                              <div>
-                                <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
-                                <br />
-                                <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
-                              </div>
+                              <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
+                              <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
                             </div>
                           )}
                           
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4" style={{ color: colors.textMuted }} />
-                            <div>
-                              <span className="font-medium" style={{ color: colors.text }}>Profesional:</span>
-                              <br />
-                              <button
-                                onClick={(e) => handleProfessionalClick(e, {
-                                  name: doc.professionalName,
-                                  role: doc.professionalRole,
-                                  email: doc.professionalEmail,
-                                  phone: doc.professionalPhone
-                                })}
-                                className="text-left hover:underline transition-colors duration-200"
-                                style={{ color: colors.primary[500] }}
-                              >
-                                {doc.professionalName}
-                              </button>
-                            </div>
+                            <span className="font-medium" style={{ color: colors.text }}>Profesional:</span>
+                            <button
+                              onClick={(e) => handleProfessionalClick(e, {
+                                name: doc.professionalName,
+                                role: doc.professionalRole,
+                                email: doc.professionalEmail,
+                                phone: doc.professionalPhone
+                              })}
+                              className="hover:underline transition-colors duration-200"
+                              style={{ color: colors.primary[500] }}
+                            >
+                              {doc.professionalName}
+                            </button>
+                            <span 
+                              className="px-2 py-0.5 rounded text-xs font-medium ml-2"
+                              style={{
+                                backgroundColor: roleColors.bg,
+                                color: roleColors.text
+                              }}
+                            >
+                              {doc.professionalRole}
+                            </span>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4" style={{ color: colors.textMuted }} />
-                            <div>
-                              <span className="font-medium" style={{ color: colors.text }}>Fecha:</span>
-                              <br />
-                              <span style={{ color: colors.textSecondary }}>{doc.date}</span>
-                            </div>
+                            <span className="font-medium" style={{ color: colors.text }}>Fecha:</span>
+                            <span style={{ color: colors.textSecondary }}>{doc.date}</span>
                           </div>
                         </div>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Ver
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="hover:bg-green-50 hover:text-green-600 hover:border-green-300"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                      <Button
-                        size="lg"
-                        className="hover:shadow-lg"
-                        style={{
-                          backgroundColor: colors.primary[500],
-                          color: colors.surface
-                        }}
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Descargar
-                      </Button>
-                    </div>
+                        {/* Botones de acción */}
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            Ver
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 hover:bg-green-50 hover:text-green-600 hover:border-green-300"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            Editar
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="flex-1"
+                            style={{
+                              backgroundColor: colors.primary[500],
+                              color: colors.surface
+                            }}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Descargar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>

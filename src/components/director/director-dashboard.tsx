@@ -115,7 +115,16 @@ export function DirectorDashboard({ userData }: DirectorDashboardProps) {
                         backgroundColor: colors.surface,
                         borderColor: colors.border,
                       }}
-                      onClick={() => setCurrentView("documents")}
+                      onClick={() => {
+                        setCurrentView("documents")
+                        // Pasar el filtro al componente de documentos
+                        setTimeout(() => {
+                          const event = new CustomEvent('applyDocumentFilter', { 
+                            detail: { type: docType.title } 
+                          })
+                          window.dispatchEvent(event)
+                        }, 100)
+                      }}
                     >
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
