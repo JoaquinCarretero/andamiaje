@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, User, LogOut, Menu, X, Home, FileText, Users, BarChart3 } from "lucide-react"
+import { Bell, User, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
@@ -13,22 +13,10 @@ interface DirectorNavbarProps {
     title: string
     role: string
   }
-  currentView: string
-  onNavigate: (view: string) => void
 }
 
-export function DirectorNavbar({ userData, currentView, onNavigate }: DirectorNavbarProps) {
+export function DirectorNavbar({ userData }: DirectorNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  const navigationItems = [
-    { id: "overview", title: "Vista General", icon: Home },
-    { id: "documents", title: "Documentos", icon: FileText },
-  ]
-
-  const handleMobileNavigation = (viewId: string) => {
-    setIsMobileMenuOpen(false)
-    onNavigate(viewId)
-  }
 
   return (
     <>
@@ -52,30 +40,6 @@ export function DirectorNavbar({ userData, currentView, onNavigate }: DirectorNa
                   className="object-contain scale-150"
                 />
               </div>
-            </div>
-
-            {/* Desktop navigation */}
-            <div className="hidden md:flex items-center space-x-6">
-              {navigationItems.map((item) => {
-                const Icon = item.icon
-                const isActive = currentView === item.id
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => onNavigate(item.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive ? 'shadow-medium' : 'hover:shadow-sm'
-                    }`}
-                    style={{
-                      backgroundColor: isActive ? colors.primary[500] : 'transparent',
-                      color: isActive ? colors.surface : colors.textSecondary
-                    }}
-                  >
-                    <Icon className="h-4 w-4" />
-                    {item.title}
-                  </button>
-                )
-              })}
             </div>
 
             {/* Desktop user menu */}
@@ -191,38 +155,6 @@ export function DirectorNavbar({ userData, currentView, onNavigate }: DirectorNa
                     <p className="text-sm" style={{ color: colors.textMuted }}>
                       {userData.title}
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <div className="p-6">
-                  <h3 className="text-sm font-medium mb-4" style={{ color: colors.textSecondary }}>
-                    Navegación
-                  </h3>
-                  <div className="space-y-2">
-                    {navigationItems.map((item) => {
-                      const Icon = item.icon
-                      const isActive = currentView === item.id
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => handleMobileNavigation(item.id)}
-                          className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
-                            isActive ? 'shadow-medium' : 'hover:scale-105 hover:bg-neutral-100'
-                          }`}
-                          style={{ 
-                            backgroundColor: isActive ? colors.primary[500] : colors.neutral[50],
-                            color: isActive ? colors.surface : colors.text
-                          }}
-                        >
-                          <Icon className="h-5 w-5" />
-                          <span className="text-sm font-medium">
-                            {item.title}
-                          </span>
-                        </button>
-                      )
-                    })}
                   </div>
                 </div>
               </div>

@@ -5,16 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Search, Download, Eye, Edit, Calendar, User, Filter, SortAsc } from "lucide-react"
+import { FileText, Search, Download, Eye, Edit, Calendar, User, Phone, Mail, ExternalLink } from "lucide-react"
+import { UserProfilePopover } from "@/components/director/user-profile-popover"
 import colors from "@/lib/colors"
 
 interface Document {
   id: number
   title: string
   type: string
-  patientName: string
+  patientName?: string
   professionalName: string
   professionalRole: string
+  professionalEmail: string
+  professionalPhone: string
   date: string
 }
 
@@ -22,71 +25,89 @@ export function DocumentsOverview() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [sortBy, setSortBy] = useState("date")
+  const [selectedProfessional, setSelectedProfessional] = useState<any>(null)
+  const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 })
 
   const [documents] = useState<Document[]>([
     {
       id: 1,
-      title: "Plan de Trabajo",
+      title: "Plan de Trabajo - Desarrollo Cognitivo",
       type: "Plan de Trabajo",
       patientName: "Juan Pérez",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
+      professionalEmail: "maria.gonzalez@andamiaje.com",
+      professionalPhone: "+54 11 1234-5678",
       date: "2024-01-15",
     },
     {
       id: 2,
-      title: "Informe Inicial",
+      title: "Informe Inicial - Evaluación Neuropsicológica",
       type: "Informe Inicial",
       patientName: "Ana López",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
+      professionalEmail: "maria.gonzalez@andamiaje.com",
+      professionalPhone: "+54 11 1234-5678",
       date: "2024-01-20",
     },
     {
       id: 3,
-      title: "Reporte Mensual - Enero",
+      title: "Reporte Mensual - Enero 2024",
       type: "Reporte Mensual",
       patientName: "Pedro Rodríguez",
       professionalName: "Prof. Ana Martínez",
       professionalRole: "Acompañante",
+      professionalEmail: "ana.martinez@andamiaje.com",
+      professionalPhone: "+54 11 2345-6789",
       date: "2024-01-30",
     },
     {
       id: 4,
-      title: "Informe Semestral",
+      title: "Informe Semestral - Primer Semestre",
       type: "Informe Semestral",
       patientName: "María González",
       professionalName: "Dr. María González",
       professionalRole: "Terapeuta",
+      professionalEmail: "maria.gonzalez@andamiaje.com",
+      professionalPhone: "+54 11 1234-5678",
       date: "2024-01-25",
     },
     {
       id: 5,
-      title: "Acta de Reunión",
+      title: "Acta de Reunión - Evaluación Trimestral",
       type: "Acta de Reunión",
       patientName: "Sofía Martín",
       professionalName: "Lucre Martínez",
       professionalRole: "Coordinador",
+      professionalEmail: "lucre.martinez@andamiaje.com",
+      professionalPhone: "+54 11 3456-7890",
       date: "2024-01-28",
     },
     {
       id: 6,
-      title: "Plan de Trabajo",
-      type: "Plan de Trabajo",
-      patientName: "Diego Morales",
+      title: "Factura Mensual - Enero",
+      type: "Factura",
       professionalName: "Prof. Carlos López",
       professionalRole: "Acompañante",
+      professionalEmail: "carlos.lopez@andamiaje.com",
+      professionalPhone: "+54 11 4567-8901",
       date: "2024-01-22",
     }
   ])
 
-  const getTypeIcon = (type: string) => {
-    return <FileText className="h-4 w-4" style={{ color: colors.primary[500] }} />
+  const handleProfessionalClick = (event: React.MouseEvent, professional: any) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    setPopoverPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.bottom + 10
+    })
+    setSelectedProfessional(professional)
   }
 
   const filteredDocuments = documents.filter(doc => {
     const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         doc.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (doc.patientName && doc.patientName.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          doc.professionalName.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filterType === "all" || doc.type === filterType
     
@@ -98,7 +119,7 @@ export function DocumentsOverview() {
       case "date":
         return new Date(b.date).getTime() - new Date(a.date).getTime()
       case "patient":
-        return a.patientName.localeCompare(b.patientName)
+        return (a.patientName || "").localeCompare(b.patientName || "")
       case "professional":
         return a.professionalName.localeCompare(b.professionalName)
       case "type":
@@ -110,31 +131,7 @@ export function DocumentsOverview() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-bold mb-2" style={{ color: colors.text }}>
-            Gestión de Documentos
-          </h1>
-          <p className="text-lg" style={{ color: colors.textSecondary }}>
-            Control completo de todos los documentos del sistema
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button
-            size="lg"
-            style={{
-              backgroundColor: colors.primary[500],
-              color: colors.surface
-            }}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Exportar Todo
-          </Button>
-        </div>
-      </div>
-
+      {/* Filtros y búsqueda */}
       <Card 
         className="shadow-soft border-0"
         style={{ 
@@ -142,9 +139,8 @@ export function DocumentsOverview() {
           borderColor: colors.border 
         }}
       >
-        <CardContent className="p-8">
-          {/* Filtros y búsqueda */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
                 Buscar Documentos
@@ -185,6 +181,7 @@ export function DocumentsOverview() {
                 <option value="Informe Semestral">Informes Semestrales</option>
                 <option value="Reporte Mensual">Reportes Mensuales</option>
                 <option value="Acta de Reunión">Actas de Reunión</option>
+                <option value="Factura">Facturas</option>
               </select>
             </div>
 
@@ -211,22 +208,37 @@ export function DocumentsOverview() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: colors.text }}>
-                Resultados
+                Acciones
               </label>
-              <div 
-                className="flex items-center justify-center h-12 px-4 rounded-md border font-medium"
-                style={{ 
-                  borderColor: colors.border,
-                  backgroundColor: colors.primary[50],
-                  color: colors.primary[600]
+              <Button
+                className="w-full h-12"
+                style={{
+                  backgroundColor: colors.primary[500],
+                  color: colors.surface
                 }}
               >
-                {sortedDocuments.length} documentos
-              </div>
+                <Download className="h-4 w-4 mr-2" />
+                Exportar Todo
+              </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Lista de documentos */}
+      {/* Lista de documentos */}
+      <Card 
+        className="shadow-soft border-0"
+        style={{ 
+          backgroundColor: colors.surface,
+          borderColor: colors.border 
+        }}
+      >
+        <CardHeader>
+          <CardTitle style={{ color: colors.text }}>
+            Documentos del Sistema ({sortedDocuments.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           {sortedDocuments.length === 0 ? (
             <div className="text-center py-16">
               <FileText className="h-16 w-16 mx-auto mb-4" style={{ color: colors.textMuted }} />
@@ -246,36 +258,64 @@ export function DocumentsOverview() {
                   style={{ borderColor: colors.border }}
                 >
                   <div className="flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-6 flex-1">
+                    <div className="flex items-center gap-6 flex-1 min-w-0">
                       <div
                         className="p-3 rounded-xl flex-shrink-0"
                         style={{ backgroundColor: colors.primary[50] }}
                       >
-                        {getTypeIcon(doc.type)}
+                        <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg mb-2" style={{ color: colors.text }}>
+                        <h3 className="font-semibold text-lg mb-3 truncate" style={{ color: colors.text }}>
                           {doc.title}
                         </h3>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-3">
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <User className="h-4 w-4" style={{ color: colors.textMuted }} />
-                            <div>
-                              <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
-                              <br />
-                              <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
-                            </div>
+                            <span className="font-medium" style={{ color: colors.text }}>Tipo:</span>
+                            <span 
+                              className="px-2 py-1 rounded-full text-xs font-medium"
+                              style={{
+                                backgroundColor: colors.accent[50],
+                                color: colors.accent[600]
+                              }}
+                            >
+                              {doc.type}
+                            </span>
                           </div>
+                          
+                          {doc.patientName && (
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" style={{ color: colors.textMuted }} />
+                              <div>
+                                <span className="font-medium" style={{ color: colors.text }}>Paciente:</span>
+                                <br />
+                                <span style={{ color: colors.textSecondary }}>{doc.patientName}</span>
+                              </div>
+                            </div>
+                          )}
+                          
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4" style={{ color: colors.textMuted }} />
                             <div>
                               <span className="font-medium" style={{ color: colors.text }}>Profesional:</span>
                               <br />
-                              <span style={{ color: colors.textSecondary }}>{doc.professionalName}</span>
+                              <button
+                                onClick={(e) => handleProfessionalClick(e, {
+                                  name: doc.professionalName,
+                                  role: doc.professionalRole,
+                                  email: doc.professionalEmail,
+                                  phone: doc.professionalPhone
+                                })}
+                                className="text-left hover:underline transition-colors duration-200"
+                                style={{ color: colors.primary[500] }}
+                              >
+                                {doc.professionalName}
+                              </button>
                             </div>
                           </div>
+                          
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4" style={{ color: colors.textMuted }} />
                             <div>
@@ -285,27 +325,6 @@ export function DocumentsOverview() {
                             </div>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center gap-3">
-                          <span 
-                            className="text-sm px-3 py-1 rounded-full font-medium"
-                            style={{
-                              backgroundColor: colors.secondary[50],
-                              color: colors.secondary[600]
-                            }}
-                          >
-                            {doc.professionalRole}
-                          </span>
-                          <span 
-                            className="text-sm px-3 py-1 rounded-full font-medium"
-                            style={{
-                              backgroundColor: colors.accent[50],
-                              color: colors.accent[600]
-                            }}
-                          >
-                            {doc.type}
-                          </span>
-                        </div>
                       </div>
                     </div>
 
@@ -314,7 +333,6 @@ export function DocumentsOverview() {
                         variant="outline"
                         size="lg"
                         className="hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
-                        title="Ver documento"
                       >
                         <Eye className="h-4 w-4 mr-2" />
                         Ver
@@ -323,7 +341,6 @@ export function DocumentsOverview() {
                         variant="outline"
                         size="lg"
                         className="hover:bg-green-50 hover:text-green-600 hover:border-green-300"
-                        title="Editar documento"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         Editar
@@ -335,7 +352,6 @@ export function DocumentsOverview() {
                           backgroundColor: colors.primary[500],
                           color: colors.surface
                         }}
-                        title="Descargar PDF"
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Descargar
@@ -348,6 +364,14 @@ export function DocumentsOverview() {
           )}
         </CardContent>
       </Card>
+
+      {/* Popover de perfil de usuario */}
+      <UserProfilePopover
+        isOpen={!!selectedProfessional}
+        onClose={() => setSelectedProfessional(null)}
+        professional={selectedProfessional}
+        position={popoverPosition}
+      />
     </div>
   )
 }
