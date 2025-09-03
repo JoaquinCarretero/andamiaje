@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Bell, User, LogOut, Menu, X, Home, FileText, Calendar, Upload } from "lucide-react"
+import { useAvatar } from "@/lib/avatar-system"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { NotificationsModal } from "@/components/ui/notifications-modal"
@@ -20,8 +21,15 @@ interface NavbarProps {
 
 export function Navbar({ userData, onNavigate }: NavbarProps) {
   const router = useRouter()
+  const { getCurrentAvatar, getAvatarOption } = useAvatar()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [currentAvatarId, setCurrentAvatarId] = useState("")
+
+  // Inicializar avatar
+  useState(() => {
+    setCurrentAvatarId(getCurrentAvatar())
+  })
 
   const handleProfileClick = () => {
     router.push('/perfil')
@@ -30,8 +38,19 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
   const handleLogout = () => {
     // Limpiar datos de sesión si los hay
     localStorage.removeItem('userSignature')
+    // No limpiar avatar si es personalizado
+    const avatarData = localStorage.getItem('userAvatar')
+    if (avatarData) {
+      const parsed = JSON.parse(avatarData)
+      if (!parsed.isCustomSelected) {
+        localStorage.removeItem('userAvatar')
+      }
+    }
     router.push('/login')
   }
+
+  const currentAvatar = getAvatarOption(currentAvatarId)
+
   const getQuickActions = () => {
     if (userData.role === "terapeuta") {
       return [
@@ -119,10 +138,17 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                   className="rounded-full transition-all duration-200"
                   style={{ 
                     color: colors.textSecondary,
-                    backgroundColor: colors.neutral[100]
+                    backgroundColor: currentAvatar ? `${currentAvatar.color}15` : colors.neutral[100]
                   }}
                 >
-                  <User className="h-5 w-5" />
+                  {currentAvatar ? (
+                    <currentAvatar.icon 
+                      className="h-5 w-5" 
+                      style={{ color: currentAvatar.color }}
+                    />
+                  ) : (
+                    <User className="h-5 w-5" />
+                  )}
                 </Button>
               </div>
 
@@ -193,9 +219,16 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                 <div className="flex items-center space-x-3">
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: colors.primary[50] }}
+                    style={{ backgroundColor: currentAvatar ? `${currentAvatar.color}15` : colors.primary[50] }}
                   >
-                    <User className="h-6 w-6" style={{ color: colors.primary[500] }} />
+                    {currentAvatar ? (
+                      <currentAvatar.icon 
+                        className="h-6 w-6" 
+                        style={{ color: currentAvatar.color }}
+                      />
+                    ) : (
+                      <User className="h-6 w-6" style={{ color: colors.primary[500] }} />
+                    )}
                   </div>
                   <div>
                     <p className="font-medium" style={{ color: colors.text }}>
