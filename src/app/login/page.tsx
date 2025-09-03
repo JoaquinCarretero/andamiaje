@@ -235,7 +235,7 @@ export default function LoginPage() {
                       id="dni"
                       type="text"
                       placeholder="12345678"
-                      className="pl-10 h-12 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
                         borderColor: colors.border,
@@ -259,7 +259,7 @@ export default function LoginPage() {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="**********"
-                      className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 focus:scale-105"
+                      className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
                         borderColor: colors.border,
