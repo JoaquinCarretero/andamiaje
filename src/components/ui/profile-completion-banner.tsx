@@ -1,3 +1,4 @@
+// Banner para completar perfil
 "use client"
 
 import { useState } from "react"

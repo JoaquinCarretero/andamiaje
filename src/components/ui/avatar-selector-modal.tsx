@@ -1,3 +1,4 @@
+// Modal para seleccionar avatar de perfil
 "use client"
 
 import { useState } from "react"
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { avatarOptions, type AvatarOption } from "@/lib/avatar-system"
+import { FaUser } from "react-icons/fa"
 import colors from "@/lib/colors"
 
 interface AvatarSelectorModalProps {
