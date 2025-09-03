@@ -1,12 +1,12 @@
 // Utilidades para manejar el almacenamiento de firmas digitales
 
-export interface StoredSignature {
+interface StoredSignature {
   signature: string // Base64 de la imagen de la firma
   name: string // Nombre y apellido para aclaración
   timestamp: string // Fecha y hora de creación
 }
 
-export const signatureStorage = {
+const signatureStorage = {
   // Guardar firma en localStorage
   save: (signature: string, name: string): void => {
     const signatureData: StoredSignature = {

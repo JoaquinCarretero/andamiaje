@@ -260,7 +260,7 @@ export const avatarOptions: AvatarOption[] = [
   }
 ]
 
-export const avatarStorage = {
+const avatarStorage = {
   // Guardar avatar seleccionado
   save: (avatarId: string): void => {
     try {
