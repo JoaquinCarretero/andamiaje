@@ -29,6 +29,7 @@ import { ProfileEditModal } from "@/components/ui/profile-edit-modal"
 import { ProfileCompletionBanner } from "@/components/ui/profile-completion-banner"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
+import { Label } from "@radix-ui/react-label"
 
 // Simulamos obtener el usuario actual desde el localStorage o contexto
 const getCurrentUser = () => {
@@ -133,14 +134,14 @@ export default function ProfilePage() {
         </div>
 
         {/* Banner de completar perfil */}
-        {isProfileIncomplete && (
+        {/* {isProfileIncomplete && (
           <div className="mb-8">
             <ProfileCompletionBanner 
               completeness={profileCompleteness}
               onComplete={() => setShowEditModal(true)}
             />
           </div>
-        )}
+        )} */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Información Principal */}
@@ -425,7 +426,7 @@ export default function ProfilePage() {
                       className="p-6 rounded-lg border-2"
                       style={{
                         backgroundColor: colors.success[50],
-                        borderColor: colors.success[200]
+                        borderColor: colors.success[500]
                       }}
                     >
                       <div className="flex items-center justify-center mb-4">
@@ -454,7 +455,7 @@ export default function ProfilePage() {
                     className="p-6 rounded-lg border-2 text-center"
                     style={{
                       backgroundColor: colors.warning[50],
-                      borderColor: colors.warning[200]
+                      borderColor: colors.warning[500]
                     }}
                   >
                     <Award className="h-12 w-12 mx-auto mb-4" style={{ color: colors.warning[500] }} />
@@ -470,7 +471,7 @@ export default function ProfilePage() {
             </Card>
 
             {/* Estadísticas */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+            {/* <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
@@ -510,10 +511,10 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Información de Contacto */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+            {/* <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Phone className="h-5 w-5" style={{ color: colors.accent[500] }} />
@@ -534,7 +535,7 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
 
