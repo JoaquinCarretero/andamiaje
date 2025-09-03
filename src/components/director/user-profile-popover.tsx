@@ -73,7 +73,7 @@ export function UserProfilePopover({ isOpen, onClose, professional, position }: 
         style={{
           left: `${position.x}px`,
           top: `${position.y - 10}px`,
-          transform: 'translateX(-50%) translateY(-100%)',
+          transform: 'translateX(-50%) translateY(-120%)',
         }}
       >
         <Card 
