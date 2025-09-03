@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { 
@@ -21,8 +21,7 @@ import {
   Clock,
   FileText,
   Users,
-  Settings,
-  Edit3
+  Settings
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -31,10 +30,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Navbar } from "@/components/shared/navbar"
-import { ProfileCompletionBanner } from "@/components/ui/profile-completion-banner"
-import { AvatarSelectorModal } from "@/components/ui/avatar-selector-modal"
 import { useSignature } from "@/lib/signature-storage"
-import { useAvatar } from "@/lib/avatar-system"
 import colors from "@/lib/colors"
 
 // Simulamos obtener el usuario actual desde el localStorage o contexto
@@ -47,12 +43,12 @@ const getCurrentUser = () => {
     phone: "+54 11 1234-5678",
     role: "terapeuta",
     title: "Terapeuta Ocupacional",
-    specialty: "", // Vacío para mostrar que se puede completar
-    license: "", // Vacío para mostrar que se puede completar
+    specialty: "Terapia Ocupacional",
+    license: "MP 12345",
     joinDate: "2023-03-15",
     lastLogin: "2024-01-30",
-    address: "", // Vacío para mostrar que se puede completar
-    bio: "", // Vacío para mostrar que se puede completar
+    address: "Av. Corrientes 1234, CABA",
+    bio: "Especialista en terapia ocupacional con más de 8 años de experiencia en rehabilitación neurológica y desarrollo infantil.",
     documentsCount: 24,
     patientsCount: 12,
     gender: "female"
@@ -62,29 +58,17 @@ const getCurrentUser = () => {
 export default function ProfilePage() {
   const router = useRouter()
   const { getSignature } = useSignature()
-  const { getCurrentAvatar, saveAvatar, hasCustomAvatar, getAvatarOption } = useAvatar()
-  
   const [user] = useState(getCurrentUser())
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [showAvatarModal, setShowAvatarModal] = useState(false)
-  const [currentAvatarId, setCurrentAvatarId] = useState("")
   
   const [editableData, setEditableData] = useState({
     phone: user.phone,
-    address: user.address || "",
-    bio: user.bio || "",
-    specialty: user.specialty || "",
-    license: user.license || ""
+    address: user.address,
+    bio: user.bio
   })
 
-  // Inicializar avatar al cargar el componente
-  useEffect(() => {
-    setCurrentAvatarId(getCurrentAvatar())
-  }, [])
-
   const signature = getSignature()
-  const currentAvatar = getAvatarOption(currentAvatarId)
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -92,11 +76,6 @@ export default function ProfilePage() {
     await new Promise(resolve => setTimeout(resolve, 1000))
     setIsSaving(false)
     setIsEditing(false)
-  }
-
-  const handleAvatarSelect = (avatarId: string) => {
-    saveAvatar(avatarId)
-    setCurrentAvatarId(avatarId)
   }
 
   const handleChangePassword = () => {
@@ -147,51 +126,287 @@ export default function ProfilePage() {
           </h1>
         </div>
 
-        {/* Banner de completar perfil */}
-        <ProfileCompletionBanner 
-          userProfile={editableData}
-          onStartEditing={() => setIsEditing(true)}
-        />
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Panel Lateral - Información del usuario */}
+          {/* Información Principal */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Datos Personales */}
+            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                    <span style={{ color: colors.text }}>Información Personal</span>
+                  </CardTitle>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditing(!isEditing)}
+                    className="flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    {isEditing ? "Cancelar" : "Editar"}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Nombre Completo</Label>
+                    <Input
+                      value={user.name}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Email</Label>
+                    <Input
+                      value={user.email}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Teléfono</Label>
+                    <Input
+                      value={isEditing ? editableData.phone : user.phone}
+                      onChange={(e) => setEditableData(prev => ({ ...prev, phone: e.target.value }))}
+                      readOnly={!isEditing}
+                      className="h-11"
+                      style={{
+                        backgroundColor: isEditing ? colors.surface : colors.neutral[50],
+                        borderColor: colors.border,
+                        color: isEditing ? colors.text : colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Rol</Label>
+                    <div className="flex items-center gap-2 h-11">
+                      <Badge
+                        className="px-3 py-2 text-sm font-medium"
+                        style={{
+                          backgroundColor: roleColors.bg,
+                          color: roleColors.text,
+                          border: `1px solid ${roleColors.border}`
+                        }}
+                      >
+                        {user.title}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label style={{ color: colors.text }}>Dirección</Label>
+                  <Input
+                    value={isEditing ? editableData.address : user.address}
+                    onChange={(e) => setEditableData(prev => ({ ...prev, address: e.target.value }))}
+                    readOnly={!isEditing}
+                    className="h-11"
+                    style={{
+                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
+                      borderColor: colors.border,
+                      color: isEditing ? colors.text : colors.textMuted
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label style={{ color: colors.text }}>Biografía Profesional</Label>
+                  <Textarea
+                    value={isEditing ? editableData.bio : user.bio}
+                    onChange={(e) => setEditableData(prev => ({ ...prev, bio: e.target.value }))}
+                    readOnly={!isEditing}
+                    className="min-h-[100px] resize-none"
+                    style={{
+                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
+                      borderColor: colors.border,
+                      color: isEditing ? colors.text : colors.textMuted
+                    }}
+                  />
+                </div>
+
+                {isEditing && (
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      style={{
+                        backgroundColor: colors.primary[500],
+                        color: colors.surface
+                      }}
+                    >
+                      {isSaving ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Guardando...
+                        </div>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          Guardar Cambios
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Información Profesional */}
+            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Briefcase className="h-5 w-5" style={{ color: colors.secondary[500] }} />
+                  <span style={{ color: colors.text }}>Información Profesional</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Especialidad</Label>
+                    <Input
+                      value={user.specialty}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Matrícula</Label>
+                    <Input
+                      value={user.license}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Fecha de Ingreso</Label>
+                    <Input
+                      value={user.joinDate}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label style={{ color: colors.text }}>Último Acceso</Label>
+                    <Input
+                      value={user.lastLogin}
+                      readOnly
+                      className="h-11"
+                      style={{
+                        backgroundColor: colors.neutral[50],
+                        borderColor: colors.border,
+                        color: colors.textMuted
+                      }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Firma Digital */}
+            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5" style={{ color: colors.accent[500] }} />
+                  <span style={{ color: colors.text }}>Firma Digital</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {signature ? (
+                  <div className="space-y-4">
+                    <div 
+                      className="p-6 rounded-lg border-2"
+                      style={{
+                        backgroundColor: colors.success[50],
+                        borderColor: colors.success[200]
+                      }}
+                    >
+                      <div className="flex items-center justify-center mb-4">
+                        <img
+                          src={signature.signature}
+                          alt="Firma digital"
+                          className="max-h-20 max-w-full object-contain border rounded"
+                          style={{ backgroundColor: colors.surface }}
+                        />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium" style={{ color: colors.text }}>
+                          {signature.name}
+                        </p>
+                        <p className="text-sm" style={{ color: colors.textMuted }}>
+                          Registrada el {new Date(signature.timestamp).toLocaleDateString('es-AR')}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-center" style={{ color: colors.textMuted }}>
+                      Su firma digital está registrada y tiene validez legal. No puede ser modificada por seguridad.
+                    </p>
+                  </div>
+                ) : (
+                  <div 
+                    className="p-6 rounded-lg border-2 text-center"
+                    style={{
+                      backgroundColor: colors.warning[50],
+                      borderColor: colors.warning[200]
+                    }}
+                  >
+                    <Award className="h-12 w-12 mx-auto mb-4" style={{ color: colors.warning[500] }} />
+                    <p className="font-medium mb-2" style={{ color: colors.text }}>
+                      Firma Digital No Registrada
+                    </p>
+                    <p className="text-sm" style={{ color: colors.textMuted }}>
+                      Debe registrar su firma digital para validar documentos oficiales.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Panel Lateral */}
           <div className="space-y-6">
             {/* Avatar y Acciones Principales */}
             <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
               <CardContent className="p-6 text-center">
-                {/* Avatar con botón de edición */}
-                <div className="relative w-24 h-24 mx-auto mb-4">
-                  <div 
-                    className="w-24 h-24 rounded-full flex items-center justify-center border-4"
-                    style={{ 
-                      backgroundColor: currentAvatar ? `${currentAvatar.color}15` : roleColors.bg,
-                      borderColor: currentAvatar ? currentAvatar.color : roleColors.border
-                    }}
-                  >
-                    {currentAvatar ? (
-                      <currentAvatar.icon 
-                        className="h-12 w-12" 
-                        style={{ color: currentAvatar.color }}
-                      />
-                    ) : (
-                      <User className="h-12 w-12" style={{ color: roleColors.text }} />
-                    )}
-                  </div>
-                  
-                  {/* Botón de editar avatar */}
-                  <Button
-                    size="icon"
-                    onClick={() => setShowAvatarModal(true)}
-                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full shadow-medium"
-                    style={{
-                      backgroundColor: colors.accent[500],
-                      color: colors.surface
-                    }}
-                  >
-                    <Edit3 className="h-4 w-4" />
-                  </Button>
+                <div 
+                  className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center"
+                  style={{ backgroundColor: roleColors.bg }}
+                >
+                  <User className="h-12 w-12" style={{ color: roleColors.text }} />
                 </div>
-
                 <h2 className="text-xl font-bold mb-1" style={{ color: colors.text }}>
                   {user.name}
                 </h2>
@@ -218,65 +433,6 @@ export default function ProfilePage() {
                     Cerrar Sesión
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Firma Digital */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" style={{ color: colors.accent[500] }} />
-                  <span style={{ color: colors.text }}>Firma Digital</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {signature ? (
-                  <div className="space-y-4">
-                    <div 
-                      className="p-4 rounded-lg border-2"
-                      style={{
-                        backgroundColor: colors.success[50],
-                        borderColor: colors.success[200]
-                      }}
-                    >
-                      <div className="flex items-center justify-center mb-3">
-                        <img
-                          src={signature.signature}
-                          alt="Firma digital"
-                          className="max-h-16 max-w-full object-contain border rounded"
-                          style={{ backgroundColor: colors.surface }}
-                        />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium text-sm" style={{ color: colors.text }}>
-                          {signature.name}
-                        </p>
-                        <p className="text-xs" style={{ color: colors.textMuted }}>
-                          Registrada el {new Date(signature.timestamp).toLocaleDateString('es-AR')}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-center" style={{ color: colors.textMuted }}>
-                      Su firma digital está registrada y tiene validez legal. No puede ser modificada por seguridad.
-                    </p>
-                  </div>
-                ) : (
-                  <div 
-                    className="p-4 rounded-lg border-2 text-center"
-                    style={{
-                      backgroundColor: colors.warning[50],
-                      borderColor: colors.warning[200]
-                    }}
-                  >
-                    <Award className="h-8 w-8 mx-auto mb-3" style={{ color: colors.warning[500] }} />
-                    <p className="font-medium mb-1 text-sm" style={{ color: colors.text }}>
-                      Firma Digital No Registrada
-                    </p>
-                    <p className="text-xs" style={{ color: colors.textMuted }}>
-                      Debe registrar su firma digital para validar documentos oficiales.
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
@@ -341,253 +497,14 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-4 w-4" style={{ color: colors.textMuted }} />
                   <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {editableData.phone || "No especificado"}
+                    {isEditing ? editableData.phone : user.phone}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <MapPin className="h-4 w-4" style={{ color: colors.textMuted }} />
                   <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {editableData.address || "No especificado"}
+                    {isEditing ? editableData.address : user.address}
                   </span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Información Principal */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Datos Personales */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" style={{ color: colors.primary[500] }} />
-                    <span style={{ color: colors.text }}>Información Personal</span>
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    {isEditing ? "Cancelar" : "Editar"}
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Nombre Completo</Label>
-                    <Input
-                      value={user.name}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Email</Label>
-                    <Input
-                      value={user.email}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Teléfono</Label>
-                    <Input
-                      value={isEditing ? editableData.phone : (editableData.phone || "")}
-                      onChange={(e) => setEditableData(prev => ({ ...prev, phone: e.target.value }))}
-                      readOnly={!isEditing}
-                      placeholder={isEditing ? "Ingrese su teléfono" : ""}
-                      className="h-11"
-                      style={{
-                        backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                        borderColor: colors.border,
-                        color: isEditing ? colors.text : colors.textMuted
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Rol</Label>
-                    <div className="flex items-center gap-2 h-11">
-                      <Badge
-                        className="px-3 py-2 text-sm font-medium"
-                        style={{
-                          backgroundColor: roleColors.bg,
-                          color: roleColors.text,
-                          border: `1px solid ${roleColors.border}`
-                        }}
-                      >
-                        {user.title}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label style={{ color: colors.text }}>Dirección</Label>
-                  <Input
-                    value={isEditing ? editableData.address : (editableData.address || "")}
-                    onChange={(e) => setEditableData(prev => ({ ...prev, address: e.target.value }))}
-                    readOnly={!isEditing}
-                    placeholder={isEditing ? "Ingrese su dirección" : ""}
-                    className="h-11"
-                    style={{
-                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                      borderColor: colors.border,
-                      color: isEditing ? colors.text : colors.textMuted
-                    }}
-                  />
-                  {!editableData.address && !isEditing && (
-                    <p className="text-xs" style={{ color: colors.textMuted }}>
-                      Puede agregar su dirección editando el perfil
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label style={{ color: colors.text }}>Biografía Profesional</Label>
-                  <Textarea
-                    value={isEditing ? editableData.bio : (editableData.bio || "")}
-                    onChange={(e) => setEditableData(prev => ({ ...prev, bio: e.target.value }))}
-                    readOnly={!isEditing}
-                    placeholder={isEditing ? "Describa su experiencia y especialidades..." : ""}
-                    className="min-h-[100px] resize-none"
-                    style={{
-                      backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                      borderColor: colors.border,
-                      color: isEditing ? colors.text : colors.textMuted
-                    }}
-                  />
-                  {!editableData.bio && !isEditing && (
-                    <p className="text-xs" style={{ color: colors.textMuted }}>
-                      Agregue una biografía profesional para completar su perfil
-                    </p>
-                  )}
-                </div>
-
-                {isEditing && (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      onClick={handleSave}
-                      disabled={isSaving}
-                      style={{
-                        backgroundColor: colors.primary[500],
-                        color: colors.surface
-                      }}
-                    >
-                      {isSaving ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Guardando...
-                        </div>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Guardar Cambios
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Información Profesional */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" style={{ color: colors.secondary[500] }} />
-                  <span style={{ color: colors.text }}>Información Profesional</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Especialidad</Label>
-                    <Input
-                      value={isEditing ? editableData.specialty : (editableData.specialty || "")}
-                      onChange={(e) => setEditableData(prev => ({ ...prev, specialty: e.target.value }))}
-                      readOnly={!isEditing}
-                      placeholder={isEditing ? "Ej: Terapia Ocupacional" : ""}
-                      className="h-11"
-                      style={{
-                        backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                        borderColor: colors.border,
-                        color: isEditing ? colors.text : colors.textMuted
-                      }}
-                    />
-                    {!editableData.specialty && !isEditing && (
-                      <p className="text-xs" style={{ color: colors.textMuted }}>
-                        Agregue su especialidad profesional
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Matrícula</Label>
-                    <Input
-                      value={isEditing ? editableData.license : (editableData.license || "")}
-                      onChange={(e) => setEditableData(prev => ({ ...prev, license: e.target.value }))}
-                      readOnly={!isEditing}
-                      placeholder={isEditing ? "Ej: MP 12345" : ""}
-                      className="h-11"
-                      style={{
-                        backgroundColor: isEditing ? colors.surface : colors.neutral[50],
-                        borderColor: colors.border,
-                        color: isEditing ? colors.text : colors.textMuted
-                      }}
-                    />
-                    {!editableData.license && !isEditing && (
-                      <p className="text-xs" style={{ color: colors.textMuted }}>
-                        Agregue su número de matrícula profesional
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Fecha de Ingreso</Label>
-                    <Input
-                      value={user.joinDate}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Último Acceso</Label>
-                    <Input
-                      value={user.lastLogin}
-                      readOnly
-                      className="h-11"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    />
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -625,14 +542,6 @@ export default function ProfilePage() {
             </Button>
           </motion.div>
         )}
-
-        {/* Modal de selección de avatar */}
-        <AvatarSelectorModal
-          isOpen={showAvatarModal}
-          onClose={() => setShowAvatarModal(false)}
-          onSelect={handleAvatarSelect}
-          currentAvatarId={currentAvatarId}
-        />
       </main>
     </div>
   )
