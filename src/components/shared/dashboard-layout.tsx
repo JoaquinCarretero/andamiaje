@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/shared/navbar"
 import { DashboardStats } from "@/components/shared/dashboard-stats"
-import { QuickActions } from "@/components/shared/quick-actions"
+import { CalendarWidget } from "@/components/shared/calendar-widget"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
@@ -85,12 +85,9 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {currentView === "dashboard" ? (
           <div className="space-y-8">
-            {/* Stats */}
-            <DashboardStats role={userData.role} />
-
             {/* Welcome Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-              <div className="xl:col-span-2">
+            <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+              <div className="xl:col-span-3">
                 <Card 
                   className="h-full shadow-soft border-0" 
                   style={{ 
@@ -101,22 +98,27 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                   <CardContent className="p-8">
                     <div className="flex items-center space-x-3 mb-6">
                       <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
-                      <h2 className="font-display text-3xl font-bold" style={{ color: colors.text }}>
+                      <h2 className="font-display text-2xl lg:text-3xl font-bold" style={{ color: colors.text }}>
                         {getGreeting()} {userData.name.split(' ')[0]}
                       </h2>
                     </div>
                     
-                    <p className="text-lg mb-8 leading-relaxed" style={{ color: colors.textSecondary }}>
+                    <p className="text-base lg:text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
                       Bienvenido a tu espacio de trabajo. Aquí puedes gestionar todas tus actividades y 
                       hacer seguimiento del progreso de tus {userData.role === "terapeuta" ? "pacientes" : "estudiantes"}.
                     </p>
 
+                    {/* Stats integradas */}
+                    <div className="mb-6">
+                      <DashboardStats role={userData.role} />
+                    </div>
+
                     {/* Action Buttons Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
-                          className={`group p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left ${
+                          className={`group p-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left ${
                             section.id === "seguimiento-acompanantes" ? "ring-2 ring-offset-2" : ""
                           }`}
                           style={{
@@ -128,7 +130,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                         >
                           <div className="space-y-3">
                             <div
-                              className={`text-2xl p-2.5 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110 ${
+                              className={`text-xl p-2 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110 ${
                                 section.id === "seguimiento-acompanantes" ? "animate-pulse-soft" : ""
                               }`}
                               style={{
@@ -140,7 +142,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                             </div>
                             <div>
                               <h3 
-                                className={`font-medium text-sm mb-1 ${
+                                className={`font-medium text-xs mb-1 ${
                                   section.id === "seguimiento-acompanantes" ? "font-semibold" : ""
                                 }`} 
                                 style={{ 
@@ -157,7 +159,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                                   </span>
                                 )}
                               </h3>
-                              <p className="text-xs leading-tight line-clamp-2" style={{ color: colors.textMuted }}>
+                              <p className="text-xs leading-tight line-clamp-2 hidden sm:block" style={{ color: colors.textMuted }}>
                                 {section.description}
                               </p>
                             </div>
@@ -169,8 +171,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                 </Card>
               </div>
 
-              <div className="xl:col-span-1">
-                <QuickActions role={userData.role} onNavigate={handleNavigation} />
+              <div className="xl:col-span-2">
+                <CalendarWidget role={userData.role} onNavigate={handleNavigation} />
               </div>
             </div>
           </div>

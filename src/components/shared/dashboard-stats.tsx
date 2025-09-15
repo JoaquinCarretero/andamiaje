@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { FileText, Calendar, Users, Upload, CheckCircle, TrendingUp } from "lucide-react"
+import { Clock, CheckCircle, TrendingUp, AlertTriangle, Calendar, Target } from "lucide-react"
 import colors from "@/lib/colors"
 
 interface StatCard {
@@ -21,34 +21,16 @@ interface DashboardStatsProps {
 const roleStats = {
   terapeuta: [
     { 
-      title: "Pacientes Activos", 
-      value: 12, 
-      subtitle: "8 en progreso", 
-      icon: Users, 
+      title: "Tareas Pendientes", 
+      value: 5, 
+      subtitle: "2 vencen esta semana", 
+      icon: Clock, 
       color: colors.primary[500], 
-      progress: 67,
+      progress: 40,
       trend: "up" as const
     },
     { 
-      title: "Sesiones del Mes", 
-      value: 48, 
-      subtitle: "3 pendientes", 
-      icon: Calendar, 
-      color: colors.accent[500], 
-      progress: 94,
-      trend: "up" as const
-    },
-    { 
-      title: "Informes Pendientes", 
-      value: 3, 
-      subtitle: "1 vence hoy", 
-      icon: FileText, 
-      color: colors.warning[500], 
-      progress: 33,
-      trend: "stable" as const
-    },
-    { 
-      title: "Tareas Completadas", 
+      title: "Documentos Completados", 
       value: "85%", 
       subtitle: "Este mes", 
       icon: CheckCircle, 
@@ -56,81 +38,99 @@ const roleStats = {
       progress: 85,
       trend: "up" as const
     },
+    { 
+      title: "Tareas Urgentes", 
+      value: 3, 
+      subtitle: "Requieren atención", 
+      icon: AlertTriangle, 
+      color: colors.error[500], 
+      progress: 60,
+      trend: "down" as const
+    },
+    { 
+      title: "Productividad", 
+      value: "92%", 
+      subtitle: "Últimos 7 días", 
+      icon: TrendingUp, 
+      color: colors.accent[500], 
+      progress: 92,
+      trend: "up" as const
+    },
   ],
   acompanante: [
     { 
-      title: "Estudiantes Activos", 
-      value: 8, 
-      subtitle: "6 en seguimiento", 
-      icon: Users, 
+      title: "Tareas Pendientes", 
+      value: 3, 
+      subtitle: "1 vence mañana", 
+      icon: Clock, 
       color: colors.primary[500], 
-      progress: 75,
+      progress: 33,
       trend: "up" as const
     },
     { 
-      title: "Reportes del Mes", 
-      value: 7, 
-      subtitle: "1 pendiente", 
+      title: "Documentos Completados", 
+      value: "90%", 
+      subtitle: "Este mes", 
+      icon: CheckCircle, 
+      color: colors.success[500], 
+      progress: 90,
+      trend: "up" as const
+    },
+    { 
+      title: "Próximos Vencimientos", 
+      value: 2, 
+      subtitle: "Esta semana", 
       icon: Calendar, 
+      color: colors.warning[500], 
+      progress: 50,
+      trend: "up" as const
+    },
+    { 
+      title: "Eficiencia", 
+      value: "88%", 
+      subtitle: "Promedio mensual", 
+      icon: Target, 
       color: colors.accent[500], 
       progress: 88,
-      trend: "up" as const
-    },
-    { 
-      title: "Actividades Realizadas", 
-      value: 24, 
-      subtitle: "Esta semana", 
-      icon: TrendingUp, 
-      color: colors.success[500], 
-      progress: 100,
-      trend: "up" as const
-    },
-    { 
-      title: "Documentos Subidos", 
-      value: "92%", 
-      subtitle: "Completado", 
-      icon: Upload, 
-      color: colors.primary[500], 
-      progress: 92,
       trend: "stable" as const
     },
   ],
   coordinador: [
     { 
-      title: "Acompañantes Activos", 
-      value: 8, 
-      subtitle: "6 con reportes al día", 
-      icon: Users, 
+      title: "Tareas de Supervisión", 
+      value: 7, 
+      subtitle: "4 pendientes de revisión", 
+      icon: Clock, 
       color: colors.primary[500], 
-      progress: 75,
+      progress: 43,
       trend: "up" as const
     },
     { 
-      title: "Reportes Pendientes", 
-      value: 5, 
-      subtitle: "2 vencen esta semana", 
-      icon: FileText, 
-      color: colors.warning[500], 
-      progress: 40,
-      trend: "down" as const
-    },
-    { 
-      title: "Reuniones del Mes", 
-      value: 12, 
-      subtitle: "3 programadas", 
-      icon: Calendar, 
-      color: colors.accent[500], 
-      progress: 80,
-      trend: "up" as const
-    },
-    { 
-      title: "Documentos Procesados", 
-      value: "92%", 
+      title: "Documentos Revisados", 
+      value: "78%", 
       subtitle: "Este mes", 
       icon: CheckCircle, 
       color: colors.success[500], 
-      progress: 92,
-      trend: "stable" as const
+      progress: 78,
+      trend: "up" as const
+    },
+    { 
+      title: "Alertas Activas", 
+      value: 5, 
+      subtitle: "Requieren seguimiento", 
+      icon: AlertTriangle, 
+      color: colors.error[500], 
+      progress: 70,
+      trend: "down" as const
+    },
+    { 
+      title: "Gestión de Equipo", 
+      value: "94%", 
+      subtitle: "Eficiencia general", 
+      icon: Target, 
+      color: colors.accent[500], 
+      progress: 94,
+      trend: "up" as const
     },
   ],
 }
