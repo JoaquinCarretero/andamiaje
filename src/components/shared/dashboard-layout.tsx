@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/shared/navbar"
-import { DashboardStats } from "@/components/shared/dashboard-stats"
 import { CalendarWidget } from "@/components/shared/calendar-widget"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -107,11 +106,6 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                       Bienvenido a tu espacio de trabajo. Aquí puedes gestionar todas tus actividades y 
                       hacer seguimiento del progreso de tus {userData.role === "terapeuta" ? "pacientes" : "estudiantes"}.
                     </p>
-
-                    {/* Stats integradas */}
-                    <div className="mb-6">
-                      <DashboardStats role={userData.role} />
-                    </div>
 
                     {/* Action Buttons Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">

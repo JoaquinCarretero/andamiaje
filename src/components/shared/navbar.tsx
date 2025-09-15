@@ -2,10 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Bell, User, LogOut, Menu, X, Home, FileText, Calendar, Upload } from "lucide-react"
+import { User, LogOut, Menu, X, Home, FileText, Calendar, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { NotificationsModal } from "@/components/ui/notifications-modal"
 import Image from "next/image"
 import colors from "@/lib/colors"
 
@@ -21,7 +19,6 @@ interface NavbarProps {
 export function Navbar({ userData, onNavigate }: NavbarProps) {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [showNotifications, setShowNotifications] = useState(false)
 
   const handleProfileClick = () => {
     router.push('/perfil')
@@ -85,23 +82,6 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
 
             {/* Desktop menu */}
             <div className="hidden md:flex items-center space-x-4">
-              {/* Notifications */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowNotifications(true)}
-                className="relative rounded-full transition-all duration-200 hover:bg-neutral-100"
-                style={{ color: colors.textSecondary }}
-              >
-                <Bell className="h-5 w-5" />
-                <Badge
-                  style={{ backgroundColor: colors.accent[500], color: colors.surface }}
-                  className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs font-medium"
-                >
-                  3
-                </Badge>
-              </Button>
-
               {/* User info */}
               <div className="flex items-center space-x-3">
                 <div className="text-right">
@@ -116,11 +96,12 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                   variant="ghost"
                   size="icon"
                   onClick={handleProfileClick}
-                  className="rounded-full transition-all duration-200"
+                  className="rounded-full transition-all duration-200 hover:bg-blue-50 hover:text-blue-600"
                   style={{ 
                     color: colors.textSecondary,
                     backgroundColor: colors.neutral[100]
                   }}
+                  title="Ver perfil"
                 >
                   <User className="h-5 w-5" />
                 </Button>
@@ -133,6 +114,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                 onClick={handleLogout}
                 className="rounded-full transition-all duration-200 hover:bg-red-50 hover:text-red-600"
                 style={{ color: colors.textSecondary }}
+                title="Cerrar sesión"
               >
                 <LogOut className="h-5 w-5" />
               </Button>
@@ -258,29 +240,14 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                 className="p-6 border-t flex-shrink-0"
                 style={{ borderColor: colors.border }}
               >
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    className="flex items-center space-x-2 rounded-lg"
-                    onClick={() => setShowNotifications(true)}
-                    style={{ color: colors.textSecondary }}
-                  >
-                    <Bell className="h-5 w-5" />
-                    <span>Notificaciones</span>
-                    <Badge
-                      style={{ backgroundColor: colors.accent[500], color: colors.surface }}
-                      className="ml-2 text-xs"
-                    >
-                      3
-                    </Badge>
-                  </Button>
-
+                <div className="flex items-center justify-end">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={handleLogout}
                     className="rounded-full hover:bg-red-50 hover:text-red-600"
                     style={{ color: colors.textSecondary }}
+                    title="Cerrar sesión"
                   >
                     <LogOut className="h-5 w-5" />
                   </Button>
@@ -291,12 +258,6 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
         </div>
       )}
 
-      {/* Modal de Notificaciones */}
-      <NotificationsModal
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-        userRole={userData.role}
-      />
     </>
   )
 }

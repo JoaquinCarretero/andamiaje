@@ -1,8 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronLeft, ChevronRight, Calendar, Plus, AlertTriangle, Clock, FileText } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, Plus, AlertTriangle, Clock, FileText, Edit, Trash2, Save, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import colors from "@/lib/colors"
@@ -14,6 +17,8 @@ interface CalendarEvent {
   priority: "high" | "medium" | "low"
   dueDate: Date
   completed: boolean
+  isCustom?: boolean
+  description?: string
 }
 
 interface CalendarWidgetProps {
@@ -146,6 +151,13 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null)
+  const [newEventForm, setNewEventForm] = useState({
+    title: "",
+    description: "",
+    priority: "medium" as "high" | "medium" | "low"
+  })
 
   useEffect(() => {
     setEvents(getEventsByRole(role))
@@ -184,7 +196,76 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   }
 
   const handleEventClick = (event: CalendarEvent) => {
-    onNavigate(event.type)
+    if (event.isCustom) {
+      setEditingEvent(event)
+      setNewEventForm({
+        title: event.title,
+        description: event.description || "",
+        priority: event.priority
+      })
+      setShowEventModal(true)
+    } else {
+      onNavigate(event.type)
+    }
+  }
+
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date)
+    const dayEvents = getEventsForDate(date)
+    
+    if (dayEvents.length === 0) {
+      // No hay eventos, mostrar modal para crear uno nuevo
+      setEditingEvent(null)
+      setNewEventForm({
+        title: "",
+        description: "",
+        priority: "medium"
+      })
+      setShowEventModal(true)
+    }
+  }
+
+  const handleSaveEvent = () => {
+    if (!selectedDate || !newEventForm.title.trim()) return
+
+    if (editingEvent) {
+      // Editar evento existente
+      setEvents(prev => prev.map(event => 
+        event.id === editingEvent.id 
+          ? {
+              ...event,
+              title: newEventForm.title,
+              description: newEventForm.description,
+              priority: newEventForm.priority
+            }
+          : event
+      ))
+    } else {
+      // Crear nuevo evento
+      const newEvent: CalendarEvent = {
+        id: `custom-${Date.now()}`,
+        title: newEventForm.title,
+        description: newEventForm.description,
+        type: "plan-trabajo",
+        priority: newEventForm.priority,
+        dueDate: selectedDate,
+        completed: false,
+        isCustom: true
+      }
+      setEvents(prev => [...prev, newEvent])
+    }
+
+    setShowEventModal(false)
+    setEditingEvent(null)
+    setNewEventForm({ title: "", description: "", priority: "medium" })
+  }
+
+  const handleDeleteEvent = () => {
+    if (editingEvent) {
+      setEvents(prev => prev.filter(event => event.id !== editingEvent.id))
+      setShowEventModal(false)
+      setEditingEvent(null)
+    }
   }
 
   const upcomingEvents = events
@@ -269,25 +350,26 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Calendario */}
-        <div className="grid grid-cols-7 gap-1 mb-6">
+        <div className="grid grid-cols-7 gap-2 mb-6">
           {calendarDays.map((date, index) => {
             if (!date) {
-              return <div key={index} className="h-8" />
+              return <div key={index} className="h-20" />
             }
 
             const dayEvents = getEventsForDate(date)
             const hasEvents = dayEvents.length > 0
             const hasHighPriority = dayEvents.some(e => e.priority === "high")
+            const displayEvent = dayEvents[0] // Mostrar solo el primer evento
 
             return (
               <button
                 key={index}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => handleDateClick(date)}
                 className={`
-                  h-8 text-xs rounded-md transition-all duration-200 relative
+                  h-20 text-xs rounded-lg transition-all duration-200 relative p-2 flex flex-col
                   ${isToday(date) ? 'font-bold ring-2' : ''}
                   ${hasEvents ? 'font-medium' : ''}
-                  hover:scale-110 hover:shadow-sm
+                  hover:scale-105 hover:shadow-md
                 `}
                 style={{
                   backgroundColor: isToday(date) 
@@ -296,7 +378,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                       ? hasHighPriority 
                         ? colors.error[50] 
                         : colors.warning[50]
-                      : 'transparent',
+                      : colors.neutral[50],
                   color: isToday(date) 
                     ? colors.surface 
                     : hasEvents 
@@ -304,17 +386,50 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         ? colors.error[600] 
                         : colors.warning[600]
                       : colors.text,
-                  ringColor: isToday(date) ? colors.primary[300] : 'transparent'
+                  ringColor: isToday(date) ? colors.primary[300] : 'transparent',
+                  border: `1px solid ${colors.border}`
                 }}
               >
-                {date.getDate()}
+                <div className="font-semibold mb-1">{date.getDate()}</div>
+                {displayEvent && (
+                  <div className="flex-1 overflow-hidden">
+                    <div 
+                      className="text-xs leading-tight line-clamp-2 p-1 rounded text-left"
+                      style={{
+                        backgroundColor: displayEvent.priority === "high" 
+                          ? colors.error[100] 
+                          : displayEvent.priority === "medium"
+                            ? colors.warning[100]
+                            : colors.success[100],
+                        color: displayEvent.priority === "high" 
+                          ? colors.error[700] 
+                          : displayEvent.priority === "medium"
+                            ? colors.warning[700]
+                            : colors.success[700]
+                      }}
+                    >
+                      {displayEvent.title}
+                    </div>
+                  </div>
+                )}
                 {hasEvents && (
                   <div
-                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+                    className="absolute top-1 right-1 w-2 h-2 rounded-full"
                     style={{
                       backgroundColor: hasHighPriority ? colors.error[500] : colors.warning[500]
                     }}
                   />
+                )}
+                {dayEvents.length > 1 && (
+                  <div 
+                    className="absolute bottom-1 right-1 text-xs px-1 rounded-full"
+                    style={{
+                      backgroundColor: colors.primary[500],
+                      color: colors.surface
+                    }}
+                  >
+                    +{dayEvents.length - 1}
+                  </div>
                 )}
               </button>
             )
@@ -381,6 +496,137 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
           )}
         </div>
       </div>
+
+      {/* Modal para crear/editar eventos */}
+      {showEventModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowEventModal(false)}
+          />
+          
+          <Card 
+            className="relative w-full max-w-md border-0 shadow-2xl"
+            style={{ 
+              backgroundColor: colors.surface,
+              boxShadow: `0 25px 50px ${colors.shadowLarge}`
+            }}
+          >
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                  <span style={{ color: colors.text }}>
+                    {editingEvent ? 'Editar Actividad' : 'Nueva Actividad'}
+                  </span>
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowEventModal(false)}
+                  className="rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="event-title" style={{ color: colors.text }}>
+                  Título *
+                </Label>
+                <Input
+                  id="event-title"
+                  value={newEventForm.title}
+                  onChange={(e) => setNewEventForm(prev => ({ ...prev, title: e.target.value }))}
+                  placeholder="Título de la actividad"
+                  className="h-11"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+              <div className="space-y-2">
+                <Label htmlFor="event-description" style={{ color: colors.text }}>
+                  Descripción
+                </Label>
+                <Textarea
+                  id="event-description"
+                  value={newEventForm.description}
+                  onChange={(e) => setNewEventForm(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Descripción detallada de la actividad"
+                  className="min-h-[80px] resize-none"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                />
+              </div>
+                />
+              <div className="space-y-2">
+                <Label htmlFor="event-priority" style={{ color: colors.text }}>
+                  Prioridad
+                </Label>
+                <select
+                  id="event-priority"
+                  value={newEventForm.priority}
+                  onChange={(e) => setNewEventForm(prev => ({ ...prev, priority: e.target.value as "high" | "medium" | "low" }))}
+                  className="flex h-11 w-full rounded-md border px-3 py-2 text-sm"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }}
+                >
+                  <option value="low">Baja</option>
+                  <option value="medium">Media</option>
+                  <option value="high">Alta</option>
+                </select>
+              </div>
+              </div>
+              <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
+                {editingEvent && (
+                  <Button
+                    variant="outline"
+                    onClick={handleDeleteEvent}
+                    className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Eliminar
+                  </Button>
+                )}
+                
+                <div className="flex gap-2 ml-auto">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowEventModal(false)}
+                    style={{
+                      borderColor: colors.border,
+                      color: colors.textSecondary
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  
+                  <Button
+                    onClick={handleSaveEvent}
+                    disabled={!newEventForm.title.trim()}
+                    style={{
+                      backgroundColor: colors.primary[500],
+                      color: colors.surface
+                    }}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {editingEvent ? 'Guardar' : 'Crear'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
