@@ -10,70 +10,65 @@ class ApiClient {
     this.baseURL = baseURL
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
-    
+
     const config: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: { 'Content-Type': 'application/json', ...options.headers },
       ...options,
     }
 
     // Agregar token si existe
     const token = localStorage.getItem('authToken')
     if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      }
+      config.headers = { ...config.headers, Authorization: `Bearer ${token}` }
     }
 
     try {
       const response = await fetch(url, config)
-      
+      const text = await response.text() // leer como texto primero
+
       if (!response.ok) {
-        const errorData: ApiError = await response.json().catch(() => ({
-          message: 'Error de conexión',
-          statusCode: response.status
-        }))
+        // Intentar parsear JSON de error
+        let errorData: ApiError = { message: text || 'Error de conexión', statusCode: response.status }
+        try { errorData = JSON.parse(text) } catch {}
         throw new Error(errorData.message || `Error ${response.status}`)
       }
 
-      return await response.json()
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error
+      // Intentar parsear JSON de respuesta
+      try {
+        return text ? JSON.parse(text) : ({} as T)
+      } catch (err) {
+        console.warn('Respuesta no es JSON válido:', text)
+        return {} as T
       }
+    } catch (error) {
+      if (error instanceof Error) throw error
       throw new Error('Error de conexión con el servidor')
     }
   }
 
   // Auth endpoints
   async login(data: LoginDto): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/login', {
+    return this.request<AuthResponse>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/register', {
+    return this.request<AuthResponse>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     })
   }
 
   async getProfile(): Promise<User> {
-    return this.request<User>('/auth/profile')
+    return this.request<User>('/api/v1/auth/profile')
   }
 
   async refreshToken(): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/auth/refresh', {
+    return this.request<AuthResponse>('/api/v1/auth/refresh', {
       method: 'POST',
     })
   }

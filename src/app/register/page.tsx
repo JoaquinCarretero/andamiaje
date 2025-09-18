@@ -48,7 +48,7 @@ export default function RegisterPage() {
     phone: "",
     documentNumber: "",
     password: "",
-    role: UserRole.TERAPEUTA
+    role: UserRole.TERAPEUTA,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
@@ -56,15 +56,18 @@ export default function RegisterPage() {
   useEffect(() => {
     // Redirigir si ya está autenticado
     if (AuthService.isAuthenticated()) {
-      const user = AuthService.getUser()
+      const user = AuthService.getUser();
       if (user) {
-        const roleRoute = AuthService.getRoleForRouting(user.role)
-        router.push(`/${roleRoute}`)
+        const roleRoute = AuthService.getRoleForRouting(user.role);
+        router.push(`/${roleRoute}`);
       }
     }
-  }, [router])
+  }, [router]);
 
-  const handleInputChange = (field: keyof RegisterDto, value: string | UserRole) => {
+  const handleInputChange = (
+    field: keyof RegisterDto,
+    value: string | UserRole
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -89,7 +92,10 @@ export default function RegisterPage() {
 
     if (!formData.documentNumber.trim()) {
       newErrors.documentNumber = "El DNI es obligatorio";
-    } else if (formData.documentNumber.length < 7 || formData.documentNumber.length > 8) {
+    } else if (
+      formData.documentNumber.length < 7 ||
+      formData.documentNumber.length > 8
+    ) {
       newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos";
     }
 
@@ -136,15 +142,15 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     setErrors({});
 
     try {
       const authResponse = await apiClient.register(formData);
-      
+
       // Guardar firma en localStorage para uso posterior
       if (signature && signatureName) {
         localStorage.setItem(
@@ -159,14 +165,15 @@ export default function RegisterPage() {
 
       // Autenticar automáticamente después del registro
       AuthService.setAuth(authResponse);
-      
+
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
       router.push(`/${roleRoute}`);
     } catch (error) {
-      console.error('Register error:', error);
+      console.error("Register error:", error);
       setErrors({
-        general: error instanceof Error ? error.message : 'Error al registrarse'
+        general:
+          error instanceof Error ? error.message : "Error al registrarse",
       });
     } finally {
       setIsLoading(false);
@@ -337,7 +344,12 @@ export default function RegisterPage() {
                         <select
                           id="role"
                           value={formData.role}
-                          onChange={(e) => handleInputChange("role", e.target.value as UserRole)}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "role",
+                              e.target.value as UserRole
+                            )
+                          }
                           className="flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200"
                           style={{
                             backgroundColor: colors.surface,
@@ -350,7 +362,13 @@ export default function RegisterPage() {
                           <option value={UserRole.ACOMPANANTE}>
                             Acompañante Externo
                           </option>
-                          <option value={UserRole.COORDINADOR}>Coordinador</option>
+                          <option value={UserRole.COORDINADOR_UNO}>
+                            Coordinador Uno
+                          </option>
+                          <option value={UserRole.COORDINADOR_DOS}>
+                            Coordinador Dos
+                          </option>
+                          <option value={UserRole.DIRECTOR}>Director</option>
                         </select>
                       </div>
 
@@ -401,7 +419,9 @@ export default function RegisterPage() {
                         <PhoneInput
                           country={"ar"}
                           value={formData.phone}
-                          onChange={(phone) => handleInputChange("phone", phone)}
+                          onChange={(phone) =>
+                            handleInputChange("phone", phone)
+                          }
                           inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
                           containerClass="!w-full"
                           buttonClass="!border-0 !border-r !rounded-l-lg"
@@ -702,11 +722,11 @@ export default function RegisterPage() {
               </div>
 
               {errors.general && (
-                <div 
+                <div
                   className="p-3 rounded-lg border-l-4 flex items-center gap-2"
-                  style={{ 
+                  style={{
                     backgroundColor: colors.error[50],
-                    borderLeftColor: colors.error[500]
+                    borderLeftColor: colors.error[500],
                   }}
                 >
                   <p className="text-sm" style={{ color: colors.error[600] }}>

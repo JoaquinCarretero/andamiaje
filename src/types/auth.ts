@@ -1,8 +1,9 @@
 export enum UserRole {
-  TERAPEUTA = 'TERAPEUTA',
-  ACOMPANANTE = 'ACOMPANANTE',
-  COORDINADOR = 'COORDINADOR',
-  DIRECTOR = 'DIRECTOR'
+  TERAPEUTA = 'terapeuta',
+  ACOMPANANTE = 'acompaniante_externo',
+  COORDINADOR_UNO = 'coordinador_uno',
+  COORDINADOR_DOS = 'coordinador_dos',
+  DIRECTOR = 'director'
 }
 
 export interface LoginDto {
@@ -39,7 +40,7 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-  token: string;
+  token: string; // ⚠ token, no accessToken
 }
 
 export interface ApiError {

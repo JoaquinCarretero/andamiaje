@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { 
-  User, 
   Mail, 
   Phone, 
   Shield, 
@@ -13,7 +12,7 @@ import {
   LogOut,
   Briefcase,
   Award,
-  Clock
+  Clock,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
