@@ -68,8 +68,10 @@ export default function ProfilePage() {
   }
 
   const handleLogout = () => {
+    // Limpiar todo el localStorage relacionado con la sesión
     AuthService.logout()
-    router.push('/login')
+    // Forzar recarga para limpiar cualquier estado residual
+    window.location.href = '/login'
   }
 
   const getRoleColor = (role: string) => {

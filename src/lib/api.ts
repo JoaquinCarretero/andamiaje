@@ -1,4 +1,4 @@
-import { LoginDto, RegisterDto, AuthResponse, ApiError } from '@/types/auth'
+import { LoginDto, RegisterDto, AuthResponse, ApiError, BACKEND_ROLES, FRONTEND_ROLES } from '@/types/auth'
 import type { User } from '@/types/auth'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://andamiaje-api.onrender.com'
@@ -50,21 +50,48 @@ class ApiClient {
 
   // Auth endpoints
   async login(data: LoginDto): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/api/v1/auth/login', {
+    const response = await this.request<any>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
-    })
+    });
+
+    // Convertir rol del backend al frontend
+    if (response.user && response.user.role) {
+      response.user.role = FRONTEND_ROLES[response.user.role as keyof typeof FRONTEND_ROLES] || response.user.role;
+    }
+
+    return response;
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/api/v1/auth/register', {
+    // Convertir rol del frontend al backend
+    const backendData = {
+      ...data,
+      role: BACKEND_ROLES[data.role] || data.role
+    };
+
+    const response = await this.request<any>('/api/v1/auth/register', {
       method: 'POST',
-      body: JSON.stringify(data),
-    })
+      body: JSON.stringify(backendData),
+    });
+
+    // Convertir rol del backend al frontend
+    if (response.user && response.user.role) {
+      response.user.role = FRONTEND_ROLES[response.user.role as keyof typeof FRONTEND_ROLES] || response.user.role;
+    }
+
+    return response;
   }
 
   async getProfile(): Promise<User> {
-    return this.request<User>('/api/v1/auth/profile')
+    const response = await this.request<any>('/api/v1/auth/profile');
+    
+    // Convertir rol del backend al frontend
+    if (response.role) {
+      response.role = FRONTEND_ROLES[response.role as keyof typeof FRONTEND_ROLES] || response.role;
+    }
+
+    return response;
   }
 
   async refreshToken(): Promise<AuthResponse> {

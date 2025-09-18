@@ -150,6 +150,10 @@ export default function RegisterPage() {
 
     try {
       const authResponse = await apiClient.register(formData);
+      
+      if (!authResponse || !authResponse.user || !authResponse.token) {
+        throw new Error('Respuesta de registro inválida')
+      }
 
       // Guardar firma en localStorage para uso posterior
       if (signature && signatureName) {
@@ -362,11 +366,8 @@ export default function RegisterPage() {
                           <option value={UserRole.ACOMPANANTE}>
                             Acompañante Externo
                           </option>
-                          <option value={UserRole.COORDINADOR_UNO}>
-                            Coordinador Uno
-                          </option>
-                          <option value={UserRole.COORDINADOR_DOS}>
-                            Coordinador Dos
+                          <option value={UserRole.COORDINADOR}>
+                            Coordinador
                           </option>
                           <option value={UserRole.DIRECTOR}>Director</option>
                         </select>

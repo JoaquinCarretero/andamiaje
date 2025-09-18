@@ -1,10 +1,26 @@
 export enum UserRole {
-  TERAPEUTA = 'terapeuta',
-  ACOMPANANTE = 'acompaniante_externo',
-  COORDINADOR_UNO = 'coordinador_uno',
-  COORDINADOR_DOS = 'coordinador_dos',
-  DIRECTOR = 'director'
+  TERAPEUTA = 'TERAPEUTA',
+  ACOMPANANTE = 'ACOMPANANTE',
+  COORDINADOR = 'COORDINADOR',
+  DIRECTOR = 'DIRECTOR'
 }
+
+// Mapeo para el backend
+export const BACKEND_ROLES = {
+  [UserRole.TERAPEUTA]: 'terapeuta',
+  [UserRole.ACOMPANANTE]: 'acompaniante_externo',
+  [UserRole.COORDINADOR]: 'coordinador_uno',
+  [UserRole.DIRECTOR]: 'director'
+} as const;
+
+// Mapeo desde el backend
+export const FRONTEND_ROLES = {
+  'terapeuta': UserRole.TERAPEUTA,
+  'acompaniante_externo': UserRole.ACOMPANANTE,
+  'coordinador_uno': UserRole.COORDINADOR,
+  'coordinador_dos': UserRole.COORDINADOR,
+  'director': UserRole.DIRECTOR
+} as const;
 
 export interface LoginDto {
   documentNumber: string;

@@ -27,7 +27,7 @@ export default function TerapeutaPage() {
         }
         
         // Verificar que el usuario tenga el rol correcto
-        if (currentUser.role !== 'TERAPEUTA') {
+        if (currentUser.role !== 'TERAPEUTA' && currentUser.role !== 'terapeuta') {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
           router.push(`/${correctRoute}`)
           return

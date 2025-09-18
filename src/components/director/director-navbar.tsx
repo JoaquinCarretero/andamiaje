@@ -27,8 +27,10 @@ export function DirectorNavbar({ userData }: DirectorNavbarProps) {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('userSignature')
-    router.push('/login')
+    // Limpiar todo el localStorage relacionado con la sesión
+    AuthService.logout()
+    // Forzar recarga para limpiar cualquier estado residual
+    window.location.href = '/login'
   }
   return (
     <>

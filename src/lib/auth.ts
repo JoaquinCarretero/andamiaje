@@ -63,14 +63,13 @@ export class AuthService {
   // Título según rol
   static getRoleTitle(role?: UserRole): string {
     switch (role) {
-      case UserRole.TERAPEUTA:
+      case 'TERAPEUTA':
         return 'Terapeuta Ocupacional'
-      case UserRole.ACOMPANANTE:
+      case 'ACOMPANANTE':
         return 'Acompañante Externo'
-      case UserRole.COORDINADOR_UNO:
-      case UserRole.COORDINADOR_DOS:
+      case 'COORDINADOR':
         return 'Coordinadora General'
-      case UserRole.DIRECTOR:
+      case 'DIRECTOR':
         return 'Director General'
       default:
         return 'Usuario'
@@ -80,14 +79,13 @@ export class AuthService {
   // Rol para rutas
   static getRoleForRouting(role?: UserRole): string {
     switch (role) {
-      case UserRole.TERAPEUTA:
+      case 'TERAPEUTA':
         return 'terapeuta'
-      case UserRole.ACOMPANANTE:
+      case 'ACOMPANANTE':
         return 'acompanante'
-      case UserRole.COORDINADOR_UNO:
-      case UserRole.COORDINADOR_DOS:
+      case 'COORDINADOR':
         return 'coordinador'
-      case UserRole.DIRECTOR:
+      case 'DIRECTOR':
         return 'director'
       default:
         return 'terapeuta'
@@ -104,13 +102,12 @@ export class AuthService {
     if (!user) return `${timeGreeting}, Usuario`
 
     switch (user.role) {
-      case UserRole.TERAPEUTA:
-      case UserRole.DIRECTOR:
+      case 'TERAPEUTA':
+      case 'DIRECTOR':
         return `${timeGreeting}, Dr.`
-      case UserRole.COORDINADOR_UNO:
-      case UserRole.COORDINADOR_DOS:
+      case 'COORDINADOR':
         return `${timeGreeting}, ${user.firstName}`
-      case UserRole.ACOMPANANTE:
+      case 'ACOMPANANTE':
       default:
         return `${timeGreeting}, Prof.`
     }

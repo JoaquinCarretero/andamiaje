@@ -33,8 +33,10 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
   }
 
   const handleLogout = () => {
+    // Limpiar todo el localStorage relacionado con la sesión
     AuthService.logout()
-    router.push('/login')
+    // Forzar recarga para limpiar cualquier estado residual
+    window.location.href = '/login'
   }
 
   if (!currentUser) {

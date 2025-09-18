@@ -25,7 +25,7 @@ export default function AcompanantePage() {
         }
         
         // Verificar que el usuario tenga el rol correcto
-        if (currentUser.role !== 'ACOMPANANTE') {
+        if (currentUser.role !== 'ACOMPANANTE' && currentUser.role !== 'acompaniante_externo') {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
           router.push(`/${correctRoute}`)
           return

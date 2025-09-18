@@ -30,7 +30,7 @@ export default function CoordinadorPage() {
         }
         
         // Verificar que el usuario tenga el rol correcto
-        if (currentUser.role !== 'COORDINADOR') {
+        if (currentUser.role !== 'COORDINADOR' && currentUser.role !== 'coordinador_uno' && currentUser.role !== 'coordinador_dos') {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
           router.push(`/${correctRoute}`)
           return
