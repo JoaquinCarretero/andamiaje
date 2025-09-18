@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import colors from "@/lib/colors"
 import { AuthService } from "@/lib/auth"
-import { User } from "@/types/auth"
+import type { User } from "@/types/auth"
 
 interface DashboardLayoutProps {
   userData?: User | null

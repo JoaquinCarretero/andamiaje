@@ -7,7 +7,7 @@ import { WorkPlanForm } from "@/components/therapist/work-plan-form"
 import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
 import { InvoiceUpload } from "@/components/therapist/invoice-upload"
 import { AuthService } from "@/lib/auth"
-import { User } from "@/types/auth"
+import type { User } from "@/types/auth"
 
 export default function AcompanantePage() {
   const [currentView, setCurrentView] = useState("dashboard")

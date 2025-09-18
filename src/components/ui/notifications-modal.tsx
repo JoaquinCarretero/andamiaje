@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Bell, CheckCircle, AlertTriangle, Info, Calendar, FileText, Users, Clock, Trash2, AreaChart as MarkAsUnread } from "lucide-react"
+import { X, Bell, CheckCircle, AlertTriangle, Info, Calendar, FileText, Users, Clock, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"

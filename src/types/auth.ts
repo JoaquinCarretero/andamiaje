@@ -30,6 +30,11 @@ export interface User {
   role: UserRole;
   createdAt: string;
   updatedAt: string;
+  specialty?: string;
+  license?: string;
+  joinDate?: string;
+  experience?: string;
+  bio?: string;
 }
 
 export interface AuthResponse {

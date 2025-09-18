@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
 import { ArrowLeft, Key, Eye, EyeOff, Shield, CheckCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,25 +9,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Navbar } from "@/components/shared/navbar"
 import colors from "@/lib/colors"
-
-const getCurrentUser = () => {
-  return {
-    name: "Dr. María González",
-    title: "Terapeuta Ocupacional",
-    role: "terapeuta",
-    email: "maria.gonzalez@andamiaje.com"
-  }
-}
+import { AuthService } from "@/lib/auth"
+import type { User } from "@/types/auth"
 
 export default function ChangePasswordPage() {
   const router = useRouter()
-  const [user] = useState(getCurrentUser())
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
     confirm: false
   })
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -36,6 +29,25 @@ export default function ChangePasswordPage() {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const currentUser = await AuthService.getCurrentUser()
+        if (!currentUser) {
+          router.push('/login')
+          return
+        }
+        setUser(currentUser)
+      } catch (error) {
+        console.error('Error checking auth:', error)
+        router.push('/login')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [router])
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     if (errors[field]) {
@@ -75,12 +87,12 @@ export default function ChangePasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      setIsLoading(true)
+      setIsSubmitting(true)
       
       // Simular cambio de contraseña
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      setIsLoading(false)
+      setIsSubmitting(false)
       router.push('/perfil')
     }
   }
@@ -96,6 +108,18 @@ export default function ChangePasswordPage() {
   }
 
   const passwordStrength = getPasswordStrength(formData.newPassword)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
@@ -122,11 +146,7 @@ export default function ChangePasswordPage() {
           </h1>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="animate-slide-in-up">
           <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -303,13 +323,13 @@ export default function ChangePasswordPage() {
                 <Button
                   type="submit"
                   className="w-full h-12"
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   style={{
                     backgroundColor: colors.primary[500],
                     color: colors.surface
                   }}
                 >
-                  {isLoading ? (
+                  {isSubmitting ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Cambiando contraseña...
@@ -324,7 +344,7 @@ export default function ChangePasswordPage() {
               </form>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </main>
     </div>
   )

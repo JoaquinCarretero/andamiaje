@@ -386,7 +386,6 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         ? colors.error[600] 
                         : colors.warning[600]
                       : colors.text,
-                  ringColor: isToday(date) ? colors.primary[300] : 'transparent',
                   border: `1px solid ${colors.border}`
                 }}
               >

@@ -9,7 +9,7 @@ import { MeetingMinutesForm } from "@/components/therapist/meeting-minutes-form"
 import { InitialReportForm } from "@/components/therapist/initial-report-form"
 import { InvoiceUpload } from "@/components/therapist/invoice-upload"
 import { AuthService } from "@/lib/auth"
-import { User } from "@/types/auth"
+import type { User } from "@/types/auth"
 
 export default function TerapeutaPage() {
   const [currentView, setCurrentView] = useState("dashboard")

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import colors from "@/lib/colors"
 import { AuthService } from "@/lib/auth"
-import { User as UserType } from "@/types/auth"
+import type { User as UserType } from "@/types/auth"
 
 interface NavbarProps {
   userData?: UserType | null

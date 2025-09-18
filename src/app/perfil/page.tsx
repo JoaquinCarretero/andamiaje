@@ -2,24 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
 import { 
   User, 
   Mail, 
   Phone, 
-  Calendar, 
   Shield, 
   Edit, 
   ArrowLeft,
   Key,
   LogOut,
-  MapPin,
   Briefcase,
   Award,
-  Clock,
-  FileText,
-  Users,
-  Settings
+  Clock
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -29,9 +23,9 @@ import { ProfileEditModal } from "@/components/ui/profile-edit-modal"
 import { ProfileCompletionBanner } from "@/components/ui/profile-completion-banner"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
-import { Label } from "@radix-ui/react-label"
+import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
-import { User } from "@/types/auth"
+import type { User } from "@/types/auth"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -349,7 +343,7 @@ export default function ProfilePage() {
                         color: colors.textMuted
                       }}
                     >
-                      {user.joinDate}
+                      {user.joinDate || new Date(user.createdAt).toLocaleDateString('es-AR')}
                     </div>
                   </div>
                   <div className="space-y-2">

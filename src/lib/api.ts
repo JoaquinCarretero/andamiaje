@@ -1,4 +1,5 @@
 import { LoginDto, RegisterDto, AuthResponse, ApiError } from '@/types/auth'
+import type { User } from '@/types/auth'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://andamiaje-api.onrender.com'
 

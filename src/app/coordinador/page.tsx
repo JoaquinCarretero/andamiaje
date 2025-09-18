@@ -12,7 +12,7 @@ import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
 import { CompanionTracking } from "@/components/coordinator/companion-tracking"
 import { FamilyTracking } from "@/components/coordinator/family-tracking"
 import { AuthService } from "@/lib/auth"
-import { User } from "@/types/auth"
+import type { User } from "@/types/auth"
 
 export default function CoordinadorPage() {
   const [currentView, setCurrentView] = useState("dashboard")
