@@ -1,9 +1,11 @@
-export enum UserRole {
-  TERAPEUTA = 'TERAPEUTA',
-  ACOMPANANTE = 'ACOMPANANTE',
-  COORDINADOR = 'COORDINADOR',
-  DIRECTOR = 'DIRECTOR'
-}
+export const UserRole = {
+  TERAPEUTA: 'TERAPEUTA',
+  ACOMPANANTE: 'ACOMPANANTE',
+  COORDINADOR: 'COORDINADOR',
+  DIRECTOR: 'DIRECTOR'
+} as const;
+
+export type UserRole = typeof UserRole[keyof typeof UserRole];
 
 // Mapeo para el backend
 export const BACKEND_ROLES = {

@@ -24,7 +24,7 @@ import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
-import type { User, UserRole } from "@/types/auth"
+import { User, UserRole } from "@/types/auth"
 
 export default function ProfilePage() {
   const router = useRouter()

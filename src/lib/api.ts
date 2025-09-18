@@ -56,44 +56,56 @@ class ApiClient {
 
   // Auth endpoints
   async login(data: LoginDto): Promise<AuthResponse> {
+    console.log('Login request:', data)
     const response = await this.request<any>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
     });
 
+    console.log('Login response:', response)
+
     // Verificar que la respuesta tenga los datos necesarios
     if (!response || !response.user || !response.accessToken) {
+      console.error('Invalid login response:', response)
       throw new Error('Respuesta de login inválida del servidor')
     }
 
     // Convertir rol del backend al frontend
     if (response.user && response.user.role) {
+      console.log('Converting role from backend:', response.user.role)
       response.user.role = FRONTEND_ROLES[response.user.role as keyof typeof FRONTEND_ROLES] || response.user.role;
+      console.log('Converted role to frontend:', response.user.role)
     }
 
     return response;
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
+    console.log('Register request with role:', data.role)
     // Convertir rol del frontend al backend
     const backendData = {
       ...data,
       role: BACKEND_ROLES[data.role] || data.role
     };
 
+    console.log('Register request to backend:', backendData)
     const response = await this.request<any>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(backendData),
     });
 
+    console.log('Register response:', response)
     // Verificar que la respuesta tenga los datos necesarios
     if (!response || !response.user || !response.accessToken) {
+      console.error('Invalid register response:', response)
       throw new Error('Respuesta de registro inválida del servidor')
     }
 
     // Convertir rol del backend al frontend
     if (response.user && response.user.role) {
+      console.log('Converting role from backend:', response.user.role)
       response.user.role = FRONTEND_ROLES[response.user.role as keyof typeof FRONTEND_ROLES] || response.user.role;
+      console.log('Converted role to frontend:', response.user.role)
     }
 
     return response;

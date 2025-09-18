@@ -151,6 +151,8 @@ export default function RegisterPage() {
     try {
       const authResponse = await apiClient.register(formData);
       
+      console.log('Registration successful:', authResponse)
+      
       // Guardar firma en localStorage para uso posterior
       if (signature && signatureName) {
         localStorage.setItem(
@@ -168,6 +170,7 @@ export default function RegisterPage() {
 
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
+      console.log('Redirecting to:', roleRoute)
       router.push(`/${roleRoute}`);
     } catch (error) {
       console.error("Register error:", error);

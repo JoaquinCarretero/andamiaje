@@ -14,7 +14,7 @@ import Image from "next/image"
 import colors from "@/lib/colors"
 import { apiClient } from "@/lib/api"
 import { AuthService } from "@/lib/auth"
-import { LoginDto } from "@/types/auth"
+import { LoginDto, UserRole } from "@/types/auth"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -77,10 +77,13 @@ export default function LoginPage() {
     try {
       const authResponse = await apiClient.login(formData)
       
+      console.log('Login successful:', authResponse)
+      
       AuthService.setAuth(authResponse)
       
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role)
+      console.log('Redirecting to:', roleRoute)
       router.push(`/${roleRoute}`)
     } catch (error) {
       console.error('Login error:', error)

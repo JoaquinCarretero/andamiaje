@@ -7,6 +7,7 @@ export class AuthService {
 
   // Guardar tokens y usuario en localStorage
   static setAuth(authResponse: AuthResponse): void {
+    console.log('Setting auth with response:', authResponse)
     if (authResponse.accessToken) localStorage.setItem(this.TOKEN_KEY, authResponse.accessToken)
     if (authResponse.user) localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user))
   }
@@ -23,7 +24,9 @@ export class AuthService {
     const userStr = localStorage.getItem(this.USER_KEY)
     if (!userStr || userStr === 'undefined') return null
     try {
-      return JSON.parse(userStr)
+      const user = JSON.parse(userStr)
+      console.log('Retrieved user from localStorage:', user)
+      return user
     } catch (error) {
       console.warn('Usuario en localStorage no es JSON válido:', userStr)
       return null
@@ -32,11 +35,15 @@ export class AuthService {
 
   // Verificar si hay sesión activa
   static isAuthenticated(): boolean {
-    return !!this.getToken() && !!this.getUser()
+    const hasToken = !!this.getToken()
+    const hasUser = !!this.getUser()
+    console.log('Auth check - hasToken:', hasToken, 'hasUser:', hasUser)
+    return hasToken && hasUser
   }
 
   // Cerrar sesión
   static logout(): void {
+    console.log('Logging out...')
     localStorage.removeItem(this.TOKEN_KEY)
     localStorage.removeItem(this.USER_KEY)
     localStorage.removeItem('userSignature')
@@ -48,8 +55,10 @@ export class AuthService {
       if (!this.isAuthenticated()) return null
       const user = await apiClient.getProfile()
       if (user) localStorage.setItem(this.USER_KEY, JSON.stringify(user))
+      console.log('Current user from server:', user)
       return user
     } catch (error) {
+      console.error('Error getting current user:', error)
       return this.getUser()
     }
   }
@@ -63,13 +72,13 @@ export class AuthService {
   // Título según rol
   static getRoleTitle(role?: UserRole): string {
     switch (role) {
-      case 'TERAPEUTA':
+      case UserRole.TERAPEUTA:
         return 'Terapeuta Ocupacional'
-      case 'ACOMPANANTE':
+      case UserRole.ACOMPANANTE:
         return 'Acompañante Externo'
-      case 'COORDINADOR':
+      case UserRole.COORDINADOR:
         return 'Coordinadora General'
-      case 'DIRECTOR':
+      case UserRole.DIRECTOR:
         return 'Director General'
       default:
         return 'Usuario'
@@ -78,6 +87,7 @@ export class AuthService {
 
   // Rol para rutas
   static getRoleForRouting(role?: UserRole): string {
+    console.log('Getting route for role:', role)
     switch (role) {
       case UserRole.TERAPEUTA:
         return 'terapeuta'
@@ -88,6 +98,7 @@ export class AuthService {
       case UserRole.DIRECTOR:
         return 'director'
       default:
+        console.warn('Unknown role, defaulting to terapeuta:', role)
         return 'terapeuta'
     }
   }

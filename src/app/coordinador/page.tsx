@@ -12,7 +12,7 @@ import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
 import { CompanionTracking } from "@/components/coordinator/companion-tracking"
 import { FamilyTracking } from "@/components/coordinator/family-tracking"
 import { AuthService } from "@/lib/auth"
-import type { User, UserRole } from "@/types/auth"
+import { User, UserRole } from "@/types/auth"
 
 export default function CoordinadorPage() {
   const [currentView, setCurrentView] = useState("dashboard")
@@ -23,19 +23,25 @@ export default function CoordinadorPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('Checking auth for coordinador page...')
         const currentUser = await AuthService.getCurrentUser()
+        console.log('Current user:', currentUser)
         if (!currentUser) {
+          console.log('No user found, redirecting to login')
           router.push('/login')
           return
         }
         
         // Verificar que el usuario tenga el rol correcto
+        console.log('User role:', currentUser.role, 'Expected:', UserRole.COORDINADOR)
         if (currentUser.role !== UserRole.COORDINADOR) {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
+          console.log('Wrong role, redirecting to:', correctRoute)
           router.push(`/${correctRoute}`)
           return
         }
         
+        console.log('Auth check passed, setting user')
         setUser(currentUser)
       } catch (error) {
         console.error('Error checking auth:', error)
