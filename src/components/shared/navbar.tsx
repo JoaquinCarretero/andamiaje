@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import colors from "@/lib/colors"
 import { AuthService } from "@/lib/auth"
-import type { User as UserType } from "@/types/auth"
+import type { User as UserType, UserRole } from "@/types/auth"
 
 interface NavbarProps {
   userData?: UserType | null
@@ -47,7 +47,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
   const roleTitle = AuthService.getRoleTitle(currentUser.role)
 
   const getQuickActions = () => {
-    if (currentUser.role === "TERAPEUTA") {
+    if (currentUser.role === UserRole.TERAPEUTA) {
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: FileText },
         { id: "informe-inicial", title: "Informe Inicial", icon: User },

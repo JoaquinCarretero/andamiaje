@@ -9,7 +9,7 @@ import { MeetingMinutesForm } from "@/components/therapist/meeting-minutes-form"
 import { InitialReportForm } from "@/components/therapist/initial-report-form"
 import { InvoiceUpload } from "@/components/therapist/invoice-upload"
 import { AuthService } from "@/lib/auth"
-import type { User } from "@/types/auth"
+import type { User, UserRole } from "@/types/auth"
 
 export default function TerapeutaPage() {
   const [currentView, setCurrentView] = useState("dashboard")
@@ -27,7 +27,7 @@ export default function TerapeutaPage() {
         }
         
         // Verificar que el usuario tenga el rol correcto
-        if (currentUser.role !== 'TERAPEUTA' && currentUser.role !== 'terapeuta') {
+        if (currentUser.role !== UserRole.TERAPEUTA) {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
           router.push(`/${correctRoute}`)
           return

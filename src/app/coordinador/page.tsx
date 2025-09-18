@@ -12,7 +12,7 @@ import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
 import { CompanionTracking } from "@/components/coordinator/companion-tracking"
 import { FamilyTracking } from "@/components/coordinator/family-tracking"
 import { AuthService } from "@/lib/auth"
-import type { User } from "@/types/auth"
+import type { User, UserRole } from "@/types/auth"
 
 export default function CoordinadorPage() {
   const [currentView, setCurrentView] = useState("dashboard")
@@ -30,7 +30,7 @@ export default function CoordinadorPage() {
         }
         
         // Verificar que el usuario tenga el rol correcto
-        if (currentUser.role !== 'COORDINADOR' && currentUser.role !== 'coordinador_uno' && currentUser.role !== 'coordinador_dos') {
+        if (currentUser.role !== UserRole.COORDINADOR) {
           const correctRoute = AuthService.getRoleForRouting(currentUser.role)
           router.push(`/${correctRoute}`)
           return

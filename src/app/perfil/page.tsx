@@ -24,7 +24,7 @@ import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
-import type { User } from "@/types/auth"
+import type { User, UserRole } from "@/types/auth"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -76,11 +76,11 @@ export default function ProfilePage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case "terapeuta":
+      case UserRole.TERAPEUTA:
         return { bg: colors.primary[50], text: colors.primary[600], border: colors.primary[200] }
-      case "COORDINADOR":
+      case UserRole.COORDINADOR:
         return { bg: colors.secondary[50], text: colors.secondary[600], border: colors.secondary[200] }
-      case "ACOMPANANTE":
+      case UserRole.ACOMPANANTE:
         return { bg: colors.accent[50], text: colors.accent[600], border: colors.accent[200] }
       default:
         return { bg: colors.neutral[50], text: colors.neutral[600], border: colors.neutral[200] }

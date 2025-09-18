@@ -151,10 +151,6 @@ export default function RegisterPage() {
     try {
       const authResponse = await apiClient.register(formData);
       
-      if (!authResponse || !authResponse.user || !authResponse.token) {
-        throw new Error('Respuesta de registro inválida')
-      }
-
       // Guardar firma en localStorage para uso posterior
       if (signature && signatureName) {
         localStorage.setItem(

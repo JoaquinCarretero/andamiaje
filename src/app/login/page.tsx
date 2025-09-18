@@ -77,10 +77,6 @@ export default function LoginPage() {
     try {
       const authResponse = await apiClient.login(formData)
       
-      if (!authResponse || !authResponse.user || !authResponse.token) {
-        throw new Error('Respuesta de autenticación inválida')
-      }
-      
       AuthService.setAuth(authResponse)
       
       // Redirigir según el rol del usuario

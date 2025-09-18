@@ -26,21 +26,27 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config)
-      const text = await response.text() // leer como texto primero
 
       if (!response.ok) {
+        const text = await response.text()
         // Intentar parsear JSON de error
         let errorData: ApiError = { message: text || 'Error de conexión', statusCode: response.status }
         try { errorData = JSON.parse(text) } catch {}
         throw new Error(errorData.message || `Error ${response.status}`)
       }
 
+      // Manejar respuestas 204 No Content
+      if (response.status === 204) {
+        throw new Error('El servidor no devolvió datos de autenticación')
+      }
+
+      const text = await response.text()
       // Intentar parsear JSON de respuesta
       try {
         return text ? JSON.parse(text) : ({} as T)
       } catch (err) {
         console.warn('Respuesta no es JSON válido:', text)
-        return {} as T
+        throw new Error('Respuesta del servidor no válida')
       }
     } catch (error) {
       if (error instanceof Error) throw error
@@ -54,6 +60,11 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data),
     });
+
+    // Verificar que la respuesta tenga los datos necesarios
+    if (!response || !response.user || !response.accessToken) {
+      throw new Error('Respuesta de login inválida del servidor')
+    }
 
     // Convertir rol del backend al frontend
     if (response.user && response.user.role) {
@@ -74,6 +85,11 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(backendData),
     });
+
+    // Verificar que la respuesta tenga los datos necesarios
+    if (!response || !response.user || !response.accessToken) {
+      throw new Error('Respuesta de registro inválida del servidor')
+    }
 
     // Convertir rol del backend al frontend
     if (response.user && response.user.role) {

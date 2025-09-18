@@ -56,7 +56,9 @@ export interface User {
 
 export interface AuthResponse {
   user: User;
-  token: string; // ⚠ token, no accessToken
+  accessToken: string; // El backend devuelve accessToken
+  refreshToken?: string;
+  expiresIn?: number;
 }
 
 export interface ApiError {

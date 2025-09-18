@@ -7,7 +7,7 @@ export class AuthService {
 
   // Guardar tokens y usuario en localStorage
   static setAuth(authResponse: AuthResponse): void {
-    if (authResponse.token) localStorage.setItem(this.TOKEN_KEY, authResponse.token)
+    if (authResponse.accessToken) localStorage.setItem(this.TOKEN_KEY, authResponse.accessToken)
     if (authResponse.user) localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user))
   }
 
@@ -79,13 +79,13 @@ export class AuthService {
   // Rol para rutas
   static getRoleForRouting(role?: UserRole): string {
     switch (role) {
-      case 'TERAPEUTA':
+      case UserRole.TERAPEUTA:
         return 'terapeuta'
-      case 'ACOMPANANTE':
+      case UserRole.ACOMPANANTE:
         return 'acompanante'
-      case 'COORDINADOR':
+      case UserRole.COORDINADOR:
         return 'coordinador'
-      case 'DIRECTOR':
+      case UserRole.DIRECTOR:
         return 'director'
       default:
         return 'terapeuta'
@@ -102,12 +102,12 @@ export class AuthService {
     if (!user) return `${timeGreeting}, Usuario`
 
     switch (user.role) {
-      case 'TERAPEUTA':
-      case 'DIRECTOR':
+      case UserRole.TERAPEUTA:
+      case UserRole.DIRECTOR:
         return `${timeGreeting}, Dr.`
-      case 'COORDINADOR':
+      case UserRole.COORDINADOR:
         return `${timeGreeting}, ${user.firstName}`
-      case 'ACOMPANANTE':
+      case UserRole.ACOMPANANTE:
       default:
         return `${timeGreeting}, Prof.`
     }
