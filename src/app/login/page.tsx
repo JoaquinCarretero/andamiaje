@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
@@ -12,22 +12,83 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FloatingCard, FloatingIcon, AnimatedBackground } from "@/components/ui/floating-elements"
 import Image from "next/image"
 import colors from "@/lib/colors"
+import { apiClient } from "@/lib/api"
+import { AuthService } from "@/lib/auth"
+import { LoginDto } from "@/types/auth"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState<LoginDto>({
+    documentNumber: "",
+    password: ""
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const router = useRouter()
+
+  useEffect(() => {
+    // Redirigir si ya está autenticado
+    if (AuthService.isAuthenticated()) {
+      const user = AuthService.getUser()
+      if (user) {
+        const roleRoute = AuthService.getRoleForRouting(user.role)
+        router.push(`/${roleRoute}`)
+      }
+    }
+  }, [router])
+
+  const handleInputChange = (field: keyof LoginDto, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }))
+    }
+  }
+
+  const handleDniChange = (value: string) => {
+    const numericValue = value.replace(/\D/g, '')
+    handleInputChange('documentNumber', numericValue)
+  }
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.documentNumber.trim()) {
+      newErrors.documentNumber = "El DNI es obligatorio"
+    } else if (formData.documentNumber.length < 7 || formData.documentNumber.length > 8) {
+      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos"
+    }
+
+    if (!formData.password) {
+      newErrors.password = "La contraseña es obligatoria"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!validateForm()) return
+    
     setIsLoading(true)
+    setErrors({})
     
-    // Simular autenticación
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    
-    // Redirigir al dashboard del terapeuta por defecto
-    router.push('/terapeuta')
-    setIsLoading(false)
+    try {
+      const authResponse = await apiClient.login(formData)
+      AuthService.setAuth(authResponse)
+      
+      // Redirigir según el rol del usuario
+      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role)
+      router.push(`/${roleRoute}`)
+    } catch (error) {
+      console.error('Login error:', error)
+      setErrors({
+        general: error instanceof Error ? error.message : 'Error al iniciar sesión'
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -235,15 +296,23 @@ export default function LoginPage() {
                       id="dni"
                       type="text"
                       placeholder="12345678"
+                      value={formData.documentNumber}
+                      onChange={(e) => handleDniChange(e.target.value)}
+                      maxLength={8}
                       className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.documentNumber ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
                     />
                   </div>
+                  {errors.documentNumber && (
+                    <p className="text-sm mt-1" style={{ color: colors.error[500] }}>
+                      {errors.documentNumber}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -259,10 +328,12 @@ export default function LoginPage() {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="**********"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: colors.border,
+                        borderColor: errors.password ? colors.error[500] : colors.border,
                         color: colors.text
                       }}
                       required
@@ -281,7 +352,26 @@ export default function LoginPage() {
                       )}
                     </Button>
                   </div>
+                  {errors.password && (
+                    <p className="text-sm mt-1" style={{ color: colors.error[500] }}>
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
+
+                {errors.general && (
+                  <div 
+                    className="p-3 rounded-lg border-l-4 flex items-center gap-2"
+                    style={{ 
+                      backgroundColor: colors.error[50],
+                      borderLeftColor: colors.error[500]
+                    }}
+                  >
+                    <p className="text-sm" style={{ color: colors.error[600] }}>
+                      {errors.general}
+                    </p>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -300,16 +390,6 @@ export default function LoginPage() {
                     style={{ color: colors.primary[500] }}
                   >
                     ¿Olvidaste tu contraseña?
-                  </Link>
-                  <Link 
-                    href="/director" 
-                    className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
-                    style={{
-                      backgroundColor: colors.neutral[700],
-                      color: colors.surface
-                    }}
-                  >
-                    Demo Director
                   </Link>
                 </div>
 
@@ -351,49 +431,6 @@ export default function LoginPage() {
             </CardFooter>
           </Card>
 
-          {/* Enlaces de demostración */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="mt-8 text-center space-y-3"
-          >
-            <p className="text-sm font-medium" style={{ color: colors.textMuted }}>
-              Acceso rápido para demostración:
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link 
-                href="/terapeuta" 
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
-                style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface
-                }}
-              >
-                Demo Terapeuta
-              </Link>
-              <Link 
-                href="/acompanante" 
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
-                style={{
-                  backgroundColor: colors.secondary[500],
-                  color: colors.surface
-                }}
-              >
-                Demo Acompañante
-              </Link>
-              <Link 
-                href="/coordinador" 
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105"
-                style={{
-                  backgroundColor: colors.accent[500],
-                  color: colors.surface
-                }}
-              >
-                Demo Coordinador
-              </Link>
-            </div>
-          </motion.div>
         </motion.div>
       </div>
     </div>

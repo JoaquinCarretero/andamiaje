@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -31,30 +31,40 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Image from "next/image";
 import colors from "@/lib/colors";
+import { apiClient } from "@/lib/api";
+import { AuthService } from "@/lib/auth";
+import { RegisterDto, UserRole } from "@/types/auth";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [phone, setPhone] = useState("");
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [signature, setSignature] = useState<string | null>(null);
   const [signatureName, setSignatureName] = useState("");
-  const router = useRouter();
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterDto>({
     firstName: "",
     lastName: "",
-    dni: "",
     email: "",
-    role: "",
+    phone: "",
+    documentNumber: "",
     password: "",
-    confirmPassword: "",
+    role: UserRole.TERAPEUTA
   });
-
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
-  const handleInputChange = (field: string, value: string) => {
+  useEffect(() => {
+    // Redirigir si ya está autenticado
+    if (AuthService.isAuthenticated()) {
+      const user = AuthService.getUser()
+      if (user) {
+        const roleRoute = AuthService.getRoleForRouting(user.role)
+        router.push(`/${roleRoute}`)
+      }
+    }
+  }, [router])
+
+  const handleInputChange = (field: keyof RegisterDto, value: string | UserRole) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -63,7 +73,7 @@ export default function RegisterPage() {
 
   const handleDniChange = (value: string) => {
     const numericValue = value.replace(/\D/g, "");
-    handleInputChange("dni", numericValue);
+    handleInputChange("documentNumber", numericValue);
   };
 
   const validateForm = () => {
@@ -77,10 +87,10 @@ export default function RegisterPage() {
       newErrors.lastName = "El apellido es obligatorio";
     }
 
-    if (!formData.dni.trim()) {
-      newErrors.dni = "El DNI es obligatorio";
-    } else if (formData.dni.length < 7 || formData.dni.length > 8) {
-      newErrors.dni = "El DNI debe tener entre 7 y 8 dígitos";
+    if (!formData.documentNumber.trim()) {
+      newErrors.documentNumber = "El DNI es obligatorio";
+    } else if (formData.documentNumber.length < 7 || formData.documentNumber.length > 8) {
+      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos";
     }
 
     if (!formData.email.trim()) {
@@ -89,22 +99,14 @@ export default function RegisterPage() {
       newErrors.email = "El email no es válido";
     }
 
-    if (!phone.trim()) {
+    if (!formData.phone.trim()) {
       newErrors.phone = "El teléfono es obligatorio";
-    }
-
-    if (!formData.role) {
-      newErrors.role = "Debe seleccionar un rol";
     }
 
     if (!formData.password) {
       newErrors.password = "La contraseña es obligatoria";
     } else if (formData.password.length < 6) {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Las contraseñas no coinciden";
     }
 
     if (!signature) {
@@ -134,12 +136,15 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      setIsLoading(true);
+    
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+    setErrors({});
 
-      // Simular registro con firma
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+    try {
+      const authResponse = await apiClient.register(formData);
+      
       // Guardar firma en localStorage para uso posterior
       if (signature && signatureName) {
         localStorage.setItem(
@@ -152,7 +157,18 @@ export default function RegisterPage() {
         );
       }
 
-      router.push("/login");
+      // Autenticar automáticamente después del registro
+      AuthService.setAuth(authResponse);
+      
+      // Redirigir según el rol del usuario
+      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
+      router.push(`/${roleRoute}`);
+    } catch (error) {
+      console.error('Register error:', error);
+      setErrors({
+        general: error instanceof Error ? error.message : 'Error al registrarse'
+      });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -314,37 +330,6 @@ export default function RegisterPage() {
                         )}
                       </div>
 
-                      {/* <div className="space-y-2">
-                        <Label htmlFor="dni" style={{ color: colors.text }}>
-                          DNI *
-                        </Label>
-                        <div className="relative">
-                          <CreditCard 
-                            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                            style={{ color: colors.textMuted }}
-                          />
-                          <Input
-                            id="dni"
-                            placeholder="12345678"
-                            value={formData.dni}
-                            onChange={(e) => handleDniChange(e.target.value)}
-                            maxLength={8}
-                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${errors.dni ? 'border-red-500' : ''}`}
-                            style={{
-                              backgroundColor: colors.surface,
-                              borderColor: errors.dni ? colors.error[500] : colors.border,
-                              color: colors.text
-                            }}
-                            required
-                          />
-                        </div>
-                        {errors.dni && (
-                          <p className="text-sm" style={{ color: colors.error[500] }}>
-                            {errors.dni}
-                          </p>
-                        )}
-                      </div> */}
-
                       <div className="space-y-2">
                         <Label htmlFor="role" style={{ color: colors.text }}>
                           Rol profesional *
@@ -352,36 +337,21 @@ export default function RegisterPage() {
                         <select
                           id="role"
                           value={formData.role}
-                          onChange={(e) =>
-                            handleInputChange("role", e.target.value)
-                          }
-                          className={`flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200 ${
-                            errors.role ? "border-red-500" : ""
-                          }`}
+                          onChange={(e) => handleInputChange("role", e.target.value as UserRole)}
+                          className="flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200"
                           style={{
                             backgroundColor: colors.surface,
-                            borderColor: errors.role
-                              ? colors.error[500]
-                              : colors.border,
+                            borderColor: colors.border,
                             color: colors.text,
                           }}
                           required
                         >
-                          <option value="">Seleccionar rol</option>
-                          <option value="terapeuta">Terapeuta</option>
-                          <option value="acompanante">
+                          <option value={UserRole.TERAPEUTA}>Terapeuta</option>
+                          <option value={UserRole.ACOMPANANTE}>
                             Acompañante Externo
                           </option>
-                          <option value="coordinador">Coordinador</option>
+                          <option value={UserRole.COORDINADOR}>Coordinador</option>
                         </select>
-                        {errors.role && (
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[500] }}
-                          >
-                            {errors.role}
-                          </p>
-                        )}
                       </div>
 
                       <div className="space-y-2">
@@ -430,8 +400,8 @@ export default function RegisterPage() {
                         </Label>
                         <PhoneInput
                           country={"ar"}
-                          value={phone}
-                          onChange={(phone) => setPhone(phone)}
+                          value={formData.phone}
+                          onChange={(phone) => handleInputChange("phone", phone)}
                           inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
                           containerClass="!w-full"
                           buttonClass="!border-0 !border-r !rounded-l-lg"
@@ -483,15 +453,15 @@ export default function RegisterPage() {
                       <Input
                         id="dni"
                         placeholder="12345678"
-                        value={formData.dni}
+                        value={formData.documentNumber}
                         onChange={(e) => handleDniChange(e.target.value)}
                         maxLength={8}
                         className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                          errors.dni ? "border-red-500" : ""
+                          errors.documentNumber ? "border-red-500" : ""
                         }`}
                         style={{
                           backgroundColor: colors.surface,
-                          borderColor: errors.dni
+                          borderColor: errors.documentNumber
                             ? colors.error[500]
                             : colors.border,
                           color: colors.text,
@@ -499,12 +469,12 @@ export default function RegisterPage() {
                         required
                       />
                     </div>
-                    {errors.dni && (
+                    {errors.documentNumber && (
                       <p
                         className="text-sm"
                         style={{ color: colors.error[500] }}
                       >
-                        {errors.dni}
+                        {errors.documentNumber}
                       </p>
                     )}
                   </div>
@@ -568,49 +538,6 @@ export default function RegisterPage() {
                         </p>
                       )}
                     </div>
-
-                    {/* <div className="space-y-2">
-                      <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
-                        Confirmar contraseña *
-                      </Label>
-                      <div className="relative">
-                        <Lock 
-                          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
-                          style={{ color: colors.textMuted }}
-                        />
-                        <Input
-                          id="confirmPassword"
-                          type={showConfirmPassword ? "text" : "password"}
-                          value={formData.confirmPassword}
-                          onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                          className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                          style={{
-                            backgroundColor: colors.surface,
-                            borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
-                            color: colors.text
-                          }}
-                          required
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
-                          ) : (
-                            <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
-                          )}
-                        </Button>
-                      </div>
-                      {errors.confirmPassword && (
-                        <p className="text-sm" style={{ color: colors.error[500] }}>
-                          {errors.confirmPassword}
-                        </p>
-                      )}
-                    </div> */}
                   </div>
                 </div>
 
@@ -774,32 +701,19 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Términos y Condiciones */}
-              {/* <div 
-                className="flex items-start space-x-3 p-6 rounded-lg" 
-                style={{ backgroundColor: colors.neutral[50] }}
-              >
-                <input
-                  id="terms"
-                  type="checkbox"
-                  className="mt-1 rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
-                  style={{ borderColor: colors.border }}
-                  required
-                />
-                <div className="flex-1">
-                  <Label htmlFor="terms" className="text-sm leading-relaxed" style={{ color: colors.textSecondary }}>
-                    Acepto los{" "}
-                    <Link href="/terms" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
-                      términos y condiciones
-                    </Link>{" "}
-                    y la{" "}
-                    <Link href="/privacy" className="font-medium hover:underline transition-colors duration-200" style={{ color: colors.primary[500] }}>
-                      política de privacidad
-                    </Link>
-                    . Confirmo que mi firma digital será utilizada para validar documentos oficiales.
-                  </Label>
+              {errors.general && (
+                <div 
+                  className="p-3 rounded-lg border-l-4 flex items-center gap-2"
+                  style={{ 
+                    backgroundColor: colors.error[50],
+                    borderLeftColor: colors.error[500]
+                  }}
+                >
+                  <p className="text-sm" style={{ color: colors.error[600] }}>
+                    {errors.general}
+                  </p>
                 </div>
-              </div> */}
+              )}
 
               <Button
                 type="submit"

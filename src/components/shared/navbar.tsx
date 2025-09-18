@@ -1,36 +1,51 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { User, LogOut, Menu, X, Home, FileText, Calendar, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import colors from "@/lib/colors"
+import { AuthService } from "@/lib/auth"
+import { User as UserType } from "@/types/auth"
 
 interface NavbarProps {
-  userData: {
-    name: string
-    title: string
-    role: string
-  }
+  userData?: UserType | null
   onNavigate?: (view: string) => void
 }
 
 export function Navbar({ userData, onNavigate }: NavbarProps) {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState<UserType | null>(userData || null)
+
+  useEffect(() => {
+    if (!userData) {
+      const user = AuthService.getUser()
+      setCurrentUser(user)
+    } else {
+      setCurrentUser(userData)
+    }
+  }, [userData])
 
   const handleProfileClick = () => {
     router.push('/perfil')
   }
 
   const handleLogout = () => {
-    // Limpiar datos de sesión si los hay
-    localStorage.removeItem('userSignature')
+    AuthService.logout()
     router.push('/login')
   }
+
+  if (!currentUser) {
+    return null
+  }
+
+  const fullName = AuthService.getFullName(currentUser)
+  const roleTitle = AuthService.getRoleTitle(currentUser.role)
+
   const getQuickActions = () => {
-    if (userData.role === "terapeuta") {
+    if (currentUser.role === "TERAPEUTA") {
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: FileText },
         { id: "informe-inicial", title: "Informe Inicial", icon: User },
@@ -86,10 +101,10 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
               <div className="flex items-center space-x-3">
                 <div className="text-right">
                   <p className="text-sm font-medium" style={{ color: colors.text }}>
-                    {userData.name}
+                    {fullName}
                   </p>
                   <p className="text-xs" style={{ color: colors.textMuted }}>
-                    {userData.title}
+                    {roleTitle}
                   </p>
                 </div>
                 <Button
@@ -181,10 +196,10 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                   </div>
                   <div>
                     <p className="font-medium" style={{ color: colors.text }}>
-                      {userData.name}
+                      {fullName}
                     </p>
                     <p className="text-sm" style={{ color: colors.textMuted }}>
-                      {userData.title}
+                      {roleTitle}
                     </p>
                   </div>
                 </div>

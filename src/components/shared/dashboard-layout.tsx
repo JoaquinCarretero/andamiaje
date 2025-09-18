@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/shared/navbar"
 import { CalendarWidget } from "@/components/shared/calendar-widget"
@@ -8,21 +8,29 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import colors from "@/lib/colors"
+import { AuthService } from "@/lib/auth"
+import { User } from "@/types/auth"
 
 interface DashboardLayoutProps {
-  userData: {
-    name: string
-    title: string
-    role: "terapeuta" | "acompanante" | "coordinador"
-    gender?: string
-  }
+  userData?: User | null
   children?: React.ReactNode
   currentView: string
   onNavigate: (view: string) => void
+  role: "terapeuta" | "acompanante" | "coordinador"
 }
 
-export function DashboardLayout({ userData, children, currentView, onNavigate }: DashboardLayoutProps) {
+export function DashboardLayout({ userData, children, currentView, onNavigate, role }: DashboardLayoutProps) {
   const router = useRouter()
+  const [currentUser, setCurrentUser] = useState<User | null>(userData || null)
+
+  useEffect(() => {
+    if (!userData) {
+      const user = AuthService.getUser()
+      setCurrentUser(user)
+    } else {
+      setCurrentUser(userData)
+    }
+  }, [userData])
 
   const handleNavigation = (view: string) => {
     if (view === 'perfil') {
@@ -31,23 +39,20 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
       onNavigate(view)
     }
   }
+
+  if (!currentUser) {
+    return null
+  }
+
+  const fullName = AuthService.getFullName(currentUser)
+  const greeting = AuthService.getGreeting(currentUser)
+
   const getGreeting = () => {
-    const hour = new Date().getHours()
-    let timeGreeting = "Buenos días"
-    if (hour >= 12 && hour < 18) timeGreeting = "Buenas tardes"
-    else if (hour >= 18) timeGreeting = "Buenas noches"
-    
-    if (userData.role === "terapeuta") {
-      return userData.gender === "female" ? `${timeGreeting}, Dra.` : `${timeGreeting}, Dr.`
-    }
-    if (userData.role === "coordinador") {
-      return `${timeGreeting}, ${userData.name.split(' ')[0]}`
-    }
-    return `${timeGreeting}, Prof.`
+    return greeting
   }
 
   const getActionButtons = () => {
-    if (userData.role === "terapeuta") {
+    if (role === "terapeuta") {
       return [
         { id: "plan-trabajo", title: "Plan de Trabajo", icon: "📋", description: "Crear y gestionar planes" },
         { id: "informe-inicial", title: "Informe Inicial", icon: "📝", description: "Evaluación inicial del paciente" },
@@ -55,7 +60,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
         { id: "actas", title: "Actas de Reunión", icon: "👥", description: "Registrar reuniones" },
         { id: "facturas", title: "Gestión de Facturas", icon: "📄", description: "Subir documentos" },
       ]
-    } else if (userData.role === "coordinador") {
+    } else if (role === "coordinador") {
       return [
         { id: "informe-inicial", title: "Informe Inicial", icon: "📝", description: "Evaluación inicial del paciente" },
         { id: "informe-semestral", title: "Informe Semestral", icon: "📊", description: "Reportes de progreso" },
@@ -79,7 +84,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
       className="min-h-screen"
       style={{ backgroundColor: colors.background }}
     >
-      <Navbar userData={userData} onNavigate={onNavigate} />
+      <Navbar userData={currentUser} onNavigate={onNavigate} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {currentView === "dashboard" ? (
@@ -98,13 +103,13 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
                     <div className="flex items-center space-x-3 mb-6">
                       <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
                       <h2 className="font-display text-2xl lg:text-3xl font-bold" style={{ color: colors.text }}>
-                        {getGreeting()} {userData.name.split(' ')[0]}
+                        {getGreeting()} {fullName.split(' ')[0]}
                       </h2>
                     </div>
                     
                     <p className="text-base lg:text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
                       Bienvenido a tu espacio de trabajo. Aquí puedes gestionar todas tus actividades y 
-                      hacer seguimiento del progreso de tus {userData.role === "terapeuta" ? "pacientes" : "estudiantes"}.
+                      hacer seguimiento del progreso de tus {role === "terapeuta" ? "pacientes" : "estudiantes"}.
                     </p>
 
                     {/* Action Buttons Grid */}
@@ -166,7 +171,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate }:
               </div>
 
               <div className="xl:col-span-2">
-                <CalendarWidget role={userData.role} onNavigate={handleNavigation} />
+                <CalendarWidget role={role} onNavigate={handleNavigation} />
               </div>
             </div>
           </div>
