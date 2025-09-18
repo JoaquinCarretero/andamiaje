@@ -457,12 +457,12 @@ export default function ProfilePage() {
                           Registrada el {new Date(signature.timestamp).toLocaleDateString('es-AR')}
                         </p>
                       </div>
-                  {new Date(user.createdAt).toLocaleDateString('es-AR')}
+                    </div>
                     <p className="text-sm text-center" style={{ color: colors.textMuted }}>
                       Su firma digital está registrada y tiene validez legal. No puede ser modificada por seguridad.
                     </p>
                   </div>
-                {false ? ( // Temporalmente deshabilitado hasta que el backend soporte experience
+                ) : (
                   <div 
                     className="p-6 rounded-lg border-2 text-center"
                     style={{
@@ -470,7 +470,6 @@ export default function ProfilePage() {
                       borderColor: colors.warning[500]
                     }}
                   >
-                    {/* {user.experience} */}
                     <p className="font-medium mb-2" style={{ color: colors.text }}>
                       Firma Digital No Registrada
                     </p>
