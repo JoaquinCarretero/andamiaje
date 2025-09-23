@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { PenTool, Check, RotateCcw, Sparkles, Shield, AlertTriangle } from "lucide-react"
+import { PenTool, Check, RotateCcw, Sparkles, Shield, AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SignatureCanvas from "react-signature-canvas"
 import Image from "next/image"
@@ -24,14 +22,9 @@ export function WelcomeSignatureModal({
   userRole 
 }: WelcomeSignatureModalProps) {
   const signatureRef = useRef<SignatureCanvas>(null)
-  const [signatureName, setSignatureName] = useState(userName)
   const [hasSignature, setHasSignature] = useState(false)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  useEffect(() => {
-    setSignatureName(userName)
-  }, [userName])
 
   useEffect(() => {
     if (isOpen) {
@@ -56,8 +49,8 @@ export function WelcomeSignatureModal({
       return
     }
 
-    if (!signatureName.trim()) {
-      setError("Por favor, ingrese su nombre y apellido para la aclaración")
+    if (!userName.trim()) {
+      setError("Error: No se pudo obtener el nombre del usuario")
       return
     }
 
@@ -65,7 +58,7 @@ export function WelcomeSignatureModal({
     
     try {
       const signatureData = signatureRef.current.toDataURL()
-      await onComplete(signatureData, signatureName.trim())
+      await onComplete(signatureData, userName.trim())
     } catch (error) {
       setError("Error al guardar la firma. Intente nuevamente.")
       setIsSubmitting(false)
@@ -80,7 +73,7 @@ export function WelcomeSignatureModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <Card 
         className="w-full max-w-4xl max-h-[95vh] overflow-y-auto border-0 shadow-2xl"
         style={{ 
@@ -88,7 +81,7 @@ export function WelcomeSignatureModal({
           boxShadow: `0 25px 50px ${colors.shadowLarge}`
         }}
       >
-        <CardHeader className="text-center pb-6">
+        <CardHeader className="text-center pb-6 relative">
           <div className="w-32 h-24 relative mx-auto mb-4">
             <Image
               src="/LogotipoFinalWEBJPEG.png"
@@ -163,34 +156,33 @@ export function WelcomeSignatureModal({
             </div>
           </div>
 
-          {/* Campo de Aclaración */}
-          <div className="space-y-2">
-            <Label htmlFor="signature-name" style={{ color: colors.text }}>
-              Aclaración de Firma (Nombre y Apellido) *
-            </Label>
-            <Input
-              id="signature-name"
-              placeholder="Ej: Dr. María González López"
-              value={signatureName}
-              onChange={(e) => setSignatureName(e.target.value)}
-              className="h-12 rounded-lg border-2"
-              style={{
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                color: colors.text
-              }}
-            />
-            <p className="text-xs" style={{ color: colors.textMuted }}>
-              Este nombre aparecerá debajo de su firma en todos los documentos
-            </p>
+          {/* Información de Aclaración */}
+          <div 
+            className="p-4 rounded-lg border"
+            style={{ 
+              backgroundColor: colors.neutral[50],
+              borderColor: colors.border
+            }}
+          >
+            <div className="text-center">
+              <p className="text-sm font-medium mb-2" style={{ color: colors.text }}>
+                Aclaración de Firma
+              </p>
+              <p className="text-lg font-semibold" style={{ color: colors.primary[600] }}>
+                {userName}
+              </p>
+              <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
+                Este nombre aparecerá debajo de su firma en todos los documentos
+              </p>
+            </div>
           </div>
 
           {/* Canvas de Firma */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label style={{ color: colors.text }}>
+              <p className="text-sm font-medium" style={{ color: colors.text }}>
                 Dibuje su firma *
-              </Label>
+              </p>
               <Button
                 type="button"
                 variant="outline"
@@ -251,7 +243,7 @@ export function WelcomeSignatureModal({
             <Button
               type="button"
               onClick={handleConfirm}
-              disabled={!hasSignature || !signatureName.trim() || isSubmitting}
+              disabled={!hasSignature || !userName.trim() || isSubmitting}
               className="w-full h-14 text-base font-medium"
               style={{
                 backgroundColor: colors.primary[500],

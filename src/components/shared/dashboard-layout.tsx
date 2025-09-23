@@ -135,22 +135,27 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
         userRole={AuthService.getRoleTitle(currentUser?.role)}
       />
       
-      <Navbar userData={currentUser} onNavigate={onNavigate} />
+      {/* Solo mostrar navbar si no hay modal de bienvenida */}
+      {!showWelcomeModal && (
+        <Navbar userData={currentUser} onNavigate={onNavigate} />
+      )}
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+      {/* Solo mostrar contenido si no hay modal de bienvenida */}
+      {!showWelcomeModal && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
         {currentView === "dashboard" ? (
           <div className="space-y-8">
             {/* Welcome Section */}
             <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-              <div className="xl:col-span-3 flex flex-col">
+              <div className="xl:col-span-3">
                 <Card 
-                  className="shadow-soft border-0 flex-1" 
+                  className="shadow-soft border-0 h-fit" 
                   style={{ 
                     backgroundColor: colors.surface,
                     background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.neutral[50]} 100%)`
                   }}
                 >
-                  <CardContent className="p-8 flex flex-col h-full">
+                  <CardContent className="p-8">
                     <div className="flex items-center space-x-3 mb-6">
                       <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
                       <h2 className="font-display text-2xl lg:text-3xl font-bold" style={{ color: colors.text }}>
@@ -164,7 +169,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                     </p>
 
                     {/* Action Buttons Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 flex-1 content-start">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
@@ -200,14 +205,6 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                                 }}
                               >
                                 {section.title}
-                                {section.id === "seguimiento-acompanantes" && (
-                                  <span className="ml-1 text-xs font-normal px-1.5 py-0.5 rounded-full" style={{
-                                    // backgroundColor: colors.secondary[100],
-                                    // color: colors.secondary[600]
-                                  }}>
-                                    {/* Prioritario */}
-                                  </span>
-                                )}
                               </h3>
                               <p className="text-xs leading-tight line-clamp-2 hidden sm:block" style={{ color: colors.textMuted }}>
                                 {section.description}
@@ -221,7 +218,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                 </Card>
               </div>
 
-              <div className="xl:col-span-2 flex flex-col">
+              <div className="xl:col-span-2">
                 <CalendarWidget role={role} onNavigate={handleNavigation} />
               </div>
             </div>
@@ -261,7 +258,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
             </div>
           </div>
         )}
-      </main>
+        </main>
+      )}
     </div>
   )
 }

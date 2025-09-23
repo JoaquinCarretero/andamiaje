@@ -66,7 +66,11 @@ export class AuthService {
   // Nombre completo
   static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'
-    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Usuario'
+    const firstName = user.firstName?.trim() || ''
+    const lastName = user.lastName?.trim() || ''
+    const fullName = `${firstName} ${lastName}`.trim()
+    console.log('Getting full name:', { firstName, lastName, fullName, user })
+    return fullName || 'Usuario'
   }
 
   // Título según rol

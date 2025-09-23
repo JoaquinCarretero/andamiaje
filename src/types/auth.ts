@@ -45,6 +45,7 @@ export interface UserI {
   id: string;
   firstName: string;
   lastName: string;
+  name?: string; // Campo adicional que puede venir del backend
   email: string;
   phone: string;
   documentNumber: string;

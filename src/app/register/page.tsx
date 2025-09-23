@@ -132,8 +132,7 @@ export default function RegisterPage() {
       AuthService.setAuth(authResponse);
 
       // Redirigir según el rol del usuario
-      console.log("🚀 ~ handleSubmit ~ authResponse.user.role:", authResponse.user.role)
-      const roleRoute = AuthService.getRoleForRouting(authResponse?.user?.role.toUpperCase()as UserRole);
+      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
       console.log('Redirecting to:', roleRoute)
       router.push(`/${roleRoute}`);
     } catch (error) {

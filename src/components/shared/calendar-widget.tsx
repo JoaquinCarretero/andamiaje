@@ -246,7 +246,10 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
     const savedCustomEvents = localStorage.getItem(`customEvents_${role}`)
     if (savedCustomEvents) {
       try {
-        const customEvents = JSON.parse(savedCustomEvents)
+        const customEvents = JSON.parse(savedCustomEvents).map((event: any) => ({
+          ...event,
+          dueDate: new Date(event.dueDate)
+        }))
         setEvents(prev => [...prev.filter(e => !e.isCustom), ...customEvents])
       } catch (error) {
         console.error('Error loading custom events:', error)
@@ -407,9 +410,17 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   }
 
   // Función para truncar texto
-  const truncateText = (text: string, maxLength: number = 15) => {
+  const truncateText = (text: string, maxLength: number = 8) => {
     if (text.length <= maxLength) return text
-    return text.substring(0, maxLength) + "..."
+    return text.substring(0, maxLength) + "…"
+  }
+
+  // Función para obtener abreviatura del evento
+  const getEventAbbreviation = (title: string) => {
+    const words = title.split(' ')
+    if (words.length === 1) return truncateText(words[0], 6)
+    if (words.length === 2) return `${words[0].charAt(0)}${words[1].charAt(0)}`
+    return words.slice(0, 3).map(word => word.charAt(0)).join('')
   }
 
   const upcomingEvents = events
@@ -432,14 +443,14 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
 
   return (
     <div
-      className="rounded-xl shadow-soft border flex flex-col h-full"
+      className="rounded-xl shadow-soft border h-fit"
       style={{
         backgroundColor: colors.surface,
         borderColor: colors.border,
         boxShadow: `0 4px 16px ${colors.shadow}`,
       }}
     >
-      <div className="p-6 flex-1 flex flex-col">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <div
@@ -485,7 +496,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
           {dayNames.map((day) => (
             <div
               key={day}
-              className="text-center text-xs font-medium py-2"
+              className="text-center text-sm font-medium py-2"
               style={{ color: colors.textMuted }}
             >
               {day}
@@ -494,10 +505,10 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Calendario */}
-        <div className="grid grid-cols-7 gap-1 mb-6">
+        <div className="grid grid-cols-7 gap-2 mb-6">
           {calendarDays.map((date, index) => {
             if (!date) {
-              return <div key={index} className="h-24" />;
+              return <div key={index} className="h-28" />;
             }
 
             const dayEvents = getEventsForDate(date);
@@ -512,7 +523,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  h-24 text-xs rounded-lg transition-all duration-200 relative p-2 flex flex-col
+                  h-28 text-sm rounded-lg transition-all duration-200 relative p-2 flex flex-col
                   ${isToday(date) ? "font-bold ring-2" : ""}
                   ${hasEvents ? "font-medium" : ""}
                   hover:scale-105 hover:shadow-md
@@ -543,7 +554,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         e.stopPropagation()
                         handleEventClick(displayEvent)
                       }}
-                      className="text-xs leading-tight line-clamp-2 p-1 rounded text-left"
+                      className="text-xs leading-tight p-1 rounded text-center w-full"
                       style={{
                         backgroundColor:
                           displayEvent.priority === "high"
@@ -559,7 +570,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                             : colors.success[700],
                       }}
                     >
-                      {truncateText(displayEvent.title, 12)}
+                      {displayEvent.isCustom ? truncateText(displayEvent.title, 10) : getEventAbbreviation(displayEvent.title)}
                     </button>
                   </div>
                 )}
@@ -575,7 +586,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                 )}
                 {dayEvents.length > 1 && (
                   <div
-                    className="absolute bottom-1 right-1 text-xs px-1 rounded-full"
+                    className="absolute bottom-1 right-1 text-xs px-1.5 py-0.5 rounded-full font-medium"
                     style={{
                       backgroundColor: colors.primary[500],
                       color: colors.surface,
@@ -590,7 +601,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Próximas actividades */}
-        <div className="space-y-3 flex-1">
+        <div className="space-y-3">
           <h4 className="text-sm font-medium" style={{ color: colors.text }}>
             Próximas Actividades
           </h4>

@@ -79,10 +79,17 @@ class ApiClient {
 
     // Asegurar que los campos requeridos existan
     if (response.user) {
-      response.user.firstName = response.user.firstName || ''
-      response.user.lastName = response.user.lastName || ''
+      response.user.firstName = response.user.firstName?.trim() || response.user.name?.split(' ')[0] || ''
+      response.user.lastName = response.user.lastName?.trim() || response.user.name?.split(' ').slice(1).join(' ') || ''
       response.user.firstLogin = response.user.firstLogin ?? true
       response.user.hasSignature = response.user.hasSignature ?? false
+      console.log('Login response user data:', {
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        fullName: `${response.user.firstName} ${response.user.lastName}`,
+        firstLogin: response.user.firstLogin,
+        hasSignature: response.user.hasSignature
+      })
     }
 
     return response;
@@ -118,10 +125,17 @@ class ApiClient {
 
     // Asegurar que los campos requeridos existan
     if (response.user) {
-      response.user.firstName = response.user.firstName || ''
-      response.user.lastName = response.user.lastName || ''
+      response.user.firstName = response.user.firstName?.trim() || response.user.name?.split(' ')[0] || ''
+      response.user.lastName = response.user.lastName?.trim() || response.user.name?.split(' ').slice(1).join(' ') || ''
       response.user.firstLogin = response.user.firstLogin ?? true
       response.user.hasSignature = response.user.hasSignature ?? false
+      console.log('Register response user data:', {
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        fullName: `${response.user.firstName} ${response.user.lastName}`,
+        firstLogin: response.user.firstLogin,
+        hasSignature: response.user.hasSignature
+      })
     }
 
     return response;
@@ -136,8 +150,8 @@ class ApiClient {
     }
 
     // Asegurar que los campos requeridos existan
-    response.firstName = response.firstName || ''
-    response.lastName = response.lastName || ''
+    response.firstName = response.firstName?.trim() || response.name?.split(' ')[0] || ''
+    response.lastName = response.lastName?.trim() || response.name?.split(' ').slice(1).join(' ') || ''
     response.firstLogin = response.firstLogin ?? false
     response.hasSignature = response.hasSignature ?? false
 

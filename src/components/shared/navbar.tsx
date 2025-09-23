@@ -129,7 +129,7 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                 variant="ghost"
                 size="icon"
                 onClick={handleLogout}
-                className="rounded-full transition-all duration-200 hover:bg-red-50 hover:text-red-600"
+                className="rounded-full transition-all duration-200 hover:bg-red-50 hover:text-red-600 hover:scale-105"
                 style={{ color: colors.textSecondary }}
                 title="Cerrar sesión"
               >
