@@ -77,6 +77,14 @@ class ApiClient {
       console.log('Converted role to frontend:', response.user.role)
     }
 
+    // Asegurar que los campos requeridos existan
+    if (response.user) {
+      response.user.firstName = response.user.firstName || ''
+      response.user.lastName = response.user.lastName || ''
+      response.user.firstLogin = response.user.firstLogin ?? true
+      response.user.hasSignature = response.user.hasSignature ?? false
+    }
+
     return response;
   }
 
@@ -108,6 +116,14 @@ class ApiClient {
       console.log('Converted role to frontend:', response.user.role)
     }
 
+    // Asegurar que los campos requeridos existan
+    if (response.user) {
+      response.user.firstName = response.user.firstName || ''
+      response.user.lastName = response.user.lastName || ''
+      response.user.firstLogin = response.user.firstLogin ?? true
+      response.user.hasSignature = response.user.hasSignature ?? false
+    }
+
     return response;
   }
 
@@ -118,6 +134,12 @@ class ApiClient {
     if (response.role) {
       response.role = FRONTEND_ROLES[response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES] || response.role;
     }
+
+    // Asegurar que los campos requeridos existan
+    response.firstName = response.firstName || ''
+    response.lastName = response.lastName || ''
+    response.firstLogin = response.firstLogin ?? false
+    response.hasSignature = response.hasSignature ?? false
 
     return response;
   }

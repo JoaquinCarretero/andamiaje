@@ -60,6 +60,9 @@ export interface UserI {
   hasSignature?: boolean;
 }
 
+// Alias para compatibilidad
+export type User = UserI;
+
 export interface AuthResponse {
   user: UserI;
   accessToken: string; // El backend devuelve accessToken

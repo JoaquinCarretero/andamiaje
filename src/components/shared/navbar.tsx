@@ -103,17 +103,17 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
               <div className="flex items-center space-x-3">
                 <div className="text-right">
                   <p className="text-sm font-medium" style={{ color: colors.text }}>
-                    {fullName}
+                    {fullName || 'Usuario'}
                   </p>
                   <p className="text-xs" style={{ color: colors.textMuted }}>
-                    {roleTitle}
+                    {roleTitle || 'Usuario'}
                   </p>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleProfileClick}
-                  className="rounded-full transition-all duration-200 hover:bg-blue-50 hover:text-blue-600"
+                  className="rounded-full transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 hover:scale-105"
                   style={{ 
                     color: colors.textSecondary,
                     backgroundColor: colors.neutral[100]
@@ -198,10 +198,10 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
                   </div>
                   <div>
                     <p className="font-medium" style={{ color: colors.text }}>
-                      {fullName}
+                      {fullName || 'Usuario'}
                     </p>
                     <p className="text-sm" style={{ color: colors.textMuted }}>
-                      {roleTitle}
+                      {roleTitle || 'Usuario'}
                     </p>
                   </div>
                 </div>

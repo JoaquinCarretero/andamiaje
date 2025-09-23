@@ -4,11 +4,13 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/shared/navbar"
 import { CalendarWidget } from "@/components/shared/calendar-widget"
+import { WelcomeSignatureModal } from "@/components/ui/welcome-signature-modal"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import colors from "@/lib/colors"
 import { AuthService } from "@/lib/auth"
+import { apiClient } from "@/lib/api"
 import type { User } from "@/types/auth"
 
 interface DashboardLayoutProps {
@@ -22,13 +24,24 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ userData, children, currentView, onNavigate, role }: DashboardLayoutProps) {
   const router = useRouter()
   const [currentUser, setCurrentUser] = useState<User | null>(userData || null)
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   useEffect(() => {
     if (!userData) {
       const user = AuthService.getUser()
       setCurrentUser(user)
+      
+      // Verificar si necesita mostrar el modal de bienvenida
+      if (user && user.firstLogin && !user.hasSignature) {
+        setShowWelcomeModal(true)
+      }
     } else {
       setCurrentUser(userData)
+      
+      // Verificar si necesita mostrar el modal de bienvenida
+      if (userData.firstLogin && !userData.hasSignature) {
+        setShowWelcomeModal(true)
+      }
     }
   }, [userData])
 
@@ -46,6 +59,36 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
 
   const fullName = AuthService.getFullName(currentUser)
   const greeting = AuthService.getGreeting(currentUser)
+
+  const handleSignatureComplete = async (signature: string, name: string) => {
+    try {
+      // Guardar firma en localStorage
+      localStorage.setItem(
+        "userSignature",
+        JSON.stringify({
+          signature,
+          name,
+          timestamp: new Date().toISOString(),
+        })
+      )
+
+      // Actualizar el usuario para marcar que ya tiene firma y no es primer login
+      if (currentUser) {
+        const updatedUser = {
+          ...currentUser,
+          firstLogin: false,
+          hasSignature: true
+        }
+        setCurrentUser(updatedUser)
+        localStorage.setItem('authUser', JSON.stringify(updatedUser))
+      }
+
+      setShowWelcomeModal(false)
+    } catch (error) {
+      console.error('Error al guardar la firma:', error)
+      throw error
+    }
+  }
 
   const getGreeting = () => {
     return greeting
@@ -84,6 +127,14 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
       className="min-h-screen"
       style={{ backgroundColor: colors.background }}
     >
+      {/* Modal de Bienvenida con Firma */}
+      <WelcomeSignatureModal
+        isOpen={showWelcomeModal}
+        onComplete={handleSignatureComplete}
+        userName={fullName}
+        userRole={AuthService.getRoleTitle(currentUser?.role)}
+      />
+      
       <Navbar userData={currentUser} onNavigate={onNavigate} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -91,15 +142,15 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
           <div className="space-y-8">
             {/* Welcome Section */}
             <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-              <div className="xl:col-span-3">
+              <div className="xl:col-span-3 flex flex-col">
                 <Card 
-                  className="h-full shadow-soft border-0" 
+                  className="shadow-soft border-0 flex-1" 
                   style={{ 
                     backgroundColor: colors.surface,
                     background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.neutral[50]} 100%)`
                   }}
                 >
-                  <CardContent className="p-8">
+                  <CardContent className="p-8 flex flex-col h-full">
                     <div className="flex items-center space-x-3 mb-6">
                       <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
                       <h2 className="font-display text-2xl lg:text-3xl font-bold" style={{ color: colors.text }}>
@@ -113,7 +164,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                     </p>
 
                     {/* Action Buttons Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 flex-1 content-start">
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
@@ -170,7 +221,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                 </Card>
               </div>
 
-              <div className="xl:col-span-2">
+              <div className="xl:col-span-2 flex flex-col">
                 <CalendarWidget role={role} onNavigate={handleNavigation} />
               </div>
             </div>

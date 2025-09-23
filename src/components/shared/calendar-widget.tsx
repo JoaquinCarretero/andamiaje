@@ -228,6 +228,8 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showEventDetailModal, setShowEventDetailModal] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [newEventForm, setNewEventForm] = useState({
     title: "",
@@ -238,6 +240,25 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   useEffect(() => {
     setEvents(getEventsByRole(role));
   }, [role]);
+
+  // Cargar eventos personalizados del localStorage
+  useEffect(() => {
+    const savedCustomEvents = localStorage.getItem(`customEvents_${role}`)
+    if (savedCustomEvents) {
+      try {
+        const customEvents = JSON.parse(savedCustomEvents)
+        setEvents(prev => [...prev.filter(e => !e.isCustom), ...customEvents])
+      } catch (error) {
+        console.error('Error loading custom events:', error)
+      }
+    }
+  }, [role])
+
+  // Guardar eventos personalizados en localStorage
+  const saveCustomEvents = (allEvents: CalendarEvent[]) => {
+    const customEvents = allEvents.filter(e => e.isCustom)
+    localStorage.setItem(`customEvents_${role}`, JSON.stringify(customEvents))
+  }
 
   const today = new Date();
   const year = currentDate.getFullYear();
@@ -277,17 +298,23 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
 
   const handleEventClick = (event: CalendarEvent) => {
     if (event.isCustom) {
-      setEditingEvent(event);
-      setNewEventForm({
-        title: event.title,
-        description: event.description || "",
-        priority: event.priority,
-      });
-      setShowEventModal(true);
+      setSelectedEvent(event)
+      setShowEventDetailModal(true)
     } else {
       onNavigate(event.type);
     }
   };
+
+  const handleEditEvent = (event: CalendarEvent) => {
+    setEditingEvent(event)
+    setNewEventForm({
+      title: event.title,
+      description: event.description || "",
+      priority: event.priority,
+    })
+    setShowEventDetailModal(false)
+    setShowEventModal(true)
+  }
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
@@ -337,6 +364,24 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
       setEvents((prev) => [...prev, newEvent]);
     }
 
+    // Guardar eventos personalizados
+    const updatedEvents = editingEvent 
+      ? events.map(event => event.id === editingEvent.id 
+          ? { ...event, title: newEventForm.title, description: newEventForm.description, priority: newEventForm.priority }
+          : event)
+      : [...events, {
+          id: `custom-${Date.now()}`,
+          title: newEventForm.title,
+          description: newEventForm.description,
+          type: "plan-trabajo",
+          priority: newEventForm.priority,
+          dueDate: selectedDate,
+          completed: false,
+          isCustom: true,
+        }]
+    
+    saveCustomEvents(updatedEvents)
+
     setShowEventModal(false);
     setEditingEvent(null);
     setNewEventForm({ title: "", description: "", priority: "medium" });
@@ -345,10 +390,27 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
   const handleDeleteEvent = () => {
     if (editingEvent) {
       setEvents((prev) => prev.filter((event) => event.id !== editingEvent.id));
+      saveCustomEvents(events.filter((event) => event.id !== editingEvent.id))
       setShowEventModal(false);
       setEditingEvent(null);
     }
   };
+
+  const handleDeleteFromDetail = () => {
+    if (selectedEvent) {
+      const updatedEvents = events.filter((event) => event.id !== selectedEvent.id)
+      setEvents(updatedEvents)
+      saveCustomEvents(updatedEvents)
+      setShowEventDetailModal(false)
+      setSelectedEvent(null)
+    }
+  }
+
+  // Función para truncar texto
+  const truncateText = (text: string, maxLength: number = 15) => {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + "..."
+  }
 
   const upcomingEvents = events
     .filter((event) => !event.completed && event.dueDate >= today)
@@ -370,14 +432,14 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
 
   return (
     <div
-      className="rounded-xl shadow-soft border"
+      className="rounded-xl shadow-soft border flex flex-col h-full"
       style={{
         backgroundColor: colors.surface,
         borderColor: colors.border,
         boxShadow: `0 4px 16px ${colors.shadow}`,
       }}
     >
-      <div className="p-6">
+      <div className="p-6 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <div
@@ -432,10 +494,10 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Calendario */}
-        <div className="grid grid-cols-7 gap-2 mb-6">
+        <div className="grid grid-cols-7 gap-1 mb-6">
           {calendarDays.map((date, index) => {
             if (!date) {
-              return <div key={index} className="h-20" />;
+              return <div key={index} className="h-24" />;
             }
 
             const dayEvents = getEventsForDate(date);
@@ -450,7 +512,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  h-20 text-xs rounded-lg transition-all duration-200 relative p-2 flex flex-col
+                  h-24 text-xs rounded-lg transition-all duration-200 relative p-2 flex flex-col
                   ${isToday(date) ? "font-bold ring-2" : ""}
                   ${hasEvents ? "font-medium" : ""}
                   hover:scale-105 hover:shadow-md
@@ -476,7 +538,11 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                 <div className="font-semibold mb-1">{date.getDate()}</div>
                 {displayEvent && (
                   <div className="flex-1 overflow-hidden">
-                    <div
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleEventClick(displayEvent)
+                      }}
                       className="text-xs leading-tight line-clamp-2 p-1 rounded text-left"
                       style={{
                         backgroundColor:
@@ -493,8 +559,8 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                             : colors.success[700],
                       }}
                     >
-                      {displayEvent.title}
-                    </div>
+                      {truncateText(displayEvent.title, 12)}
+                    </button>
                   </div>
                 )}
                 {hasEvents && (
@@ -524,7 +590,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Próximas actividades */}
-        <div className="space-y-3">
+        <div className="space-y-3 flex-1">
           <h4 className="text-sm font-medium" style={{ color: colors.text }}>
             Próximas Actividades
           </h4>
@@ -602,6 +668,85 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
           )}
         </div>
       </div>
+
+      {/* Modal para ver detalles del evento */}
+      {showEventDetailModal && selectedEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowEventDetailModal(false)}
+          />
+
+          <Card
+            className="relative w-full max-w-md border-0 shadow-2xl"
+            style={{
+              backgroundColor: colors.surface,
+              boxShadow: `0 25px 50px ${colors.shadowLarge}`,
+            }}
+          >
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar
+                    className="h-5 w-5"
+                    style={{ color: colors.primary[500] }}
+                  />
+                  <span style={{ color: colors.text }}>
+                    Detalles de la Actividad
+                  </span>
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowEventDetailModal(false)}
+                  className="rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2" style={{ color: colors.text }}>
+                  {selectedEvent.title}
+                </h4>
+                {selectedEvent.description && (
+                  <p className="text-sm mb-3" style={{ color: colors.textSecondary }}>
+                    {selectedEvent.description}
+                  </p>
+                )}
+                <div className="flex items-center gap-2 text-sm" style={{ color: colors.textMuted }}>
+                  <Calendar className="h-4 w-4" />
+                  <span>{selectedEvent.dueDate.toLocaleDateString('es-AR')}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between pt-4 border-t" style={{ borderColor: colors.border }}>
+                <Button
+                  variant="outline"
+                  onClick={() => handleDeleteFromDetail()}
+                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
+                </Button>
+
+                <Button
+                  onClick={() => handleEditEvent(selectedEvent)}
+                  style={{
+                    backgroundColor: colors.primary[500],
+                    color: colors.surface,
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Editar
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Modal para crear/editar eventos */}
       {showEventModal && (

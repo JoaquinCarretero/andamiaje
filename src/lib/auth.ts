@@ -66,7 +66,7 @@ export class AuthService {
   // Nombre completo
   static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'
-    return `${user.firstName} ${user.lastName}`
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Usuario'
   }
 
   // Título según rol
@@ -113,12 +113,14 @@ export class AuthService {
 
     if (!user) return `${timeGreeting}, Usuario`
 
+    const firstName = user.firstName || 'Usuario'
+
     switch (user.role) {
       case UserRole.TERAPEUTA:
       case UserRole.DIRECTOR:
         return `${timeGreeting}, Dr.`
       case UserRole.COORDINADOR:
-        return `${timeGreeting}, ${user.firstName}`
+        return `${timeGreeting}, ${firstName}`
       case UserRole.ACOMPANANTE:
       default:
         return `${timeGreeting}, Prof.`

@@ -26,7 +26,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SignatureModal } from "@/components/ui/signature-modal";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Image from "next/image";
@@ -38,9 +37,6 @@ import { RegisterDto, UserRole } from "@/types/auth";
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSignatureModal, setShowSignatureModal] = useState(false);
-  const [signature, setSignature] = useState<string | null>(null);
-  const [signatureName, setSignatureName] = useState("");
   const [formData, setFormData] = useState<RegisterDto>({
     firstName: "",
     lastName: "",
@@ -115,29 +111,8 @@ export default function RegisterPage() {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
     }
 
-    if (!signature) {
-      newErrors.signature = "La firma digital es obligatoria";
-    }
-
-    if (!signatureName.trim()) {
-      newErrors.signatureName = "La aclaración de firma es obligatoria";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSignatureConfirm = (signatureData: string, name: string) => {
-    setSignature(signatureData);
-    setSignatureName(name);
-    setShowSignatureModal(false);
-    // Limpiar errores relacionados con la firma
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors.signature;
-      delete newErrors.signatureName;
-      return newErrors;
-    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,18 +127,6 @@ export default function RegisterPage() {
       console.log("🚀 ~ handleSubmit ~ formData:", formData)
       const authResponse = await apiClient.register(formData);
       console.log("📩 Respuesta del backend en register:", authResponse);
-          
-      // Guardar firma en localStorage para uso posterior
-      if (signature && signatureName) {
-        localStorage.setItem(
-          "userSignature",
-          JSON.stringify({
-            signature,
-            name: signatureName,
-            timestamp: new Date().toISOString(),
-          })
-        );
-      }
 
       // Autenticar automáticamente después del registro
       AuthService.setAuth(authResponse);
@@ -562,19 +525,19 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Firma Digital */}
+                {/* Información de Seguridad */}
                 <div
                   className="p-6 rounded-lg border-l-4 space-y-4"
                   style={{
-                    backgroundColor: colors.accent[50],
-                    borderLeftColor: colors.accent[500],
+                    backgroundColor: colors.info[50],
+                    borderLeftColor: colors.info[500],
                   }}
                 >
                   <h3
                     className="font-medium text-lg"
                     style={{ color: colors.text }}
                   >
-                    Firma Digital
+                    Información de Seguridad
                   </h3>
 
                   <div
@@ -594,129 +557,37 @@ export default function RegisterPage() {
                           className="font-medium"
                           style={{ color: colors.warning[600] }}
                         >
-                          Aviso Legal Importante
+                          Configuración de Seguridad
                         </p>
                         <p style={{ color: colors.warning[600] }}>
-                          Su firma digital será utilizada para validar
-                          documentos oficiales y reportes profesionales. Esta
-                          firma tiene validez legal y será asociada
-                          permanentemente a su cuenta profesional.
+                          Después del registro, deberá configurar su firma digital 
+                          para validar documentos oficiales. Este proceso es obligatorio 
+                          y se realiza una sola vez por seguridad.
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label style={{ color: colors.text }}>
-                        Firma Digital *
-                      </Label>
-                      <div
-                        className={`border-2 rounded-lg p-4 transition-all duration-200 ${
-                          signature
-                            ? "border-green-300 bg-green-50"
-                            : errors.signature
-                            ? "border-red-500 bg-red-50"
-                            : "border-dashed"
-                        }`}
-                        style={{
-                          borderColor: signature
-                            ? colors.success[500]
-                            : errors.signature
-                            ? colors.error[500]
-                            : colors.border,
-                          backgroundColor: signature
-                            ? colors.success[50]
-                            : errors.signature
-                            ? colors.error[50]
-                            : colors.surface,
-                        }}
-                      >
-                        {signature ? (
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: colors.success[600] }}
-                              >
-                                ✓ Firma registrada correctamente
-                              </span>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setShowSignatureModal(true)}
-                                className="text-xs"
-                              >
-                                Cambiar firma
-                              </Button>
-                            </div>
-                            <div className="flex items-center justify-center p-4 bg-white rounded border">
-                              <img
-                                src={signature}
-                                alt="Firma digital"
-                                className="max-h-16 max-w-full object-contain"
-                              />
-                            </div>
-                            <p
-                              className="text-sm text-center font-medium"
-                              style={{ color: colors.text }}
-                            >
-                              {signatureName}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="text-center space-y-3">
-                            <PenTool
-                              className="h-8 w-8 mx-auto"
-                              style={{ color: colors.textMuted }}
-                            />
-                            <div>
-                              <p
-                                className="text-sm font-medium mb-1"
-                                style={{ color: colors.text }}
-                              >
-                                Registre su firma digital
-                              </p>
-                              <p
-                                className="text-xs"
-                                style={{ color: colors.textMuted }}
-                              >
-                                Esta firma será utilizada en todos sus
-                                documentos oficiales
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              onClick={() => setShowSignatureModal(true)}
-                              className="w-full"
-                              style={{
-                                backgroundColor: colors.accent[500],
-                                color: colors.surface,
-                              }}
-                            >
-                              <PenTool className="h-4 w-4 mr-2" />
-                              Crear Firma Digital
-                            </Button>
-                          </div>
-                        )}
+                    <div className="text-center space-y-3">
+                      <PenTool
+                        className="h-8 w-8 mx-auto"
+                        style={{ color: colors.info[500] }}
+                      />
+                      <div>
+                        <p
+                          className="text-sm font-medium mb-1"
+                          style={{ color: colors.text }}
+                        >
+                          Firma Digital
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: colors.textMuted }}
+                        >
+                          Se configurará después del registro por seguridad
+                        </p>
                       </div>
-                      {errors.signature && (
-                        <p
-                          className="text-sm"
-                          style={{ color: colors.error[500] }}
-                        >
-                          {errors.signature}
-                        </p>
-                      )}
-                      {errors.signatureName && (
-                        <p
-                          className="text-sm"
-                          style={{ color: colors.error[500] }}
-                        >
-                          {errors.signatureName}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -773,14 +644,6 @@ export default function RegisterPage() {
             </p>
           </CardFooter>
         </Card>
-
-        {/* Modal de Firma */}
-        <SignatureModal
-          isOpen={showSignatureModal}
-          onClose={() => setShowSignatureModal(false)}
-          onConfirm={handleSignatureConfirm}
-          initialName={`${formData.firstName} ${formData.lastName}`.trim()}
-        />
       </motion.div>
     </div>
   );
