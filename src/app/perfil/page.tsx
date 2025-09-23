@@ -13,6 +13,7 @@ import {
   Briefcase,
   Award,
   Clock,
+  User,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -24,12 +25,12 @@ import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
-import { User, UserRole } from "@/types/auth"
+import { UserI, UserRole } from "@/types/auth"
 
 export default function ProfilePage() {
   const router = useRouter()
   const { getSignature } = useSignature()
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<UserI | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
   

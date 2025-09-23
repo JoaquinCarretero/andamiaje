@@ -1,5 +1,5 @@
 import { LoginDto, RegisterDto, AuthResponse, ApiError, BACKEND_ROLES, FRONTEND_ROLES } from '@/types/auth'
-import type { User } from '@/types/auth'
+import type { UserI } from '@/types/auth'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://andamiaje-api.onrender.com'
 
@@ -111,12 +111,12 @@ class ApiClient {
     return response;
   }
 
-  async getProfile(): Promise<User> {
+  async getProfile(): Promise<UserI> {
     const response = await this.request<any>('/api/v1/auth/profile');
     
     // Convertir rol del backend al frontend
     if (response.role) {
-      response.role = FRONTEND_ROLES[response.role as keyof typeof FRONTEND_ROLES] || response.role;
+      response.role = FRONTEND_ROLES[response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES] || response.role;
     }
 
     return response;

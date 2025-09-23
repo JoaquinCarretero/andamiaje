@@ -2,6 +2,7 @@ export const UserRole = {
   TERAPEUTA: 'TERAPEUTA',
   ACOMPANANTE: 'ACOMPANANTE',
   COORDINADOR: 'COORDINADOR',
+  COORDINADOR_UNO: 'COORDINADOR_UNO',
   DIRECTOR: 'DIRECTOR'
 } as const;
 
@@ -9,19 +10,20 @@ export type UserRole = typeof UserRole[keyof typeof UserRole];
 
 // Mapeo para el backend
 export const BACKEND_ROLES = {
-  [UserRole.TERAPEUTA]: 'terapeuta',
-  [UserRole.ACOMPANANTE]: 'acompaniante_externo',
-  [UserRole.COORDINADOR]: 'coordinador_uno',
-  [UserRole.DIRECTOR]: 'director'
+  [UserRole.TERAPEUTA]: 'TERAPEUTA',
+  [UserRole.ACOMPANANTE]: 'ACOMPANIANTE_EXTERNO',
+  [UserRole.COORDINADOR]: 'COORDINADOR_UNO',
+  [UserRole.COORDINADOR_UNO]: 'COORDINADOR_UNO',
+  [UserRole.DIRECTOR]: 'DIRECTOR'
 } as const;
 
 // Mapeo desde el backend
 export const FRONTEND_ROLES = {
-  'terapeuta': UserRole.TERAPEUTA,
-  'acompaniante_externo': UserRole.ACOMPANANTE,
-  'coordinador_uno': UserRole.COORDINADOR,
-  'coordinador_dos': UserRole.COORDINADOR,
-  'director': UserRole.DIRECTOR
+  'TERAPEUTA': UserRole.TERAPEUTA,
+  'ACOMPANIANTE_EXTERNO': UserRole.ACOMPANANTE,
+  'COORDINADOR_UNO': UserRole.COORDINADOR,
+  // 'coordinador_dos': UserRole.COORDINADOR,
+  'DIRECTOR': UserRole.DIRECTOR
 } as const;
 
 export interface LoginDto {
@@ -39,7 +41,7 @@ export interface RegisterDto {
   role: UserRole;
 }
 
-export interface User {
+export interface UserI {
   id: string;
   firstName: string;
   lastName: string;
@@ -54,10 +56,12 @@ export interface User {
   joinDate?: string;
   experience?: string;
   bio?: string;
+  firstLogin?: boolean;
+  hasSignature?: boolean;
 }
 
 export interface AuthResponse {
-  user: User;
+  user: UserI;
   accessToken: string; // El backend devuelve accessToken
   refreshToken?: string;
   expiresIn?: number;

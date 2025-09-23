@@ -1,4 +1,4 @@
-import { User, AuthResponse, UserRole } from '@/types/auth'
+import { UserI, AuthResponse, UserRole } from '@/types/auth'
 import { apiClient } from './api'
 
 export class AuthService {
@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   // Obtener usuario del localStorage de forma segura
-  static getUser(): User | null {
+  static getUser(): UserI | null {
     if (typeof window === 'undefined') return null
     const userStr = localStorage.getItem(this.USER_KEY)
     if (!userStr || userStr === 'undefined') return null
@@ -50,7 +50,7 @@ export class AuthService {
   }
 
   // Obtener usuario actualizado del servidor
-  static async getCurrentUser(): Promise<User | null> {
+  static async getCurrentUser(): Promise<UserI | null> {
     try {
       if (!this.isAuthenticated()) return null
       const user = await apiClient.getProfile()
@@ -64,7 +64,7 @@ export class AuthService {
   }
 
   // Nombre completo
-  static getFullName(user?: User | null): string {
+  static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'
     return `${user.firstName} ${user.lastName}`
   }
@@ -86,7 +86,7 @@ export class AuthService {
   }
 
   // Rol para rutas
-  static getRoleForRouting(role?: UserRole): string {
+  static getRoleForRouting(role: UserRole): string {
     console.log('Getting route for role:', role)
     switch (role) {
       case UserRole.TERAPEUTA:
@@ -94,6 +94,7 @@ export class AuthService {
       case UserRole.ACOMPANANTE:
         return 'acompanante'
       case UserRole.COORDINADOR:
+      case UserRole.COORDINADOR_UNO:
         return 'coordinador'
       case UserRole.DIRECTOR:
         return 'director'
@@ -104,7 +105,7 @@ export class AuthService {
   }
 
   // Saludo personalizado
-  static getGreeting(user?: User | null): string {
+  static getGreeting(user?: UserI | null): string {
     const hour = new Date().getHours()
     let timeGreeting = "Buenos días"
     if (hour >= 12 && hour < 18) timeGreeting = "Buenas tardes"
