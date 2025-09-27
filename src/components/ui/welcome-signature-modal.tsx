@@ -7,29 +7,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SignatureCanvas from "react-signature-canvas"
 import Image from "next/image"
 import colors from "@/lib/colors"
+import { apiClient } from "@/lib/api"
 
 interface WelcomeSignatureModalProps {
   isOpen: boolean
-  onComplete: (signature: string, name: string) => void
+  onComplete: (signatureKey: string, name: string) => void
   userName: string
   userRole: string
+  userId: string
 }
 
 export function WelcomeSignatureModal({ 
   isOpen, 
   onComplete, 
   userName, 
-  userRole 
+  userRole,
+  userId
 }: WelcomeSignatureModalProps) {
   const signatureRef = useRef<SignatureCanvas>(null)
   const [hasSignature, setHasSignature] = useState(false)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState("")
 
   useEffect(() => {
     if (isOpen) {
       setError("")
       setHasSignature(false)
+      setUploadProgress("")
     }
   }, [isOpen])
 
@@ -38,7 +43,17 @@ export function WelcomeSignatureModal({
       signatureRef.current.clear()
       setHasSignature(false)
       setError("")
+      setUploadProgress("")
     }
+  }
+
+  // Convertir canvas a blob
+  const canvasToBlob = (canvas: HTMLCanvasElement): Promise<Blob> => {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        resolve(blob!)
+      }, 'image/png', 0.8)
+    })
   }
 
   const handleConfirm = async () => {
@@ -55,13 +70,48 @@ export function WelcomeSignatureModal({
     }
 
     setIsSubmitting(true)
+    setError("")
     
     try {
-      const signatureData = signatureRef.current.toDataURL()
-      await onComplete(signatureData, userName.trim())
+      setUploadProgress("Preparando firma...")
+      
+      // Obtener el canvas y convertirlo a blob
+      const canvas = signatureRef.current.getCanvas()
+      const blob = await canvasToBlob(canvas)
+      
+      // Crear archivo desde el blob
+      const file = new File([blob], `firma_${userId}_${Date.now()}.png`, { 
+        type: 'image/png' 
+      })
+      
+      setUploadProgress("Subiendo firma al servidor...")
+      
+      // Subir archivo al servidor
+      const uploadResponse = await apiClient.uploadSignature(file)
+      
+      if (!uploadResponse.key) {
+        throw new Error("No se recibió la clave del archivo subido")
+      }
+      
+      setUploadProgress("Actualizando perfil...")
+      
+      // Actualizar perfil del usuario
+      await apiClient.updateUserProfile(userId, {
+        firstLogin: false,
+        hasSignature: true,
+        signatureKey: uploadResponse.key
+      })
+      
+      setUploadProgress("Completado")
+      
+      // Llamar al callback con la key de la firma
+      await onComplete(uploadResponse.key, userName.trim())
+      
     } catch (error) {
-      setError("Error al guardar la firma. Intente nuevamente.")
+      console.error('Error al guardar la firma:', error)
+      setError(error instanceof Error ? error.message : "Error al guardar la firma. Intente nuevamente.")
       setIsSubmitting(false)
+      setUploadProgress("")
     }
   }
 
@@ -238,6 +288,22 @@ export function WelcomeSignatureModal({
             </div>
           )}
 
+          {/* Progress */}
+          {uploadProgress && (
+            <div 
+              className="p-3 rounded-lg border-l-4 flex items-center gap-2"
+              style={{ 
+                backgroundColor: colors.info[50],
+                borderLeftColor: colors.info[500]
+              }}
+            >
+              <div className="w-4 h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+              <p className="text-sm" style={{ color: colors.info[600] }}>
+                {uploadProgress}
+              </p>
+            </div>
+          )}
+
           {/* Botón de Confirmación */}
           <div className="pt-4 border-t" style={{ borderColor: colors.border }}>
             <Button
@@ -253,7 +319,7 @@ export function WelcomeSignatureModal({
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Guardando firma...
+                  {uploadProgress || "Guardando firma..."}
                 </div>
               ) : (
                 <>

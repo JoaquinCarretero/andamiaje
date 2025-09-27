@@ -8,6 +8,7 @@ import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import Image from "next/image"
 import colors from "@/lib/colors"
+import { apiClient } from "@/lib/api"
 
 interface PDFPreviewModalProps {
   isOpen: boolean
@@ -34,7 +35,14 @@ export function PDFPreviewModal({
   const getStoredSignature = () => {
     try {
       const stored = localStorage.getItem('userSignature')
-      return stored ? JSON.parse(stored) : null
+      if (!stored) return null
+      
+      const signature = JSON.parse(stored)
+      // Si tiene signatureKey, usar la URL del servidor, sino usar la firma local
+      if (signature.signatureKey) {
+        signature.signature = apiClient.getDownloadUrl(signature.signatureKey)
+      }
+      return signature
     } catch {
       return null
     }

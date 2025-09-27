@@ -187,6 +187,66 @@ class ApiClient {
       method: 'POST',
     })
   }
+
+  // Storage endpoints
+  async uploadSignature(file: File): Promise<{ key: string }> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const token = localStorage.getItem('authToken')
+    const response = await fetch(`${this.baseURL}/api/v1/storage/upload?type=FIRMA_DIGITAL`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    })
+
+    if (!response.ok) {
+      const text = await response.text()
+      let errorData: ApiError = { message: text || 'Error al subir archivo', statusCode: response.status }
+      try { errorData = JSON.parse(text) } catch {}
+      throw new Error(errorData.message || `Error ${response.status}`)
+    }
+
+    return response.json()
+  }
+
+  getDownloadUrl(key: string): string {
+    return `${this.baseURL}/api/v1/storage/download?key=${encodeURIComponent(key)}`
+  }
+
+  // User profile update
+  async updateUserProfile(userId: string, data: {
+    firstLogin?: boolean
+    hasSignature?: boolean
+    signatureKey?: string
+  }): Promise<UserI> {
+    const response = await this.request<any>(`/api/v1/users/profile/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+
+    // Convertir rol del backend al frontend si es necesario
+    if (response.role) {
+      response.role = FRONTEND_ROLES[response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES] || response.role;
+    }
+
+    // Procesar nombres
+    if (!response.firstName && !response.lastName && response.name) {
+      const nameParts = response.name.trim().split(' ')
+      response.firstName = nameParts[0] || ''
+      response.lastName = nameParts.slice(1).join(' ') || ''
+    } else {
+      response.firstName = response.firstName?.trim() || ''
+      response.lastName = response.lastName?.trim() || ''
+    }
+    
+    response.firstLogin = response.firstLogin ?? false
+    response.hasSignature = response.hasSignature ?? false
+
+    return response;
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL)

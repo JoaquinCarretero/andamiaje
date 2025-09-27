@@ -62,11 +62,13 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
 
   const handleSignatureComplete = async (signature: string, name: string) => {
     try {
-      // Guardar firma en localStorage
+      // Guardar firma en localStorage (para compatibilidad con código existente)
+      const signatureUrl = apiClient.getDownloadUrl(signature) // signature es ahora la key
       localStorage.setItem(
         "userSignature",
         JSON.stringify({
-          signature,
+          signature: signatureUrl, // URL completa para descargar
+          signatureKey: signature, // Key para futuras referencias
           name,
           timestamp: new Date().toISOString(),
         })
@@ -77,7 +79,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
         const updatedUser = {
           ...currentUser,
           firstLogin: false,
-          hasSignature: true
+          hasSignature: true,
+          signatureKey: signature
         }
         setCurrentUser(updatedUser)
         localStorage.setItem('authUser', JSON.stringify(updatedUser))
@@ -133,6 +136,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
         onComplete={handleSignatureComplete}
         userName={fullName}
         userRole={AuthService.getRoleTitle(currentUser?.role)}
+        userId={currentUser?.id || ''}
       />
       
       {/* Solo mostrar navbar si no hay modal de bienvenida */}

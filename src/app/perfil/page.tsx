@@ -26,6 +26,7 @@ import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
 import { UserI, UserRole } from "@/types/auth"
+import { apiClient } from "@/lib/api"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -55,6 +56,17 @@ export default function ProfilePage() {
   }, [router])
 
   const signature = getSignature()
+  
+  // Si la firma tiene signatureKey, usar la URL del servidor
+  const getSignatureUrl = () => {
+    if (!signature) return null
+    if (signature.signatureKey) {
+      return apiClient.getDownloadUrl(signature.signatureKey)
+    }
+    return signature.signature
+  }
+  
+  const signatureUrl = getSignatureUrl()
 
   const handleSaveProfile = (updatedData: any) => {
     if (user) {
@@ -439,7 +451,7 @@ export default function ProfilePage() {
                     >
                       <div className="flex items-center justify-center mb-4">
                         <img
-                          src={signature.signature}
+                          src={signatureUrl || signature.signature}
                           alt="Firma digital"
                           className="max-h-20 max-w-full object-contain border rounded"
                           style={{ backgroundColor: colors.surface }}

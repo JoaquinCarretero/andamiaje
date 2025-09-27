@@ -2,6 +2,7 @@
 
 export interface StoredSignature {
   signature: string // Base64 de la imagen de la firma
+  signatureKey?: string // Key para descargar del servidor
   name: string // Nombre y apellido para aclaración
   timestamp: string // Fecha y hora de creación
 }

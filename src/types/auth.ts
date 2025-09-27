@@ -59,6 +59,7 @@ export interface UserI {
   bio?: string;
   firstLogin?: boolean;
   hasSignature?: boolean;
+  signatureKey?: string;
 }
 
 // Alias para compatibilidad
