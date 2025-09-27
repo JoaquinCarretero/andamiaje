@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { User, LogOut, Menu, X, Home, FileText, Calendar, Upload } from "lucide-react"
+import { User, LogOut, Menu, X, Chrome as Home, FileText, Calendar, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import colors from "@/lib/colors"

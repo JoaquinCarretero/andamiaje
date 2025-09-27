@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { PenTool, Check, RotateCcw, Sparkles, Shield, AlertTriangle, X } from "lucide-react"
+import { PenTool, Check, RotateCcw, Sparkles, Shield, TriangleAlert as AlertTriangle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import SignatureCanvas from "react-signature-canvas"

@@ -1,19 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calendar,
-  Plus,
-  AlertTriangle,
-  Clock,
-  FileText,
-  Edit,
-  Trash2,
-  Save,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Plus, TriangleAlert as AlertTriangle, Clock, FileText, CreditCard as Edit, Trash2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
