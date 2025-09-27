@@ -96,7 +96,7 @@ export function WelcomeSignatureModal({
           </CardTitle>
           <div className="mt-4 space-y-2">
             <p className="text-lg font-medium" style={{ color: colors.text }}>
-              Hola {userName}
+              Hola {userName || 'Usuario'}
             </p>
             <p className="text-base" style={{ color: colors.textSecondary }}>
               {userRole}

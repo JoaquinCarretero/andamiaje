@@ -79,8 +79,16 @@ class ApiClient {
 
     // Asegurar que los campos requeridos existan
     if (response.user) {
-      response.user.firstName = response.user.firstName?.trim() || response.user.name?.split(' ')[0] || ''
-      response.user.lastName = response.user.lastName?.trim() || response.user.name?.split(' ').slice(1).join(' ') || ''
+      // Procesar nombres de manera más robusta
+      if (!response.user.firstName && !response.user.lastName && response.user.name) {
+        const nameParts = response.user.name.trim().split(' ')
+        response.user.firstName = nameParts[0] || ''
+        response.user.lastName = nameParts.slice(1).join(' ') || ''
+      } else {
+        response.user.firstName = response.user.firstName?.trim() || ''
+        response.user.lastName = response.user.lastName?.trim() || ''
+      }
+      
       response.user.firstLogin = response.user.firstLogin ?? true
       response.user.hasSignature = response.user.hasSignature ?? false
       console.log('Login response user data:', {
@@ -125,8 +133,16 @@ class ApiClient {
 
     // Asegurar que los campos requeridos existan
     if (response.user) {
-      response.user.firstName = response.user.firstName?.trim() || response.user.name?.split(' ')[0] || ''
-      response.user.lastName = response.user.lastName?.trim() || response.user.name?.split(' ').slice(1).join(' ') || ''
+      // Procesar nombres de manera más robusta
+      if (!response.user.firstName && !response.user.lastName && response.user.name) {
+        const nameParts = response.user.name.trim().split(' ')
+        response.user.firstName = nameParts[0] || ''
+        response.user.lastName = nameParts.slice(1).join(' ') || ''
+      } else {
+        response.user.firstName = response.user.firstName?.trim() || ''
+        response.user.lastName = response.user.lastName?.trim() || ''
+      }
+      
       response.user.firstLogin = response.user.firstLogin ?? true
       response.user.hasSignature = response.user.hasSignature ?? false
       console.log('Register response user data:', {
@@ -150,8 +166,16 @@ class ApiClient {
     }
 
     // Asegurar que los campos requeridos existan
-    response.firstName = response.firstName?.trim() || response.name?.split(' ')[0] || ''
-    response.lastName = response.lastName?.trim() || response.name?.split(' ').slice(1).join(' ') || ''
+    // Procesar nombres de manera más robusta
+    if (!response.firstName && !response.lastName && response.name) {
+      const nameParts = response.name.trim().split(' ')
+      response.firstName = nameParts[0] || ''
+      response.lastName = nameParts.slice(1).join(' ') || ''
+    } else {
+      response.firstName = response.firstName?.trim() || ''
+      response.lastName = response.lastName?.trim() || ''
+    }
+    
     response.firstLogin = response.firstLogin ?? false
     response.hasSignature = response.hasSignature ?? false
 

@@ -146,8 +146,8 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
         {currentView === "dashboard" ? (
           <div className="space-y-8">
             {/* Welcome Section */}
-            <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-              <div className="xl:col-span-3">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              <div className="xl:col-span-2">
                 <Card 
                   className="shadow-soft border-0 h-fit" 
                   style={{ 
@@ -155,25 +155,25 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                     background: `linear-gradient(135deg, ${colors.surface} 0%, ${colors.neutral[50]} 100%)`
                   }}
                 >
-                  <CardContent className="p-8">
+                  <CardContent className="p-6">
                     <div className="flex items-center space-x-3 mb-6">
                       <Sparkles className="h-6 w-6" style={{ color: colors.primary[500] }} />
-                      <h2 className="font-display text-2xl lg:text-3xl font-bold" style={{ color: colors.text }}>
+                      <h2 className="font-display text-xl lg:text-2xl font-bold" style={{ color: colors.text }}>
                         {getGreeting()} {fullName.split(' ')[0]}
                       </h2>
                     </div>
                     
-                    <p className="text-base lg:text-lg mb-6 leading-relaxed" style={{ color: colors.textSecondary }}>
+                    <p className="text-sm lg:text-base mb-4 leading-relaxed" style={{ color: colors.textSecondary }}>
                       Bienvenido a tu espacio de trabajo. Aquí puedes gestionar todas tus actividades y 
                       hacer seguimiento del progreso de tus {role === "terapeuta" ? "pacientes" : "estudiantes"}.
                     </p>
 
                     {/* Action Buttons Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                       {getActionButtons().map((section) => (
                         <button
                           key={section.id}
-                          className={`group p-3 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left ${
+                          className={`group p-2.5 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-medium text-left ${
                             section.id === "seguimiento-acompanantes" ? "ring-2 ring-offset-2" : ""
                           }`}
                           style={{
@@ -183,9 +183,9 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                           }}
                           onClick={() => handleNavigation(section.id)}
                         >
-                          <div className="space-y-3">
+                          <div className="space-y-2">
                             <div
-                              className={`text-xl p-2 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110 ${
+                              className={`text-lg p-1.5 rounded-xl border-2 w-fit transition-all duration-300 group-hover:scale-110 ${
                                 section.id === "seguimiento-acompanantes" ? "animate-pulse-soft" : ""
                               }`}
                               style={{
@@ -197,7 +197,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                             </div>
                             <div>
                               <h3 
-                                className={`font-medium text-xs mb-1 ${
+                                className={`font-medium text-xs mb-0.5 ${
                                   section.id === "seguimiento-acompanantes" ? "font-semibold" : ""
                                 }`} 
                                 style={{ 
@@ -206,7 +206,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                               >
                                 {section.title}
                               </h3>
-                              <p className="text-xs leading-tight line-clamp-2 hidden sm:block" style={{ color: colors.textMuted }}>
+                              <p className="text-xs leading-tight line-clamp-1 hidden lg:block" style={{ color: colors.textMuted }}>
                                 {section.description}
                               </p>
                             </div>
@@ -218,7 +218,7 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
                 </Card>
               </div>
 
-              <div className="xl:col-span-2">
+              <div className="xl:col-span-1">
                 <CalendarWidget role={role} onNavigate={handleNavigation} />
               </div>
             </div>

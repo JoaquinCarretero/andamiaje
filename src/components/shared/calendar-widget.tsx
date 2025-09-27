@@ -450,7 +450,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         boxShadow: `0 4px 16px ${colors.shadow}`,
       }}
     >
-      <div className="p-6">
+      <div className="p-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
             <div
@@ -458,7 +458,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
               style={{ backgroundColor: colors.primary[500] }}
             />
             <h2
-              className="text-lg font-semibold font-display"
+              className="text-base font-semibold font-display"
               style={{ color: colors.text }}
             >
               Calendario de Actividades
@@ -467,7 +467,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Navegación del calendario */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <Button
             variant="ghost"
             size="icon"
@@ -477,7 +477,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <h3 className="text-lg font-semibold" style={{ color: colors.text }}>
+          <h3 className="text-base font-semibold" style={{ color: colors.text }}>
             {monthNames[month]} {year}
           </h3>
 
@@ -492,11 +492,11 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Días de la semana */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-0.5 mb-2">
           {dayNames.map((day) => (
             <div
               key={day}
-              className="text-center text-sm font-medium py-2"
+              className="text-center text-xs font-medium py-1"
               style={{ color: colors.textMuted }}
             >
               {day}
@@ -505,10 +505,10 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
         </div>
 
         {/* Calendario */}
-        <div className="grid grid-cols-7 gap-2 mb-6">
+        <div className="grid grid-cols-7 gap-1 mb-4">
           {calendarDays.map((date, index) => {
             if (!date) {
-              return <div key={index} className="h-28" />;
+              return <div key={index} className="h-16" />;
             }
 
             const dayEvents = getEventsForDate(date);
@@ -523,7 +523,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                 key={index}
                 onClick={() => handleDateClick(date)}
                 className={`
-                  h-28 text-sm rounded-lg transition-all duration-200 relative p-2 flex flex-col
+                  h-16 text-xs rounded-md transition-all duration-200 relative p-1 flex flex-col
                   ${isToday(date) ? "font-bold ring-2" : ""}
                   ${hasEvents ? "font-medium" : ""}
                   hover:scale-105 hover:shadow-md
@@ -546,7 +546,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                   border: `1px solid ${colors.border}`,
                 }}
               >
-                <div className="font-semibold mb-1">{date.getDate()}</div>
+                <div className="font-semibold text-xs">{date.getDate()}</div>
                 {displayEvent && (
                   <div className="flex-1 overflow-hidden">
                     <button
@@ -554,7 +554,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         e.stopPropagation()
                         handleEventClick(displayEvent)
                       }}
-                      className="text-xs leading-tight p-1 rounded text-center w-full"
+                      className="text-xs leading-tight p-0.5 rounded text-center w-full"
                       style={{
                         backgroundColor:
                           displayEvent.priority === "high"
@@ -570,7 +570,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                             : colors.success[700],
                       }}
                     >
-                      {displayEvent.isCustom ? truncateText(displayEvent.title, 10) : getEventAbbreviation(displayEvent.title)}
+                      {displayEvent.isCustom ? truncateText(displayEvent.title, 6) : getEventAbbreviation(displayEvent.title)}
                     </button>
                   </div>
                 )}
@@ -602,14 +602,14 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
 
         {/* Próximas actividades */}
         <div className="space-y-3">
-          <h4 className="text-sm font-medium" style={{ color: colors.text }}>
+          <h4 className="text-xs font-medium" style={{ color: colors.text }}>
             Próximas Actividades
           </h4>
 
           {upcomingEvents.length === 0 ? (
-            <div className="text-center py-4">
+            <div className="text-center py-2">
               <Calendar
-                className="h-8 w-8 mx-auto mb-2"
+                className="h-6 w-6 mx-auto mb-1"
                 style={{ color: colors.textMuted }}
               />
               <p className="text-xs" style={{ color: colors.textMuted }}>
@@ -617,7 +617,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {upcomingEvents.map((event) => {
                 const eventColors = getEventColor(event.type, event.priority);
                 const daysUntil = Math.ceil(
@@ -629,7 +629,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                   <button
                     key={event.id}
                     onClick={() => handleEventClick(event)}
-                    className="w-full p-2 rounded-lg border transition-all duration-200 hover:shadow-sm hover:scale-[1.02] text-left"
+                    className="w-full p-1.5 rounded-md border transition-all duration-200 hover:shadow-sm hover:scale-[1.02] text-left"
                     style={{
                       backgroundColor: eventColors.bg,
                       borderColor: eventColors.border,
@@ -643,7 +643,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         >
                           {event.title}
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-1 mt-0.5">
                           <Clock
                             className="h-3 w-3"
                             style={{ color: colors.textMuted }}
@@ -660,7 +660,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                           </span>
                           {event.priority === "high" && (
                             <Badge
-                              className="text-xs px-1 py-0"
+                              className="text-xs px-0.5 py-0"
                               style={{
                                 backgroundColor: colors.error[500],
                                 color: colors.surface,

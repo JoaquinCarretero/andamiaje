@@ -66,8 +66,23 @@ export class AuthService {
   // Nombre completo
   static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'
-    const firstName = user.firstName?.trim() || ''
-    const lastName = user.lastName?.trim() || ''
+    
+    // Intentar obtener el nombre de diferentes fuentes
+    let firstName = user.firstName?.trim() || ''
+    let lastName = user.lastName?.trim() || ''
+    
+    // Si no hay firstName/lastName, intentar extraer del campo 'name'
+    if (!firstName && !lastName && user.name) {
+      const nameParts = user.name.trim().split(' ')
+      firstName = nameParts[0] || ''
+      lastName = nameParts.slice(1).join(' ') || ''
+    }
+    
+    // Si aún no hay nombres, usar email como fallback
+    if (!firstName && !lastName && user.email) {
+      firstName = user.email.split('@')[0] || 'Usuario'
+    }
+    
     const fullName = `${firstName} ${lastName}`.trim()
     console.log('Getting full name:', { firstName, lastName, fullName, user })
     return fullName || 'Usuario'
