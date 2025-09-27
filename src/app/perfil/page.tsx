@@ -2,19 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { 
-  Mail, 
-  Phone, 
-  Shield, 
-  Edit, 
-  ArrowLeft,
-  Key,
-  LogOut,
-  Briefcase,
-  Award,
-  Clock,
-  User,
-} from "lucide-react"
+import { Mail, Phone, Shield, CreditCard as Edit, ArrowLeft, Key, LogOut, Briefcase, Award, Clock, User } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -451,7 +439,7 @@ export default function ProfilePage() {
                     >
                       <div className="flex items-center justify-center mb-4">
                         <img
-                          src={signatureUrl || signature.signature}
+                          src={signature.signature}
                           alt="Firma digital"
                           className="max-h-20 max-w-full object-contain border rounded"
                           style={{ backgroundColor: colors.surface }}
