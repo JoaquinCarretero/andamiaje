@@ -1,124 +1,175 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Eye, EyeOff, CreditCard, Lock, Shield, Sparkles, Heart, Users, Target, TrendingUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { FloatingCard, FloatingIcon, AnimatedBackground } from "@/components/ui/floating-elements"
-import Image from "next/image"
-import colors from "@/lib/colors"
-import { apiClient } from "@/lib/api"
-import { AuthService } from "@/lib/auth"
-import { LoginDto, UserRole } from "@/types/auth"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Eye,
+  EyeOff,
+  CreditCard,
+  Lock,
+  Shield,
+  Sparkles,
+  Heart,
+  Users,
+  Target,
+  TrendingUp,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  FloatingCard,
+  FloatingIcon,
+  AnimatedBackground,
+} from "@/components/ui/floating-elements";
+import Image from "next/image";
+import colors from "@/lib/colors";
+import { apiClient } from "@/lib/api";
+import { AuthService } from "@/lib/auth";
+import { LoginDto, UserRole } from "@/types/auth";
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<LoginDto>({
     documentNumber: "",
-    password: ""
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const router = useRouter()
+    password: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   useEffect(() => {
     // Redirigir si ya está autenticado
     if (AuthService.isAuthenticated()) {
-      const user = AuthService.getUser()
+      const user = AuthService.getUser();
       if (user) {
-        const roleRoute = AuthService.getRoleForRouting(user.role)
-        router.push(`/${roleRoute}`)
+        const roleRoute = AuthService.getRoleForRouting(user.role);
+        router.push(`/${roleRoute}`);
       }
     }
-  }, [router])
+  }, [router]);
 
   const handleInputChange = (field: keyof LoginDto, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }))
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-  }
+  };
 
   const handleDniChange = (value: string) => {
-    const numericValue = value.replace(/\D/g, '')
-    handleInputChange('documentNumber', numericValue)
-  }
+    const numericValue = value.replace(/\D/g, "");
+    handleInputChange("documentNumber", numericValue);
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     if (!formData.documentNumber.trim()) {
-      newErrors.documentNumber = "El DNI es obligatorio"
-    } else if (formData.documentNumber.length < 7 || formData.documentNumber.length > 8) {
-      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos"
+      newErrors.documentNumber = "El DNI es obligatorio";
+    } else if (
+      formData.documentNumber.length < 7 ||
+      formData.documentNumber.length > 8
+    ) {
+      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos";
     }
 
     if (!formData.password) {
-      newErrors.password = "La contraseña es obligatoria"
+      newErrors.password = "La contraseña es obligatoria";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
-    
-    setIsLoading(true)
-    setErrors({})
-    
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setErrors({});
+
     try {
-      const authResponse = await apiClient.login(formData)
-      
-      console.log('Login successful:', authResponse)
-      
-      AuthService.setAuth(authResponse)
-      
+      const authResponse = await apiClient.login(formData);
+
+      console.log("Login successful:", authResponse);
+
+      AuthService.setAuth({
+        user: {
+          id: "string;",
+          firstName: "string;",
+          lastName: "string;",
+          name: "string;", // Campo adicional que puede venir del backend
+          email: "string;",
+          phone: "string;",
+          documentNumber: "string;",
+          role: UserRole.TERAPEUTA,
+          createdAt: "string;",
+          updatedAt: "string;",
+          specialty: "string;",
+          license: "string;",
+          joinDate: "string;",
+          experience: "string;",
+          bio: "string;",
+          firstLogin: true,
+          hasSignature: false,
+          signatureKey: "string,",
+        },
+        accessToken: "qwreqdfsafasf", // El backend devuelve accessToken
+        refreshToken: "qwrtruy",
+        expiresIn: 5,
+      });
+
       // Redirigir según el rol del usuario
-      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role)
-      console.log('Redirecting to:', roleRoute)
-      router.push(`/${roleRoute}`)
+      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
+      console.log("Redirecting to:", roleRoute);
+      router.push(`/${roleRoute}`);
     } catch (error) {
-      console.error('Login error:', error)
+      console.error("Login error:", error);
       setErrors({
-        general: error instanceof Error ? error.message : 'Error al iniciar sesión'
-      })
+        general:
+          error instanceof Error ? error.message : "Error al iniciar sesión",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex">
       {/* Lado izquierdo - Imagen y elementos flotantes */}
-      <div 
+      <div
         className="hidden lg:flex lg:w-3/5 relative overflow-hidden"
         style={{
           background: `linear-gradient(135deg, ${colors.primary[500]}20 0%, ${colors.secondary[500]}15 50%, ${colors.accent[500]}20 100%)`,
-          backgroundColor: colors.primary[50]
+          backgroundColor: colors.primary[50],
         }}
       >
         {/* Imagen de fondo difuminada - aquí puedes poner tu imagen */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center opacity-30 scale-110"
           style={{
-            backgroundImage: "url('/Gemini_Generated_Image_6h9jd6h9jd6h9jd6.png')",
-            filter: "blur(2px)"
+            backgroundImage:
+              "url('/Gemini_Generated_Image_6h9jd6h9jd6h9jd6.png')",
+            filter: "blur(2px)",
           }}
         />
-        
+
         {/* Overlay gradient */}
-        <div 
+        <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(135deg, ${colors.primary[500]}40 0%, ${colors.secondary[500]}30 50%, ${colors.accent[500]}40 100%)`
+            background: `linear-gradient(135deg, ${colors.primary[500]}40 0%, ${colors.secondary[500]}30 50%, ${colors.accent[500]}40 100%)`,
           }}
         />
 
@@ -129,15 +180,15 @@ export default function LoginPage() {
         <div className="relative z-10 flex items-center justify-center w-full p-12">
           <div className="text-center max-w-lg">
             <FloatingCard delay={200}>
-              <div 
+              <div
                 className="glass rounded-2xl p-8 backdrop-blur-xl"
                 style={{
                   background: `rgba(255, 255, 255, 0.15)`,
                   border: `1px solid rgba(255, 255, 255, 0.2)`,
-                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.1)`
+                  boxShadow: `0 8px 32px rgba(0, 0, 0, 0.1)`,
                 }}
               >
-                <motion.h1 
+                <motion.h1
                   className="text-4xl font-serif font-bold mb-4"
                   style={{ color: colors.text }}
                   initial={{ opacity: 0, y: 20 }}
@@ -146,88 +197,102 @@ export default function LoginPage() {
                 >
                   Rehabilitación e Integración Escolar
                 </motion.h1>
-                
-                <motion.p 
+
+                <motion.p
                   className="text-lg mb-8 leading-relaxed"
                   style={{ color: colors.textSecondary }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7, duration: 0.8 }}
                 >
-                  Potenciar habilidades, construir comunidad y acompañar estudiantes
+                  Potenciar habilidades, construir comunidad y acompañar
+                  estudiantes
                 </motion.p>
 
-                <motion.div 
+                <motion.div
                   className="grid grid-cols-2 gap-4"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9, duration: 0.8 }}
                 >
                   <FloatingCard delay={1000}>
-                    <div 
+                    <div
                       className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
                       style={{
                         backgroundColor: colors.surface,
                         color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
+                        boxShadow: `0 4px 12px ${colors.shadow}`,
                       }}
                     >
-                      <TrendingUp className="w-4 h-4" style={{ color: colors.primary[500] }} />
+                      <TrendingUp
+                        className="w-4 h-4"
+                        style={{ color: colors.primary[500] }}
+                      />
                       Crecimiento
                     </div>
                   </FloatingCard>
-                  
+
                   <FloatingCard delay={1200}>
-                    <div 
+                    <div
                       className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
                       style={{
                         backgroundColor: colors.surface,
                         color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
+                        boxShadow: `0 4px 12px ${colors.shadow}`,
                       }}
                     >
-                      <Heart className="w-4 h-4" style={{ color: colors.secondary[500] }} />
+                      <Heart
+                        className="w-4 h-4"
+                        style={{ color: colors.secondary[500] }}
+                      />
                       Apoyo
                     </div>
                   </FloatingCard>
-                  
+
                   <FloatingCard delay={1400}>
-                    <div 
+                    <div
                       className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
                       style={{
                         backgroundColor: colors.surface,
                         color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
+                        boxShadow: `0 4px 12px ${colors.shadow}`,
                       }}
                     >
-                      <Users className="w-4 h-4" style={{ color: colors.accent[500] }} />
+                      <Users
+                        className="w-4 h-4"
+                        style={{ color: colors.accent[500] }}
+                      />
                       Aprendizaje
                     </div>
                   </FloatingCard>
-                  
+
                   <FloatingCard delay={1600}>
-                    <div 
+                    <div
                       className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
                       style={{
                         backgroundColor: colors.surface,
                         color: colors.text,
-                        boxShadow: `0 4px 12px ${colors.shadow}`
+                        boxShadow: `0 4px 12px ${colors.shadow}`,
                       }}
                     >
-                      <Target className="w-4 h-4" style={{ color: colors.success[500] }} />
+                      <Target
+                        className="w-4 h-4"
+                        style={{ color: colors.success[500] }}
+                      />
                       Trabajo en equipo
                     </div>
                   </FloatingCard>
                 </motion.div>
 
-                <motion.p 
+                <motion.p
                   className="text-sm mt-8 opacity-80"
                   style={{ color: colors.textMuted }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 0.8 }}
                   transition={{ delay: 1.8, duration: 0.8 }}
                 >
-                  Trabajamos en un entorno terapéutico con un toque de color y alegría para cada día.
+                  Trabajamos en un entorno terapéutico con un toque de color y
+                  alegría para cada día.
                 </motion.p>
               </div>
             </FloatingCard>
@@ -236,7 +301,7 @@ export default function LoginPage() {
       </div>
 
       {/* Lado derecho - Formulario de login */}
-      <div 
+      <div
         className="w-full lg:w-2/5 flex items-center justify-center p-8"
         style={{ backgroundColor: colors.background }}
       >
@@ -246,11 +311,11 @@ export default function LoginPage() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-md"
         >
-          <Card 
+          <Card
             className="border-0 shadow-xl"
-            style={{ 
+            style={{
               backgroundColor: colors.surface,
-              boxShadow: `0 20px 40px ${colors.shadowLarge}`
+              boxShadow: `0 20px 40px ${colors.shadowLarge}`,
             }}
           >
             <CardHeader className="space-y-4 text-center pb-8">
@@ -267,16 +332,19 @@ export default function LoginPage() {
                   className="object-contain scale-150"
                 />
               </motion.div>
-              
+
               <div className="space-y-2">
-                <CardTitle 
+                <CardTitle
                   className="text-2xl font-display font-bold flex items-center justify-center gap-2"
                   style={{ color: colors.text }}
                 >
-                  <Sparkles className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                  <Sparkles
+                    className="h-5 w-5"
+                    style={{ color: colors.primary[500] }}
+                  />
                   ¡Bienvenido de nuevo!
                 </CardTitle>
-                <CardDescription 
+                <CardDescription
                   className="text-base"
                   style={{ color: colors.textMuted }}
                 >
@@ -292,8 +360,8 @@ export default function LoginPage() {
                     DNI
                   </Label>
                   <div className="relative">
-                    <CreditCard 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                    <CreditCard
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
                       style={{ color: colors.textMuted }}
                     />
                     <Input
@@ -306,14 +374,19 @@ export default function LoginPage() {
                       className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: errors.documentNumber ? colors.error[500] : colors.border,
-                        color: colors.text
+                        borderColor: errors.documentNumber
+                          ? colors.error[500]
+                          : colors.border,
+                        color: colors.text,
                       }}
                       required
                     />
                   </div>
                   {errors.documentNumber && (
-                    <p className="text-sm mt-1" style={{ color: colors.error[500] }}>
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: colors.error[500] }}
+                    >
                       {errors.documentNumber}
                     </p>
                   )}
@@ -324,8 +397,8 @@ export default function LoginPage() {
                     Contraseña
                   </Label>
                   <div className="relative">
-                    <Lock 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" 
+                    <Lock
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
                       style={{ color: colors.textMuted }}
                     />
                     <Input
@@ -333,12 +406,16 @@ export default function LoginPage() {
                       type={showPassword ? "text" : "password"}
                       placeholder="**********"
                       value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("password", e.target.value)
+                      }
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: errors.password ? colors.error[500] : colors.border,
-                        color: colors.text
+                        borderColor: errors.password
+                          ? colors.error[500]
+                          : colors.border,
+                        color: colors.text,
                       }}
                       required
                     />
@@ -350,25 +427,34 @@ export default function LoginPage() {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        <EyeOff
+                          className="h-4 w-4"
+                          style={{ color: colors.textMuted }}
+                        />
                       ) : (
-                        <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                        <Eye
+                          className="h-4 w-4"
+                          style={{ color: colors.textMuted }}
+                        />
                       )}
                     </Button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm mt-1" style={{ color: colors.error[500] }}>
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: colors.error[500] }}
+                    >
                       {errors.password}
                     </p>
                   )}
                 </div>
 
                 {errors.general && (
-                  <div 
+                  <div
                     className="p-3 rounded-lg border-l-4 flex items-center gap-2"
-                    style={{ 
+                    style={{
                       backgroundColor: colors.error[50],
-                      borderLeftColor: colors.error[500]
+                      borderLeftColor: colors.error[500],
                     }}
                   >
                     <p className="text-sm" style={{ color: colors.error[600] }}>
@@ -384,7 +470,10 @@ export default function LoginPage() {
                       className="rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
                       style={{ borderColor: colors.border }}
                     />
-                    <span className="text-sm" style={{ color: colors.textMuted }}>
+                    <span
+                      className="text-sm"
+                      style={{ color: colors.textMuted }}
+                    >
                       Recordarme
                     </span>
                   </label>
@@ -434,9 +523,8 @@ export default function LoginPage() {
               </p>
             </CardFooter>
           </Card>
-
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
