@@ -20,12 +20,14 @@ export function Navbar({ userData, onNavigate }: NavbarProps) {
   const [currentUser, setCurrentUser] = useState<UserType | null>(userData || null)
 
   useEffect(() => {
-    if (!userData) {
+    // Solo actualizar si userData cambia o si no tenemos usuario actual
+    if (userData) {
+      setCurrentUser(userData)
+    } else if (!currentUser) {
       const user = AuthService.getUser()
       setCurrentUser(user)
-    } else {
-      setCurrentUser(userData)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData])
 
   const handleProfileClick = () => {

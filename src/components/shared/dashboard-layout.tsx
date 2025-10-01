@@ -27,19 +27,13 @@ export function DashboardLayout({ userData, children, currentView, onNavigate, r
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   useEffect(() => {
-    if (!userData) {
-      const user = AuthService.getUser()
+    const user = userData || AuthService.getUser()
+
+    if (user) {
       setCurrentUser(user)
-      
+
       // Verificar si necesita mostrar el modal de bienvenida
-      if (user && user.firstLogin && !user.hasSignature) {
-        setShowWelcomeModal(true)
-      }
-    } else {
-      setCurrentUser(userData)
-      
-      // Verificar si necesita mostrar el modal de bienvenida
-      if (userData.firstLogin && !userData.hasSignature) {
+      if (user.firstLogin && !user.hasSignature) {
         setShowWelcomeModal(true)
       }
     }

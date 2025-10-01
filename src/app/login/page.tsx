@@ -29,18 +29,18 @@ import {
 } from "@/components/ui/card";
 import {
   FloatingCard,
-  FloatingIcon,
   AnimatedBackground,
 } from "@/components/ui/floating-elements";
 import Image from "next/image";
 import colors from "@/lib/colors";
 import { apiClient } from "@/lib/api";
 import { AuthService } from "@/lib/auth";
-import { LoginDto, UserRole } from "@/types/auth";
+import { LoginDto } from "@/types/auth";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState<LoginDto>({
     documentNumber: "",
     password: "",
@@ -54,8 +54,15 @@ export default function LoginPage() {
       const user = AuthService.getUser();
       if (user) {
         const roleRoute = AuthService.getRoleForRouting(user.role);
-        router.push(`/${roleRoute}`);
+        router.replace(`/${roleRoute}`);
       }
+    }
+
+    // Cargar datos de recordarme si existen
+    const savedDni = localStorage.getItem('rememberedDni');
+    if (savedDni) {
+      setFormData(prev => ({ ...prev, documentNumber: savedDni }));
+      setRememberMe(true);
     }
   }, [router]);
 
@@ -102,43 +109,29 @@ export default function LoginPage() {
     try {
       const authResponse = await apiClient.login(formData);
 
-      console.log("Login successful:", authResponse);
+      // Validar respuesta
+      if (!authResponse || !authResponse.user || !authResponse.accessToken) {
+        throw new Error("Respuesta de inicio de sesión inválida");
+      }
 
-      AuthService.setAuth({
-        user: {
-          id: "string;",
-          firstName: "string;",
-          lastName: "string;",
-          name: "string;", // Campo adicional que puede venir del backend
-          email: "string;",
-          phone: "string;",
-          documentNumber: "string;",
-          role: UserRole.TERAPEUTA,
-          createdAt: "string;",
-          updatedAt: "string;",
-          specialty: "string;",
-          license: "string;",
-          joinDate: "string;",
-          experience: "string;",
-          bio: "string;",
-          firstLogin: true,
-          hasSignature: false,
-          signatureKey: "string,",
-        },
-        accessToken: "qwreqdfsafasf", // El backend devuelve accessToken
-        refreshToken: "qwrtruy",
-        expiresIn: 5,
-      });
+      // Guardar credenciales si recordarme está activado
+      if (rememberMe) {
+        localStorage.setItem('rememberedDni', formData.documentNumber);
+      } else {
+        localStorage.removeItem('rememberedDni');
+      }
+
+      // Guardar autenticación
+      AuthService.setAuth(authResponse);
 
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
-      console.log("Redirecting to:", roleRoute);
-      router.push(`/${roleRoute}`);
+      router.replace(`/${roleRoute}`);
     } catch (error) {
       console.error("Login error:", error);
       setErrors({
         general:
-          error instanceof Error ? error.message : "Error al iniciar sesión",
+          error instanceof Error ? error.message : "Error al iniciar sesión. Verifique sus credenciales.",
       });
     } finally {
       setIsLoading(false);
@@ -467,6 +460,8 @@ export default function LoginPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
                       className="rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
                       style={{ borderColor: colors.border }}
                     />

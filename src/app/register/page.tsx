@@ -21,10 +21,7 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -55,7 +52,7 @@ export default function RegisterPage() {
       const user = AuthService.getUser();
       if (user) {
         const roleRoute = AuthService.getRoleForRouting(user.role);
-        router.push(`/${roleRoute}`);
+        router.replace(`/${roleRoute}`);
       }
     }
   }, [router]);
@@ -124,22 +121,24 @@ export default function RegisterPage() {
     setErrors({});
 
     try {
-      console.log("🚀 ~ handleSubmit ~ formData:", formData)
       const authResponse = await apiClient.register(formData);
-      console.log("📩 Respuesta del backend en register:", authResponse);
+
+      // Validar respuesta
+      if (!authResponse || !authResponse.user || !authResponse.accessToken) {
+        throw new Error("Respuesta de registro inválida");
+      }
 
       // Autenticar automáticamente después del registro
       AuthService.setAuth(authResponse);
 
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
-      console.log('Redirecting to:', roleRoute)
-      router.push(`/${roleRoute}`);
+      router.replace(`/${roleRoute}`);
     } catch (error) {
       console.error("Register error:", error);
       setErrors({
         general:
-          error instanceof Error ? error.message : "Error al registrarse",
+          error instanceof Error ? error.message : "Error al registrarse. Verifique sus datos.",
       });
     } finally {
       setIsLoading(false);

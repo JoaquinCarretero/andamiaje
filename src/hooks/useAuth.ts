@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { User } from '@/types/auth'
+import { User, AuthResponse } from '@/types/auth'
 import { AuthService } from '@/lib/auth'
 
 export function useAuth() {
@@ -8,9 +8,18 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    const initAuth = async () => {
+    const initAuth = () => {
       try {
-        const currentUser = await AuthService.getCurrentUser()
+        // Primero verificar si hay token
+        if (!AuthService.isAuthenticated()) {
+          setUser(null)
+          setIsAuthenticated(false)
+          setIsLoading(false)
+          return
+        }
+
+        // Obtener usuario del localStorage
+        const currentUser = AuthService.getUser()
         setUser(currentUser)
         setIsAuthenticated(!!currentUser)
       } catch (error) {
@@ -25,7 +34,7 @@ export function useAuth() {
     initAuth()
   }, [])
 
-  const login = (authResponse: any) => {
+  const login = (authResponse: AuthResponse) => {
     AuthService.setAuth(authResponse)
     setUser(authResponse.user)
     setIsAuthenticated(true)

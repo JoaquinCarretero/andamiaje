@@ -7,9 +7,12 @@ export class AuthService {
 
   // Guardar tokens y usuario en localStorage
   static setAuth(authResponse: AuthResponse): void {
-    console.log('Setting auth with response:', authResponse)
-    if (authResponse.accessToken) localStorage.setItem(this.TOKEN_KEY, authResponse.accessToken)
-    if (authResponse.user) localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user))
+    if (authResponse.accessToken) {
+      localStorage.setItem(this.TOKEN_KEY, authResponse.accessToken)
+    }
+    if (authResponse.user) {
+      localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.user))
+    }
   }
 
   // Obtener token del localStorage
@@ -24,26 +27,20 @@ export class AuthService {
     const userStr = localStorage.getItem(this.USER_KEY)
     if (!userStr || userStr === 'undefined') return null
     try {
-      const user = JSON.parse(userStr)
-      console.log('Retrieved user from localStorage:', user)
-      return user
+      return JSON.parse(userStr)
     } catch (error) {
-      console.warn('Usuario en localStorage no es JSON válido:', userStr)
+      console.error('Error parsing user from localStorage:', error)
       return null
     }
   }
 
   // Verificar si hay sesión activa
   static isAuthenticated(): boolean {
-    const hasToken = !!this.getToken()
-    const hasUser = !!this.getUser()
-    console.log('Auth check - hasToken:', hasToken, 'hasUser:', hasUser)
-    return hasToken && hasUser
+    return !!this.getToken() && !!this.getUser()
   }
 
   // Cerrar sesión
   static logout(): void {
-    console.log('Logging out...')
     localStorage.removeItem(this.TOKEN_KEY)
     localStorage.removeItem(this.USER_KEY)
     localStorage.removeItem('userSignature')
@@ -54,8 +51,9 @@ export class AuthService {
     try {
       if (!this.isAuthenticated()) return null
       const user = await apiClient.getProfile()
-      if (user) localStorage.setItem(this.USER_KEY, JSON.stringify(user))
-      console.log('Current user from server:', user)
+      if (user) {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user))
+      }
       return user
     } catch (error) {
       console.error('Error getting current user:', error)
@@ -66,25 +64,24 @@ export class AuthService {
   // Nombre completo
   static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'
-    
+
     // Intentar obtener el nombre de diferentes fuentes
     let firstName = user.firstName?.trim() || ''
     let lastName = user.lastName?.trim() || ''
-    
+
     // Si no hay firstName/lastName, intentar extraer del campo 'name'
     if (!firstName && !lastName && user.name) {
       const nameParts = user.name.trim().split(' ')
       firstName = nameParts[0] || ''
       lastName = nameParts.slice(1).join(' ') || ''
     }
-    
+
     // Si aún no hay nombres, usar email como fallback
     if (!firstName && !lastName && user.email) {
       firstName = user.email.split('@')[0] || 'Usuario'
     }
-    
+
     const fullName = `${firstName} ${lastName}`.trim()
-    console.log('Getting full name:', { firstName, lastName, fullName, user })
     return fullName || 'Usuario'
   }
 
@@ -106,7 +103,6 @@ export class AuthService {
 
   // Rol para rutas
   static getRoleForRouting(role: UserRole): string {
-    console.log('Getting route for role:', role)
     switch (role) {
       case UserRole.TERAPEUTA:
         return 'terapeuta'
@@ -118,7 +114,6 @@ export class AuthService {
       case UserRole.DIRECTOR:
         return 'director'
       default:
-        console.warn('Unknown role, defaulting to terapeuta:', role)
         return 'terapeuta'
     }
   }

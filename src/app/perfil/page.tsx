@@ -2,19 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Phone, Shield, CreditCard as Edit, ArrowLeft, Key, LogOut, Briefcase, Award, Clock, User } from "lucide-react"
+import { CreditCard as Edit, ArrowLeft, Key, LogOut, Briefcase, Award, User } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Navbar } from "@/components/shared/navbar"
 import { ProfileEditModal } from "@/components/ui/profile-edit-modal"
-import { ProfileCompletionBanner } from "@/components/ui/profile-completion-banner"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
-import { UserI, UserRole } from "@/types/auth"
-import { apiClient } from "@/lib/api"
+import { UserI } from "@/types/auth"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -44,19 +42,8 @@ export default function ProfilePage() {
   }, [router])
 
   const signature = getSignature()
-  
-  // Si la firma tiene signatureKey, usar la URL del servidor
-  const getSignatureUrl = () => {
-    if (!signature) return null
-    if (signature.signatureKey) {
-      return apiClient.getDownloadUrl(signature.signatureKey)
-    }
-    return signature.signature
-  }
-  
-  const signatureUrl = getSignatureUrl()
 
-  const handleSaveProfile = (updatedData: any) => {
+  const handleSaveProfile = (updatedData: Partial<UserI>) => {
     if (user) {
       const updatedUser = { ...user, ...updatedData }
       setUser(updatedUser)
@@ -76,26 +63,12 @@ export default function ProfilePage() {
   }
 
   const getRoleColor = (role: string) => {
-    switch (role) {
-      case UserRole.TERAPEUTA:
-        return { bg: colors.primary[50], text: colors.primary[600], border: colors.primary[200] }
-      case UserRole.COORDINADOR:
-        return { bg: colors.secondary[50], text: colors.secondary[600], border: colors.secondary[200] }
-      case UserRole.ACOMPANANTE:
-        return { bg: colors.accent[50], text: colors.accent[600], border: colors.accent[200] }
-      default:
-        return { bg: colors.neutral[50], text: colors.neutral[600], border: colors.neutral[200] }
+    const roleMap: Record<string, { bg: string; text: string; border: string }> = {
+      'TERAPEUTA': { bg: colors.primary[50], text: colors.primary[600], border: colors.primary[200] },
+      'COORDINADOR': { bg: colors.secondary[50], text: colors.secondary[600], border: colors.secondary[200] },
+      'ACOMPANANTE': { bg: colors.accent[50], text: colors.accent[600], border: colors.accent[200] }
     }
-  }
-
-  // Calcular completitud del perfil
-  const getProfileCompleteness = () => {
-    if (!user) return 0
-    const fields = [
-      user.phone
-    ]
-    const completed = fields.filter(field => field && field.trim()).length
-    return Math.round((completed / fields.length) * 100)
+    return roleMap[role] || { bg: colors.neutral[50], text: colors.neutral[600], border: colors.neutral[200] }
   }
 
   if (isLoading) {
@@ -113,8 +86,6 @@ export default function ProfilePage() {
   const fullName = AuthService.getFullName(user)
   const roleTitle = AuthService.getRoleTitle(user.role)
   const roleColors = getRoleColor(user.role)
-  const profileCompleteness = getProfileCompleteness()
-  const isProfileIncomplete = profileCompleteness < 100
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>

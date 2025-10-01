@@ -5,7 +5,6 @@ import {
   ApiError,
   BACKEND_ROLES,
   FRONTEND_ROLES,
-  UserRole,
 } from "@/types/auth";
 import type { UserI } from "@/types/auth";
 
@@ -61,7 +60,7 @@ class ApiClient {
       // Intentar parsear JSON de respuesta
       try {
         return text ? JSON.parse(text) : ({} as T);
-      } catch (err) {
+      } catch {
         console.warn("Respuesta no es JSON válido:", text);
         throw new Error("Respuesta del servidor no válida");
       }
@@ -73,107 +72,70 @@ class ApiClient {
 
   // Auth endpoints
   async login(data: LoginDto): Promise<AuthResponse> {
-    console.log("Login request:", data);
-    let response;
-
-    response = await this.request<any>("/api/v1/auth/login", {
+    const response = await this.request<any>("/api/v1/auth/login", {
       method: "POST",
       body: JSON.stringify(data),
       credentials: "include",
     });
-    console.log("🚀 ~ ApiClient ~ try ~ response:", response);
-    if (response.status === 204) {
-      return {
-        user: {
-          id: "string;",
-          firstName: "string;",
-          lastName: "string;",
-          name: "string;", // Campo adicional que puede venir del backend
-          email: "string;",
-          phone: "string;",
-          documentNumber: "string;",
-          role: UserRole.TERAPEUTA,
-          createdAt: "string;",
-          updatedAt: "string;",
-          specialty: "string;",
-          license: "string;",
-          joinDate: "string;",
-          experience: "string;",
-          bio: "string;",
-          firstLogin: true,
-          hasSignature: false,
-          signatureKey: "string,",
-        },
-        accessToken: "qwreqdfsafasf", // El backend devuelve accessToken
-        refreshToken: "qwrtruy",
-        expiresIn: 5,
-      };
+
+    // Validar respuesta
+    if (!response || !response.user || !response.accessToken) {
+      throw new Error("Respuesta de inicio de sesión inválida");
     }
-    return {
-        user: {
-          id: "string;",
-          firstName: "string;",
-          lastName: "string;",
-          name: "string;", // Campo adicional que puede venir del backend
-          email: "string;",
-          phone: "string;",
-          documentNumber: "string;",
-          role: UserRole.TERAPEUTA,
-          createdAt: "string;",
-          updatedAt: "string;",
-          specialty: "string;",
-          license: "string;",
-          joinDate: "string;",
-          experience: "string;",
-          bio: "string;",
-          firstLogin: true,
-          hasSignature: false,
-          signatureKey: "string,",
-        },
-        accessToken: "qwreqdfsafasf", // El backend devuelve accessToken
-        refreshToken: "qwrtruy",
-        expiresIn: 5,
-      };;
+
+    // Convertir rol del backend al frontend
+    if (response.user && response.user.role) {
+      response.user.role =
+        FRONTEND_ROLES[response.user.role.toUpperCase() as keyof typeof FRONTEND_ROLES] ||
+        response.user.role;
+    }
+
+    // Procesar nombres de manera más robusta
+    if (response.user) {
+      if (!response.user.firstName && !response.user.lastName && response.user.name) {
+        const nameParts = response.user.name.trim().split(" ");
+        response.user.firstName = nameParts[0] || "";
+        response.user.lastName = nameParts.slice(1).join(" ") || "";
+      } else {
+        response.user.firstName = response.user.firstName?.trim() || "";
+        response.user.lastName = response.user.lastName?.trim() || "";
+      }
+
+      response.user.firstLogin = response.user.firstLogin ?? false;
+      response.user.hasSignature = response.user.hasSignature ?? false;
+    }
+
+    return response;
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
-    console.log("Register request with role:", data.role);
     // Convertir rol del frontend al backend
     const backendData = {
       ...data,
       role: BACKEND_ROLES[data.role] || data.role,
     };
 
-    console.log("Register request to backend:", backendData);
     const response = await this.request<any>("/api/v1/auth/register", {
       method: "POST",
       body: JSON.stringify(backendData),
     });
 
-    console.log("Register response:", response);
     // Verificar que la respuesta tenga los datos necesarios
     if (!response || !response.user || !response.accessToken) {
-      console.error("Invalid register response:", response);
       throw new Error("Respuesta de registro inválida del servidor");
     }
 
     // Convertir rol del backend al frontend
     if (response.user && response.user.role) {
-      console.log("Converting role from backend:", response.user.role);
       response.user.role =
-        FRONTEND_ROLES[response.user.role as keyof typeof FRONTEND_ROLES] ||
+        FRONTEND_ROLES[response.user.role.toUpperCase() as keyof typeof FRONTEND_ROLES] ||
         response.user.role;
-      console.log("Converted role to frontend:", response.user.role);
     }
 
     // Asegurar que los campos requeridos existan
     if (response.user) {
       // Procesar nombres de manera más robusta
-      if (
-        !response.user.firstName &&
-        !response.user.lastName &&
-        response.user.name
-      ) {
+      if (!response.user.firstName && !response.user.lastName && response.user.name) {
         const nameParts = response.user.name.trim().split(" ");
         response.user.firstName = nameParts[0] || "";
         response.user.lastName = nameParts.slice(1).join(" ") || "";
@@ -184,13 +146,6 @@ class ApiClient {
 
       response.user.firstLogin = response.user.firstLogin ?? true;
       response.user.hasSignature = response.user.hasSignature ?? false;
-      console.log("Register response user data:", {
-        firstName: response.user.firstName,
-        lastName: response.user.lastName,
-        fullName: `${response.user.firstName} ${response.user.lastName}`,
-        firstLogin: response.user.firstLogin,
-        hasSignature: response.user.hasSignature,
-      });
     }
 
     return response;
