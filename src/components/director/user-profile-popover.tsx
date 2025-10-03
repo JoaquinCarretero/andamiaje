@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Phone, Mail, MessageCircle, ExternalLink, X } from "lucide-react"
+import { User, Phone, Mail, MessageCircle, X } from "lucide-react"
 import colors from "@/lib/colors"
 
 interface UserProfilePopoverProps {

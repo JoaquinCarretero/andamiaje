@@ -49,14 +49,18 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirigir si ya está autenticado
-    if (AuthService.isAuthenticated()) {
-      const user = AuthService.getUser();
+  const checkAuth = async () => {
+    const authenticated = await AuthService.isAuthenticated()
+    if (authenticated) {
+      const user = AuthService.getUser()
       if (user) {
-        const roleRoute = AuthService.getRoleForRouting(user.role);
-        router.replace(`/${roleRoute}`);
+        const roleRoute = AuthService.getRoleForRouting(user.role)
+        router.replace(`/${roleRoute}`)
       }
     }
+  }
+
+  checkAuth()
 
     // Cargar datos de recordarme si existen
     const savedDni = localStorage.getItem('rememberedDni');
@@ -108,21 +112,29 @@ export default function LoginPage() {
 
     try {
       const authResponse = await apiClient.login(formData);
+      console.log("🚀 ~ handleSubmit ~ Object.keys authResponse:", Object.keys(authResponse))
+      console.log("🚀 ~ handleSubmit ~ Object.values authResponse:", Object.values(authResponse))
 
-      // Validar respuesta
-      if (!authResponse || !authResponse.user || !authResponse.accessToken) {
+      // // Validar respuesta
+      if (!authResponse) {
         throw new Error("Respuesta de inicio de sesión inválida");
       }
-
-      // Guardar credenciales si recordarme está activado
-      if (rememberMe) {
-        localStorage.setItem('rememberedDni', formData.documentNumber);
-      } else {
-        localStorage.removeItem('rememberedDni');
+      if (!authResponse.user) {
+        throw new Error("NO hay usuario en la respuesta de inicio de sesión");
       }
+      // if (!authResponse.accessToken) {
+      //   throw new Error("No hay token en la respuesta de inicio de sesión");
+      // }
+
+      // // Guardar credenciales si recordarme está activado
+      // if (rememberMe) {
+      //   localStorage.setItem('rememberedDni', formData.documentNumber);
+      // } else {
+      //   localStorage.removeItem('rememberedDni');
+      // }
 
       // Guardar autenticación
-      AuthService.setAuth(authResponse);
+      // AuthService.setAuth(authResponse);
 
       // Redirigir según el rol del usuario
       const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);

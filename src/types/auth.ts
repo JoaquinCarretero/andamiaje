@@ -67,9 +67,9 @@ export type User = UserI;
 
 export interface AuthResponse {
   user: UserI;
-  accessToken: string; // El backend devuelve accessToken
-  refreshToken?: string;
-  expiresIn?: number;
+  // accessToken: string; // El backend devuelve accessToken
+  // refreshToken?: string;
+  // expiresIn?: number;
 }
 
 export interface ApiError {

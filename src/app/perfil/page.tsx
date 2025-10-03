@@ -57,7 +57,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     // Limpiar todo el localStorage relacionado con la sesión
-    AuthService.logout()
+    // AuthService.logout()
     // Forzar recarga para limpiar cualquier estado residual
     window.location.href = '/login'
   }
@@ -111,16 +111,6 @@ export default function ProfilePage() {
             Mi Perfil
           </h1>
         </div>
-
-        {/* Banner de completar perfil */}
-        {/* {isProfileIncomplete && (
-          <div className="mb-8">
-            <ProfileCompletionBanner 
-              completeness={profileCompleteness}
-              onComplete={() => setShowEditModal(true)}
-            />
-          </div>
-        )} */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Información Principal */}
@@ -447,73 +437,6 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
-
-            {/* Estadísticas */}
-            {/* <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
-                  <span style={{ color: colors.text }}>Estadísticas</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" style={{ color: colors.textMuted }} />
-                    <span className="text-sm" style={{ color: colors.text }}>Documentos</span>
-                  </div>
-                  <span className="font-bold" style={{ color: colors.primary[500] }}>
-                    {user.documentsCount}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" style={{ color: colors.textMuted }} />
-                    <span className="text-sm" style={{ color: colors.text }}>
-                      {user.role === "terapeuta" ? "Pacientes" : "Estudiantes"}
-                    </span>
-                  </div>
-                  <span className="font-bold" style={{ color: colors.secondary[500] }}>
-                    {user.patientsCount}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" style={{ color: colors.textMuted }} />
-                    <span className="text-sm" style={{ color: colors.text }}>Último Acceso</span>
-                  </div>
-                  <span className="font-bold" style={{ color: colors.accent[500] }}>
-                    {user.lastLogin}
-                  </span>
-                </div>
-              </CardContent>
-            </Card> */}
-
-            {/* Información de Contacto */}
-            {/* <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Phone className="h-5 w-5" style={{ color: colors.accent[500] }} />
-                  <span style={{ color: colors.text }}>Contacto</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4" style={{ color: colors.textMuted }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {user.email}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4" style={{ color: colors.textMuted }} />
-                  <span className="text-sm" style={{ color: colors.textSecondary }}>
-                    {user.phone || "No especificado"}
-                  </span>
-                </div>
-              </CardContent>
-            </Card> */}
           </div>
         </div>
 

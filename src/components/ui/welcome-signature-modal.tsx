@@ -96,11 +96,11 @@ export function WelcomeSignatureModal({
       setUploadProgress("Actualizando perfil...")
       
       // Actualizar perfil del usuario
-      await apiClient.updateUserProfile(userId, {
-        firstLogin: false,
-        hasSignature: true,
-        signatureKey: uploadResponse.key
-      })
+      // await apiClient.updateUserProfile(userId, {
+      //   firstLogin: false,
+      //   hasSignature: true,
+      //   signatureKey: uploadResponse.key
+      // })
       
       setUploadProgress("Completado")
       

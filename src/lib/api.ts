@@ -26,6 +26,7 @@ class ApiClient {
 
     const config: RequestInit = {
       headers: { "Content-Type": "application/json", ...options.headers },
+      credentials: "include",
       ...options,
     };
 
@@ -71,41 +72,17 @@ class ApiClient {
   }
 
   // Auth endpoints
-  async login(data: LoginDto): Promise<AuthResponse> {
-    const response = await this.request<any>("/api/v1/auth/login", {
+  async login(data: LoginDto): Promise<any> {
+    await this.request<any>("/api/v1/auth/login", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
       credentials: "include",
     });
 
-    // Validar respuesta
-    if (!response || !response.user || !response.accessToken) {
-      throw new Error("Respuesta de inicio de sesión inválida");
-    }
+  const user = await this.getProfile();
 
-    // Convertir rol del backend al frontend
-    if (response.user && response.user.role) {
-      response.user.role =
-        FRONTEND_ROLES[response.user.role.toUpperCase() as keyof typeof FRONTEND_ROLES] ||
-        response.user.role;
-    }
-
-    // Procesar nombres de manera más robusta
-    if (response.user) {
-      if (!response.user.firstName && !response.user.lastName && response.user.name) {
-        const nameParts = response.user.name.trim().split(" ");
-        response.user.firstName = nameParts[0] || "";
-        response.user.lastName = nameParts.slice(1).join(" ") || "";
-      } else {
-        response.user.firstName = response.user.firstName?.trim() || "";
-        response.user.lastName = response.user.lastName?.trim() || "";
-      }
-
-      response.user.firstLogin = response.user.firstLogin ?? false;
-      response.user.hasSignature = response.user.hasSignature ?? false;
-    }
-
-    return response;
+  return { user: user, accessToken: "qweqwrweyertyhertyertyertyersgs" };
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
@@ -152,7 +129,15 @@ class ApiClient {
   }
 
   async getProfile(): Promise<UserI> {
-    const response = await this.request<any>("/api/v1/auth/profile");
+    const response = await this.request<any>("/api/v1/auth/profile", {
+    method: "GET",
+    credentials: "include", // 👈 esto manda las cookies (accessToken/refreshToken)
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+    console.log("🚀 ~ ApiClient ~ getProfile ~ response:", response)
 
     // Convertir rol del backend al frontend
     if (response.role) {
@@ -176,6 +161,7 @@ class ApiClient {
     response.firstLogin = response.firstLogin ?? false;
     response.hasSignature = response.hasSignature ?? false;
 
+    console.log("🚀 ~ ApiClient ~ getProfile ~ response:", response)
     return response;
   }
 
@@ -196,9 +182,7 @@ class ApiClient {
       `${this.baseURL}/api/v1/storage/upload?type=FIRMA_DIGITAL`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: "include",
         body: formData,
       }
     );
