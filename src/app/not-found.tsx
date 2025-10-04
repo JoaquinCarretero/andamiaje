@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Home } from 'lucide-react'
+import { Chrome as Home } from 'lucide-react'
 
 export default function NotFound() {
   const lottieContainer = useRef<HTMLDivElement>(null)
