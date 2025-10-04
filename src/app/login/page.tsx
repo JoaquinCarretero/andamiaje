@@ -33,47 +33,37 @@ import {
 } from "@/components/ui/floating-elements";
 import Image from "next/image";
 import colors from "@/lib/colors";
-import { apiClient } from "@/lib/api";
 import { AuthService } from "@/lib/auth";
 import { LoginDto } from "@/types/auth";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { loginThunk, clearError } from "@/store/slices/authSlice";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState<LoginDto>({
     documentNumber: "",
     password: "",
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-  const checkAuth = async () => {
-    const authenticated = await AuthService.isAuthenticated()
-    if (authenticated) {
-      const user = AuthService.getUser()
-      if (user) {
-        const roleRoute = AuthService.getRoleForRouting(user.role)
-        router.replace(`/${roleRoute}`)
-      }
+    if (initialized && isAuthenticated && user) {
+      const roleRoute = AuthService.getRoleForRouting(user.role);
+      router.replace(`/${roleRoute}`);
     }
-  }
-
-  checkAuth()
-
-    // Cargar datos de recordarme si existen
-    const savedDni = localStorage.getItem('rememberedDni');
-    if (savedDni) {
-      setFormData(prev => ({ ...prev, documentNumber: savedDni }));
-      setRememberMe(true);
-    }
-  }, [router]);
+  }, [isAuthenticated, user, router, initialized]);
 
   const handleInputChange = (field: keyof LoginDto, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (localErrors[field]) {
+      setLocalErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -98,7 +88,7 @@ export default function LoginPage() {
       newErrors.password = "La contraseña es obligatoria";
     }
 
-    setErrors(newErrors);
+    setLocalErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -107,46 +97,10 @@ export default function LoginPage() {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrors({});
-
     try {
-      const authResponse = await apiClient.login(formData);
-      console.log("🚀 ~ handleSubmit ~ Object.keys authResponse:", Object.keys(authResponse))
-      console.log("🚀 ~ handleSubmit ~ Object.values authResponse:", Object.values(authResponse))
-
-      // // Validar respuesta
-      if (!authResponse) {
-        throw new Error("Respuesta de inicio de sesión inválida");
-      }
-      if (!authResponse.user) {
-        throw new Error("NO hay usuario en la respuesta de inicio de sesión");
-      }
-      // if (!authResponse.accessToken) {
-      //   throw new Error("No hay token en la respuesta de inicio de sesión");
-      // }
-
-      // // Guardar credenciales si recordarme está activado
-      // if (rememberMe) {
-      //   localStorage.setItem('rememberedDni', formData.documentNumber);
-      // } else {
-      //   localStorage.removeItem('rememberedDni');
-      // }
-
-      // Guardar autenticación
-      // AuthService.setAuth(authResponse);
-
-      // Redirigir según el rol del usuario
-      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
-      router.replace(`/${roleRoute}`);
+      await dispatch(loginThunk(formData)).unwrap();
     } catch (error) {
       console.error("Login error:", error);
-      setErrors({
-        general:
-          error instanceof Error ? error.message : "Error al iniciar sesión. Verifique sus credenciales.",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -379,7 +333,7 @@ export default function LoginPage() {
                       className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: errors.documentNumber
+                        borderColor: localErrors.documentNumber
                           ? colors.error[500]
                           : colors.border,
                         color: colors.text,
@@ -387,12 +341,12 @@ export default function LoginPage() {
                       required
                     />
                   </div>
-                  {errors.documentNumber && (
+                  {localErrors.documentNumber && (
                     <p
                       className="text-sm mt-1"
                       style={{ color: colors.error[500] }}
                     >
-                      {errors.documentNumber}
+                      {localErrors.documentNumber}
                     </p>
                   )}
                 </div>
@@ -417,7 +371,7 @@ export default function LoginPage() {
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: errors.password
+                        borderColor: localErrors.password
                           ? colors.error[500]
                           : colors.border,
                         color: colors.text,
@@ -444,17 +398,17 @@ export default function LoginPage() {
                       )}
                     </Button>
                   </div>
-                  {errors.password && (
+                  {localErrors.password && (
                     <p
                       className="text-sm mt-1"
                       style={{ color: colors.error[500] }}
                     >
-                      {errors.password}
+                      {localErrors.password}
                     </p>
                   )}
                 </div>
 
-                {errors.general && (
+                {error && (
                   <div
                     className="p-3 rounded-lg border-l-4 flex items-center gap-2"
                     style={{
@@ -463,7 +417,7 @@ export default function LoginPage() {
                     }}
                   >
                     <p className="text-sm" style={{ color: colors.error[600] }}>
-                      {errors.general}
+                      {error}
                     </p>
                   </div>
                 )}
@@ -500,9 +454,9 @@ export default function LoginPage() {
                     backgroundColor: colors.primary[500],
                     color: colors.surface,
                   }}
-                  disabled={isLoading}
+                  disabled={loading}
                 >
-                  {isLoading ? (
+                  {loading ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Iniciando sesión...

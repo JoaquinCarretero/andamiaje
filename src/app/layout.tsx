@@ -2,6 +2,8 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Poppins, Playfair_Display } from "next/font/google"
 import colors from "@/lib/colors"
+import { ReduxProvider } from "@/store/provider"
+import { AuthInitializer } from "@/components/auth/AuthInitializer"
 import "./globals.css"
 
 const inter = Inter({
@@ -46,7 +48,10 @@ export default function RootLayout({
         style={{ backgroundColor: colors.background, color: colors.text }}
         className="font-sans antialiased min-h-screen"
       >
-        {children}
+        <ReduxProvider>
+          <AuthInitializer />
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   )

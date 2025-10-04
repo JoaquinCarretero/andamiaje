@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import lottie from 'lottie-web'
 import { Button } from '@/components/ui/button'
 import { Home } from 'lucide-react'
 
@@ -10,17 +9,22 @@ export default function NotFound() {
   const lottieContainer = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (lottieContainer.current) {
-      const animation = lottie.loadAnimation({
-        container: lottieContainer.current,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: '/animations/404.json' // Aquí irá tu archivo de animación
-      })
+    const loadLottie = async () => {
+      if (lottieContainer.current && typeof window !== 'undefined') {
+        const lottie = (await import('lottie-web')).default;
+        const animation = lottie.loadAnimation({
+          container: lottieContainer.current,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          path: '/animations/404.json'
+        })
 
-      return () => animation.destroy()
+        return () => animation.destroy()
+      }
     }
+
+    loadLottie()
   }, [])
 
   return (

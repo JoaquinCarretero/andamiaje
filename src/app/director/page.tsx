@@ -1,15 +1,16 @@
 "use client"
 
-import { useState } from "react"
 import { DirectorDashboard } from "@/components/director/director-dashboard"
-
-const userData = {
-  name: "Dr. Roberto Silva",
-  title: "Director General",
-  role: "director" as const,
-  gender: "male",
-}
+import { UserRole } from "@/types/auth"
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { useAppSelector } from "@/store"
 
 export default function DirectorPage() {
-  return <DirectorDashboard userData={userData} />
+  const { user } = useAppSelector((state) => state.auth)
+
+  return (
+    <ProtectedRoute allowedRoles={[UserRole.DIRECTOR]}>
+      <DirectorDashboard userData={user} />
+    </ProtectedRoute>
+  )
 }

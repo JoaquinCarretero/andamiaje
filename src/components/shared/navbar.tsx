@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -16,40 +16,27 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import colors from "@/lib/colors";
 import { AuthService } from "@/lib/auth";
-import { User as UserType, UserRole } from "@/types/auth";
+import { UserRole } from "@/types/auth";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { logout as logoutAction } from "@/store/slices/authSlice";
 
 interface NavbarProps {
-  userData?: UserType | null;
   onNavigate?: (view: string) => void;
 }
 
-export function Navbar({ userData, onNavigate }: NavbarProps) {
+export function Navbar({ onNavigate }: NavbarProps) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<UserType | null>(
-    userData || null
-  );
-
-  useEffect(() => {
-    // Solo actualizar si userData cambia o si no tenemos usuario actual
-    if (userData) {
-      setCurrentUser(userData);
-    } else if (!currentUser) {
-      const user = AuthService.getUser();
-      setCurrentUser(user);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userData]);
+  const { user: currentUser } = useAppSelector((state) => state.auth);
 
   const handleProfileClick = () => {
     router.push("/perfil");
   };
 
   const handleLogout = () => {
-    // Limpiar todo el localStorage relacionado con la sesión
-    // AuthService.logout();
-    // Forzar recarga para limpiar cualquier estado residual
-    window.location.href = "/login";
+    dispatch(logoutAction());
+    router.push("/login");
   };
 
   if (!currentUser) {

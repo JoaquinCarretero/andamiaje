@@ -27,13 +27,13 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Image from "next/image";
 import colors from "@/lib/colors";
-import { apiClient } from "@/lib/api";
 import { AuthService } from "@/lib/auth";
 import { RegisterDto, UserRole } from "@/types/auth";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { registerThunk, clearError } from "@/store/slices/authSlice";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<RegisterDto>({
     firstName: "",
     lastName: "",
@@ -43,27 +43,28 @@ export default function RegisterPage() {
     password: "",
     role: UserRole.TERAPEUTA,
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    // Redirigir si ya está autenticado
-    if (AuthService.isAuthenticated()) {
-      const user = AuthService.getUser();
-      if (user) {
-        const roleRoute = AuthService.getRoleForRouting(user.role);
-        router.replace(`/${roleRoute}`);
-      }
+    if (initialized && isAuthenticated && user) {
+      const roleRoute = AuthService.getRoleForRouting(user.role);
+      router.replace(`/${roleRoute}`);
     }
-  }, [router]);
+  }, [isAuthenticated, user, router, initialized]);
 
   const handleInputChange = (
     field: keyof RegisterDto,
     value: string | UserRole
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (localErrors[field]) {
+      setLocalErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    if (error) {
+      dispatch(clearError());
     }
   };
 
@@ -108,7 +109,7 @@ export default function RegisterPage() {
       newErrors.password = "La contraseña debe tener al menos 6 caracteres";
     }
 
-    setErrors(newErrors);
+    setLocalErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
@@ -117,31 +118,10 @@ export default function RegisterPage() {
 
     if (!validateForm()) return;
 
-    setIsLoading(true);
-    setErrors({});
-
     try {
-      const authResponse = await apiClient.register(formData);
-
-      // Validar respuesta
-      if (!authResponse || !authResponse.user || !authResponse.accessToken) {
-        throw new Error("Respuesta de registro inválida");
-      }
-
-      // Autenticar automáticamente después del registro
-      AuthService.setAuth(authResponse);
-
-      // Redirigir según el rol del usuario
-      const roleRoute = AuthService.getRoleForRouting(authResponse.user.role);
-      router.replace(`/${roleRoute}`);
+      await dispatch(registerThunk(formData)).unwrap();
     } catch (error) {
       console.error("Register error:", error);
-      setErrors({
-        general:
-          error instanceof Error ? error.message : "Error al registrarse. Verifique sus datos.",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -238,11 +218,11 @@ export default function RegisterPage() {
                               handleInputChange("firstName", e.target.value)
                             }
                             className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              errors.firstName ? "border-red-500" : ""
+                              localErrors.firstName ? "border-red-500" : ""
                             }`}
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: errors.firstName
+                              borderColor: localErrors.firstName
                                 ? colors.error[500]
                                 : colors.border,
                               color: colors.text,
@@ -250,12 +230,12 @@ export default function RegisterPage() {
                             required
                           />
                         </div>
-                        {errors.firstName && (
+                        {localErrors.firstName && (
                           <p
                             className="text-sm"
                             style={{ color: colors.error[500] }}
                           >
-                            {errors.firstName}
+                            {localErrors.firstName}
                           </p>
                         )}
                       </div>
@@ -280,11 +260,11 @@ export default function RegisterPage() {
                               handleInputChange("lastName", e.target.value)
                             }
                             className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              errors.lastName ? "border-red-500" : ""
+                              localErrors.lastName ? "border-red-500" : ""
                             }`}
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: errors.lastName
+                              borderColor: localErrors.lastName
                                 ? colors.error[500]
                                 : colors.border,
                               color: colors.text,
@@ -292,12 +272,12 @@ export default function RegisterPage() {
                             required
                           />
                         </div>
-                        {errors.lastName && (
+                        {localErrors.lastName && (
                           <p
                             className="text-sm"
                             style={{ color: colors.error[500] }}
                           >
-                            {errors.lastName}
+                            {localErrors.lastName}
                           </p>
                         )}
                       </div>
@@ -352,11 +332,11 @@ export default function RegisterPage() {
                               handleInputChange("email", e.target.value)
                             }
                             className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              errors.email ? "border-red-500" : ""
+                              localErrors.email ? "border-red-500" : ""
                             }`}
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: errors.email
+                              borderColor: localErrors.email
                                 ? colors.error[500]
                                 : colors.border,
                               color: colors.text,
@@ -364,12 +344,12 @@ export default function RegisterPage() {
                             required
                           />
                         </div>
-                        {errors.email && (
+                        {localErrors.email && (
                           <p
                             className="text-sm"
                             style={{ color: colors.error[500] }}
                           >
-                            {errors.email}
+                            {localErrors.email}
                           </p>
                         )}
                       </div>
@@ -389,18 +369,18 @@ export default function RegisterPage() {
                           buttonClass="!border-0 !border-r !rounded-l-lg"
                           inputStyle={{
                             backgroundColor: colors.surface,
-                            borderColor: errors.phone
+                            borderColor: localErrors.phone
                               ? colors.error[500]
                               : colors.border,
                             color: colors.text,
                           }}
                         />
-                        {errors.phone && (
+                        {localErrors.phone && (
                           <p
                             className="text-sm"
                             style={{ color: colors.error[500] }}
                           >
-                            {errors.phone}
+                            {localErrors.phone}
                           </p>
                         )}
                       </div>
@@ -439,11 +419,11 @@ export default function RegisterPage() {
                         onChange={(e) => handleDniChange(e.target.value)}
                         maxLength={8}
                         className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                          errors.documentNumber ? "border-red-500" : ""
+                          localErrors.documentNumber ? "border-red-500" : ""
                         }`}
                         style={{
                           backgroundColor: colors.surface,
-                          borderColor: errors.documentNumber
+                          borderColor: localErrors.documentNumber
                             ? colors.error[500]
                             : colors.border,
                           color: colors.text,
@@ -451,12 +431,12 @@ export default function RegisterPage() {
                         required
                       />
                     </div>
-                    {errors.documentNumber && (
+                    {localErrors.documentNumber && (
                       <p
                         className="text-sm"
                         style={{ color: colors.error[500] }}
                       >
-                        {errors.documentNumber}
+                        {localErrors.documentNumber}
                       </p>
                     )}
                   </div>
@@ -480,11 +460,11 @@ export default function RegisterPage() {
                             handleInputChange("password", e.target.value)
                           }
                           className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${
-                            errors.password ? "border-red-500" : ""
+                            localErrors.password ? "border-red-500" : ""
                           }`}
                           style={{
                             backgroundColor: colors.surface,
-                            borderColor: errors.password
+                            borderColor: localErrors.password
                               ? colors.error[500]
                               : colors.border,
                             color: colors.text,
@@ -511,12 +491,12 @@ export default function RegisterPage() {
                           )}
                         </Button>
                       </div>
-                      {errors.password && (
+                      {localErrors.password && (
                         <p
                           className="text-sm"
                           style={{ color: colors.error[500] }}
                         >
-                          {errors.password}
+                          {localErrors.password}
                         </p>
                       )}
                     </div>
@@ -591,7 +571,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {errors.general && (
+              {error && (
                 <div
                   className="p-3 rounded-lg border-l-4 flex items-center gap-2"
                   style={{
@@ -600,7 +580,7 @@ export default function RegisterPage() {
                   }}
                 >
                   <p className="text-sm" style={{ color: colors.error[600] }}>
-                    {errors.general}
+                    {error}
                   </p>
                 </div>
               )}
@@ -612,9 +592,9 @@ export default function RegisterPage() {
                   backgroundColor: colors.secondary[500],
                   color: colors.surface,
                 }}
-                disabled={isLoading}
+                disabled={loading}
               >
-                {isLoading ? (
+                {loading ? (
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Creando cuenta...
