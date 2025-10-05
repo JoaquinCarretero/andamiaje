@@ -10,12 +10,14 @@ export interface StoredSignature {
 export const signatureStorage = {
   // Guardar firma en localStorage
   save: (signature: string, name: string): void => {
+    if (typeof window === 'undefined') return
+
     const signatureData: StoredSignature = {
       signature,
       name,
       timestamp: new Date().toISOString()
     }
-    
+
     try {
       localStorage.setItem('userSignature', JSON.stringify(signatureData))
     } catch (error) {
@@ -26,6 +28,8 @@ export const signatureStorage = {
 
   // Obtener firma del localStorage
   get: (): StoredSignature | null => {
+    if (typeof window === 'undefined') return null
+
     try {
       const stored = localStorage.getItem('userSignature')
       return stored ? JSON.parse(stored) : null
@@ -37,11 +41,14 @@ export const signatureStorage = {
 
   // Verificar si existe una firma
   exists: (): boolean => {
+    if (typeof window === 'undefined') return false
     return signatureStorage.get() !== null
   },
 
   // Eliminar firma
   remove: (): void => {
+    if (typeof window === 'undefined') return
+
     try {
       localStorage.removeItem('userSignature')
     } catch (error) {
@@ -52,8 +59,8 @@ export const signatureStorage = {
   // Validar firma
   validate: (signature: StoredSignature): boolean => {
     return !!(
-      signature.signature && 
-      signature.name && 
+      signature.signature &&
+      signature.name &&
       signature.timestamp &&
       signature.signature.startsWith('data:image/')
     )

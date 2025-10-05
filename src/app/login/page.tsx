@@ -50,19 +50,13 @@ export default function LoginPage() {
   const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-  // Solo redirigir si estamos en la página de login y hay un usuario cargado
-  console.log("🚀 ~ LoginPage ~ initialized:", initialized)
-  console.log("🚀 ~ LoginPage ~ isAuthenticated:", isAuthenticated)
-  console.log("🚀 ~ LoginPage ~ user:", user)
-  if (initialized && isAuthenticated && user) {
-    // Esto evita que el login se ejecute solo al abrir la página
-    const currentPath = window.location.pathname;
-    if (currentPath === "/login") {
+    if (!initialized) return;
+
+    if (isAuthenticated && user) {
       const roleRoute = AuthService.getRoleForRouting(user.role);
       router.replace(`/${roleRoute}`);
     }
-  }
-}, [isAuthenticated, user, router, initialized]);
+  }, [initialized, isAuthenticated, user, router]);
 
 
   const handleInputChange = (field: keyof LoginDto, value: string) => {
@@ -338,6 +332,7 @@ export default function LoginPage() {
                       value={formData.documentNumber}
                       onChange={(e) => handleDniChange(e.target.value)}
                       maxLength={8}
+                      autoComplete="off"
                       className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
@@ -376,6 +371,7 @@ export default function LoginPage() {
                       onChange={(e) =>
                         handleInputChange("password", e.target.value)
                       }
+                      autoComplete="off"
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,

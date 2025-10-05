@@ -14,45 +14,44 @@ import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
 import { UserI } from "@/types/auth"
 import { apiClient } from "@/lib/api"
-import { useDispatch } from "react-redux"
-import { logout } from "@/store/slices/userSlice"
+import { useAppDispatch, useAppSelector } from "@/store"
+import { logout } from "@/store/slices/authSlice"
+import { getProfileThunk } from "@/store/slices/authSlice"
 
 export default function ProfilePage() {
   const router = useRouter()
   const { getSignature } = useSignature()
-  const [user, setUser] = useState<UserI | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
+  const { user, isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth)
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null)
+  const [localSignature, setLocalSignature] = useState<any>(null)
 
-  
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = await AuthService.getCurrentUser()
-        if (!currentUser) {
-          router.push('/login')
-          return
-        }
-        setUser(currentUser)
-      } catch (error) {
-        console.error('Error checking auth:', error)
-        router.push('/login')
-      } finally {
-        setIsLoading(false)
-      }
+    if (!initialized) return
+
+    if (!isAuthenticated || !user) {
+      router.push('/login')
+      return
     }
 
-    checkAuth()
-  }, [router])
+    if (user.signatureKey) {
+      const url = apiClient.getDownloadUrl(user.signatureKey)
+      setSignatureUrl(url)
+    }
 
-  const signature = getSignature()
+    const sig = getSignature()
+    setLocalSignature(sig)
+  }, [initialized, isAuthenticated, user, router, getSignature])
 
-  const handleSaveProfile = (updatedData: Partial<UserI>) => {
-    if (user) {
-      const updatedUser = { ...user, ...updatedData }
-      setUser(updatedUser)
-      localStorage.setItem('authUser', JSON.stringify(updatedUser))
+  const handleSaveProfile = async (updatedData: Partial<UserI>) => {
+    if (!user) return
+
+    try {
+      const updatedUser = await apiClient.updateUserProfile(user.id, updatedData)
+      await dispatch(getProfileThunk()).unwrap()
+    } catch (error) {
+      console.error('Error updating profile:', error)
     }
   }
 
@@ -61,15 +60,15 @@ export default function ProfilePage() {
   }
 
   const handleLogout = async () => {
-  try {
-    await apiClient.logout(); // Limpia cookies HttpOnly en el backend
-    dispatch(logout());       // Limpia estado Redux
-    localStorage.removeItem('authUser'); // Limpia localStorage
-    window.location.href = "/login";
-  } catch (error) {
-    console.error("Error al cerrar sesión:", error);
+    try {
+      await apiClient.logout()
+      dispatch(logout())
+      localStorage.removeItem('authUser')
+      router.push('/login')
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error)
+    }
   }
-};
 
 
   const getRoleColor = (role: string) => {
@@ -81,7 +80,7 @@ export default function ProfilePage() {
     return roleMap[role] || { bg: colors.neutral[50], text: colors.neutral[600], border: colors.neutral[200] }
   }
 
-  if (isLoading) {
+  if (!initialized || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -89,7 +88,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (!user) {
+  if (!user || !isAuthenticated) {
     return null
   }
 
@@ -311,12 +310,14 @@ export default function ProfilePage() {
                     <div
                       className="h-11 px-3 py-2 rounded-md border flex items-center"
                       style={{
-                        backgroundColor: colors.neutral[50],
+                        backgroundColor: colors.surface,
                         borderColor: colors.border,
-                        color: colors.textMuted
+                        color: colors.text
                       }}
                     >
-                      {user.joinDate || new Date(user.createdAt).toLocaleDateString('es-AR')}
+                      {user.joinDate
+                        ? new Date(user.joinDate).toLocaleDateString('es-AR')
+                        : new Date(user.createdAt).toLocaleDateString('es-AR')}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -399,9 +400,9 @@ export default function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {signature ? (
+                {(signatureUrl || localSignature) ? (
                   <div className="space-y-4">
-                    <div 
+                    <div
                       className="p-6 rounded-lg border-2"
                       style={{
                         backgroundColor: colors.success[50],
@@ -410,7 +411,7 @@ export default function ProfilePage() {
                     >
                       <div className="flex items-center justify-center mb-4">
                         <img
-                          src={signature.signature}
+                          src={signatureUrl || localSignature?.signature}
                           alt="Firma digital"
                           className="max-h-20 max-w-full object-contain border rounded"
                           style={{ backgroundColor: colors.surface }}
@@ -418,10 +419,10 @@ export default function ProfilePage() {
                       </div>
                       <div className="text-center">
                         <p className="font-medium" style={{ color: colors.text }}>
-                          {signature.name}
+                          {fullName}
                         </p>
                         <p className="text-sm" style={{ color: colors.textMuted }}>
-                          Registrada el {new Date(signature.timestamp).toLocaleDateString('es-AR')}
+                          Registrada el {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('es-AR') : 'Fecha no disponible'}
                         </p>
                       </div>
                     </div>
@@ -430,7 +431,7 @@ export default function ProfilePage() {
                     </p>
                   </div>
                 ) : (
-                  <div 
+                  <div
                     className="p-6 rounded-lg border-2 text-center"
                     style={{
                       backgroundColor: colors.warning[50],
@@ -457,10 +458,10 @@ export default function ProfilePage() {
           onSave={handleSaveProfile}
           initialData={{
             phone: user.phone || "",
-            bio: "",
-            specialty: "",
-            license: "",
-            experience: ""
+            bio: user.bio || "",
+            specialty: user.specialty || "",
+            license: user.license || "",
+            experience: user.experience || ""
           }}
         />
       </main>

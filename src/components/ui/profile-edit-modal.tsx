@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Save, User, Phone, Briefcase, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -27,16 +27,26 @@ export function ProfileEditModal({ isOpen, onClose, onSave, initialData }: Profi
   const [formData, setFormData] = useState(initialData)
   const [isSaving, setIsSaving] = useState(false)
 
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(initialData)
+    }
+  }, [isOpen, initialData])
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSave = async () => {
     setIsSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    onSave(formData)
-    setIsSaving(false)
-    onClose()
+    try {
+      await onSave(formData)
+    } catch (error) {
+      console.error('Error saving profile:', error)
+    } finally {
+      setIsSaving(false)
+      onClose()
+    }
   }
 
   if (!isOpen) return null
