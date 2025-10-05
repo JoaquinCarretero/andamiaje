@@ -40,7 +40,6 @@ import { loginThunk, clearError } from "@/store/slices/authSlice";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState<LoginDto>({
     documentNumber: "",
     password: "",
@@ -51,11 +50,20 @@ export default function LoginPage() {
   const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (initialized && isAuthenticated && user) {
+  // Solo redirigir si estamos en la página de login y hay un usuario cargado
+  console.log("🚀 ~ LoginPage ~ initialized:", initialized)
+  console.log("🚀 ~ LoginPage ~ isAuthenticated:", isAuthenticated)
+  console.log("🚀 ~ LoginPage ~ user:", user)
+  if (initialized && isAuthenticated && user) {
+    // Esto evita que el login se ejecute solo al abrir la página
+    const currentPath = window.location.pathname;
+    if (currentPath === "/login") {
       const roleRoute = AuthService.getRoleForRouting(user.role);
       router.replace(`/${roleRoute}`);
     }
-  }, [isAuthenticated, user, router, initialized]);
+  }
+}, [isAuthenticated, user, router, initialized]);
+
 
   const handleInputChange = (field: keyof LoginDto, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -422,22 +430,7 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-2 text-primary focus:ring-primary focus:ring-offset-0"
-                      style={{ borderColor: colors.border }}
-                    />
-                    <span
-                      className="text-sm"
-                      style={{ color: colors.textMuted }}
-                    >
-                      Recordarme
-                    </span>
-                  </label>
+                <div className="flex items-center gap-4">
                   <Link
                     href="/forgot-password"
                     className="text-sm hover:underline transition-colors duration-200"

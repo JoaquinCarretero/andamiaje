@@ -13,6 +13,9 @@ import colors from "@/lib/colors"
 import { Label } from "@/components/ui/label"
 import { AuthService } from "@/lib/auth"
 import { UserI } from "@/types/auth"
+import { apiClient } from "@/lib/api"
+import { useDispatch } from "react-redux"
+import { logout } from "@/store/slices/userSlice"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -20,6 +23,8 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserI | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
+  const dispatch = useDispatch()
+
   
   useEffect(() => {
     const checkAuth = async () => {
@@ -55,12 +60,17 @@ export default function ProfilePage() {
     router.push('/cambiar-contrasena')
   }
 
-  const handleLogout = () => {
-    // Limpiar todo el localStorage relacionado con la sesión
-    // AuthService.logout()
-    // Forzar recarga para limpiar cualquier estado residual
-    window.location.href = '/login'
+  const handleLogout = async () => {
+  try {
+    await apiClient.logout(); // Limpia cookies HttpOnly en el backend
+    dispatch(logout());       // Limpia estado Redux
+    localStorage.removeItem('authUser'); // Limpia localStorage
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
   }
+};
+
 
   const getRoleColor = (role: string) => {
     const roleMap: Record<string, { bg: string; text: string; border: string }> = {

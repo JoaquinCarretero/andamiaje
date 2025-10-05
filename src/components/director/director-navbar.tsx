@@ -8,6 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { NotificationsModal } from "@/components/ui/notifications-modal"
 import Image from "next/image"
 import colors from "@/lib/colors"
+import { AuthService } from "@/lib/auth"
+import { apiClient } from "@/lib/api"
+import { useDispatch } from "react-redux"
+import { logout } from "@/store/slices/userSlice"
 
 interface DirectorNavbarProps {
   userData: {
@@ -18,20 +22,25 @@ interface DirectorNavbarProps {
 }
 
 export function DirectorNavbar({ userData }: DirectorNavbarProps) {
-  const router = useRouter()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [showNotifications, setShowNotifications] = useState(false)
+const router = useRouter()
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+const [showNotifications, setShowNotifications] = useState(false)
+const dispatch = useDispatch()
 
-  const handleProfileClick = () => {
-    router.push('/perfil')
-  }
+const handleProfileClick = () => {
+  router.push('/perfil')
+}
 
-  const handleLogout = () => {
-    // Limpiar todo el localStorage relacionado con la sesión
-    AuthService.logout()
-    // Forzar recarga para limpiar cualquier estado residual
-    window.location.href = '/login'
+const handleLogout = async () => {
+  try {
+    await apiClient.logout();
+    dispatch(logout());
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
   }
+}
+
   return (
     <>
       <nav

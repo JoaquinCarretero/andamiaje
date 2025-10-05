@@ -19,22 +19,21 @@ class ApiClient {
   }
 
   private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-
-    const config: RequestInit = {
-      headers: { "Content-Type": "application/json", ...options.headers },
-      credentials: "include",
-      ...options,
-    };
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${this.baseURL}${endpoint}`;
+  const config: RequestInit = {
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...options.headers },
+    ...options,
+  };
 
     // Agregar token si existe
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
-    }
+    // const token = localStorage.getItem("authToken");
+    // if (token) {
+    //   config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
+    // }
 
     try {
       const response = await fetch(url, config);
@@ -82,7 +81,7 @@ class ApiClient {
 
   const user = await this.getProfile();
 
-  return { user: user, accessToken: "qweqwrweyertyhertyertyertyersgs" };
+  return { user };
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
@@ -96,6 +95,7 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(backendData),
     });
+    console.log("🚀 ~ ApiClient ~ register ~ response:", response)
 
     // Verificar que la respuesta tenga los datos necesarios
     if (!response || !response.user || !response.accessToken) {
@@ -169,6 +169,16 @@ class ApiClient {
     return this.request<AuthResponse>("/api/v1/auth/refresh", {
       method: "POST",
     });
+  }
+
+   // Logout
+  async logout(): Promise<void> {
+    await this.request<void>("/api/v1/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+    // No necesitas borrar localStorage ni cookies aquí,
+    // el backend se encarga de limpiar las cookies HttpOnly.
   }
 
   // Storage endpoints
