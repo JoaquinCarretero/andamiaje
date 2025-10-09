@@ -18,7 +18,7 @@ import colors from "@/lib/colors";
 import { AuthService } from "@/lib/auth";
 import { UserRole } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { logout as logoutAction } from "@/store/slices/authSlice";
+import { logoutThunk } from "@/store/slices/authSlice"; // <-- CORRECCIÓN AQUÍ
 
 interface NavbarProps {
   onNavigate?: (view: string) => void;
@@ -35,7 +35,7 @@ export function Navbar({ onNavigate }: NavbarProps) {
   };
 
   const handleLogout = () => {
-    dispatch(logoutAction());
+    dispatch(logoutThunk()); // <-- CORRECCIÓN AQUÍ
     router.push("/login");
   };
 
@@ -70,6 +70,7 @@ export function Navbar({ onNavigate }: NavbarProps) {
       onNavigate(actionId);
     }
   };
+
 
   return (
     <>

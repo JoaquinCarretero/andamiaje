@@ -35,14 +35,7 @@ export class AuthService {
       return false
     }
   }
-
-  // Cerrar sesión
-  // static logout(): void {
-  //   localStorage.removeItem(this.USER_KEY)
-  //   // Llamada al backend para limpiar cookies si existe endpoint
-  //   apiClient.logout?.()
-  // }
-
+  
   // Obtener usuario actualizado del servidor
   static async getCurrentUser(): Promise<UserI | null> {
     try {
@@ -50,8 +43,12 @@ export class AuthService {
       const user = await apiClient.getProfile()
       if (user) this.setUser(user)
       return user
-    } catch (error) {
-      console.error('Error getting current user:', error)
+    } catch (error: any) {
+      // Modificación: Solo registrar en consola si el error NO es el esperado "sin acceso autorizado".
+      // Esto evita llenar la consola con errores esperados durante la carga inicial.
+      if (error?.message?.toLowerCase() !== 'sin acceso autorizado') {
+        console.error('Error getting current user:', error)
+      }
       return this.getUser()
     }
   }

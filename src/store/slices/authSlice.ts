@@ -1,181 +1,118 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { apiClient } from '@/lib/api';
-import { LoginDto, RegisterDto, UserI } from '@/types/auth';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { AuthService } from '@/lib/auth'
+import { apiClient } from '@/lib/api'
+import { LoginDto, UserI } from '@/types/auth'
 
 interface AuthState {
-  user: UserI | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-  initialized: boolean;
+  isAuthenticated: boolean
+  user: UserI | null
+  loading: boolean
+  error: string | null
+  initialized: boolean // Para saber si ya se intentó cargar el usuario inicial
 }
 
 const initialState: AuthState = {
-  user: null,
   isAuthenticated: false,
+  user: null,
   loading: false,
   error: null,
   initialized: false,
-};
+}
 
+// Thunks asíncronos
 export const loginThunk = createAsyncThunk(
   'auth/login',
-  async (credentials: LoginDto, { rejectWithValue }) => {
+  async (loginDto: LoginDto, { rejectWithValue }) => {
     try {
-      const response = await apiClient.login(credentials);
-      return response.user;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Error al iniciar sesión'
-      );
+      const user = await apiClient.login(loginDto)
+      AuthService.setUser(user)
+      return { user }
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error de autenticación')
     }
-  }
-);
+  },
+)
 
-export const registerThunk = createAsyncThunk(
-  'auth/register',
-  async (data: RegisterDto, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.register(data);
-      console.log("🚀 ~ response:", response)
-      return response.user;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Error al registrarse'
-      );
-    }
-  }
-);
+export const logoutThunk = createAsyncThunk('auth/logout', async () => {
+  await apiClient.logout()
+  localStorage.removeItem('authUser')
+})
 
-export const getProfileThunk = createAsyncThunk(
-  'auth/getProfile',
+export const checkAuthThunk = createAsyncThunk(
+  'auth/checkAuth',
   async (_, { rejectWithValue }) => {
     try {
-      const user = await apiClient.getProfile();
-      return user;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Error al obtener perfil'
-      );
+      const user = await AuthService.getCurrentUser()
+      if (user) {
+        return { user }
+      }
+      return rejectWithValue('No authenticated user found')
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error checking auth status')
     }
-  }
-);
+  },
+)
 
-export const updateProfileThunk = createAsyncThunk(
-  'auth/updateProfile',
-  async (
-    data: {
-      userId: string;
-      updates: {
-        firstLogin?: boolean;
-        hasSignature?: boolean;
-        signatureKey?: string;
-      };
-    },
-    { rejectWithValue }
-  ) => {
-    try {
-      const user = await apiClient.updateUserProfile(data.userId, data.updates);
-      return user;
-    } catch (error) {
-      return rejectWithValue(
-        error instanceof Error ? error.message : 'Error al actualizar perfil'
-      );
-    }
-  }
-);
-
+// Slice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
-      state.error = null;
-      state.initialized = false;
-    },
     clearError: (state) => {
-      state.error = null;
+      state.error = null
     },
-    updateUser: (state, action: PayloadAction<Partial<UserI>>) => {
-      if (state.user) {
-        state.user = { ...state.user, ...action.payload };
-      }
-    },
-    setInitialized: (state) => {
-      state.initialized = true;
-    },
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = !!action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(loginThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loading = true
+        state.error = null
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-        state.error = null;
-        state.initialized = true;
+        state.loading = false
+        state.isAuthenticated = true
+        state.user = action.payload.user
       })
       .addCase(loginThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.isAuthenticated = false;
-        state.user = null;
+        state.loading = false
+        state.error = action.payload as string
+        state.user = null
+        state.isAuthenticated = false
       })
-      .addCase(registerThunk.pending, (state) => {
-        state.loading = true;
+      // Logout
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.isAuthenticated = false
+        state.user = null
+        state.loading = false
+      })
+      // Check Auth
+      .addCase(checkAuthThunk.pending, (state) => {
+        state.loading = true
+        state.initialized = false
+      })
+      .addCase(checkAuthThunk.fulfilled, (state, action) => {
+        state.isAuthenticated = true
+        state.user = action.payload.user
+        state.loading = false
+        state.initialized = true
+      })
+      .addCase(checkAuthThunk.rejected, (state, action) => {
+        state.isAuthenticated = false
+        state.user = null
+        state.loading = false
+        state.initialized = true
+        // NO establecemos el error aquí para evitar mostrarlo en la UI
+        // durante la carga inicial. Un fallo aquí es esperado si el
+        // usuario no está logueado.
         state.error = null;
       })
-      .addCase(registerThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-        state.error = null;
-        state.initialized = true;
-      })
-      .addCase(registerThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.isAuthenticated = false;
-        state.user = null;
-      })
-      .addCase(getProfileThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(getProfileThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-        state.error = null;
-        state.initialized = true;
-      })
-      .addCase(getProfileThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-        state.isAuthenticated = false;
-        state.user = null;
-        state.initialized = true;
-      })
-      .addCase(updateProfileThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateProfileThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(updateProfileThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
   },
-});
+})
 
-export const { logout, clearError, updateUser, setInitialized } = authSlice.actions;
-export default authSlice.reducer;
+export const { clearError, setUser } = authSlice.actions
+export default authSlice.reducer

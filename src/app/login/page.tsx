@@ -45,19 +45,15 @@ export default function LoginPage() {
     password: "",
   });
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado local para el envío del formulario
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
+  const { error } = useAppSelector((state) => state.auth); // Solo necesitamos el 'error' global
 
+  // Limpiar errores globales al cargar la página
   useEffect(() => {
-    if (!initialized) return;
-
-    if (isAuthenticated && user) {
-      const roleRoute = AuthService.getRoleForRouting(user.role);
-      router.replace(`/${roleRoute}`);
-    }
-  }, [initialized, isAuthenticated, user, router]);
-
+    dispatch(clearError());
+  }, [dispatch]);
 
   const handleInputChange = (field: keyof LoginDto, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -99,10 +95,18 @@ export default function LoginPage() {
 
     if (!validateForm()) return;
 
+    setIsSubmitting(true); // Activar estado de carga local
     try {
-      await dispatch(loginThunk(formData)).unwrap();
-    } catch (error) {
-      console.error("Login error:", error);
+      const action = await dispatch(loginThunk(formData)).unwrap();
+      if (action.user) {
+        const roleRoute = AuthService.getRoleForRouting(action.user.role);
+        router.replace(`/${roleRoute}`);
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      // El error se manejará a través del estado de Redux
+    } finally {
+      setIsSubmitting(false); // Desactivar estado de carga local
     }
   };
 
@@ -315,7 +319,11 @@ export default function LoginPage() {
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-5"
+                autoComplete="off"
+              >
                 <div className="space-y-2">
                   <Label htmlFor="dni" style={{ color: colors.text }}>
                     DNI
@@ -371,7 +379,7 @@ export default function LoginPage() {
                       onChange={(e) =>
                         handleInputChange("password", e.target.value)
                       }
-                      autoComplete="off"
+                      autoComplete="new-password"
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
@@ -436,16 +444,16 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <Button
+                 <Button
                   type="submit"
                   className="w-full h-12 rounded-lg font-medium text-base transition-all duration-200 hover:scale-105 hover:shadow-medium"
                   style={{
                     backgroundColor: colors.primary[500],
                     color: colors.surface,
                   }}
-                  disabled={loading}
+                  disabled={isSubmitting}
                 >
-                  {loading ? (
+                  {isSubmitting ? (
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Iniciando sesión...

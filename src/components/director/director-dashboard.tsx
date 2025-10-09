@@ -6,7 +6,7 @@ import { DocumentsOverview } from "@/components/director/documents-overview"
 import { UsersOverview } from "@/components/director/users-overview"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { FileText, Users, BarChart3, Sparkles, Calendar, Upload, ClipboardList } from "lucide-react"
+import { FileText, Users, BarChart3, Sparkles,} from "lucide-react"
 import colors from "@/lib/colors"
 
 interface DirectorDashboardProps {

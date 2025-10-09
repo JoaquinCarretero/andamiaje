@@ -35,16 +35,16 @@ export function useAuth() {
   }, [])
 
   const login = (authResponse: AuthResponse) => {
-    AuthService.setAuth(authResponse)
+    // AuthService.setAuth(authResponse)
     setUser(authResponse.user)
     setIsAuthenticated(true)
   }
 
-  const logout = () => {
-    AuthService.logout()
-    setUser(null)
-    setIsAuthenticated(false)
-  }
+  // const logout = () => {
+  //   AuthService.logout()
+  //   setUser(null)
+  //   setIsAuthenticated(false)
+  // }
 
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser)
@@ -56,7 +56,7 @@ export function useAuth() {
     isLoading,
     isAuthenticated,
     login,
-    logout,
+    // logout,
     updateUser
   }
 }
