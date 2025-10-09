@@ -19,28 +19,21 @@ class ApiClient {
   }
 
   private async request<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${this.baseURL}${endpoint}`;
-  const config: RequestInit = {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
-    ...options,
-  };
-
-    // Agregar token si existe
-    // const token = localStorage.getItem("authToken");
-    // if (token) {
-    //   config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
-    // }
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseURL}${endpoint}`;
+    const config: RequestInit = {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...options.headers },
+      ...options,
+    };
 
     try {
       const response = await fetch(url, config);
 
       if (!response.ok) {
         const text = await response.text();
-        // Intentar parsear JSON de error
         let errorData: ApiError = {
           message: text || "Error de conexión",
           statusCode: response.status,
@@ -51,17 +44,10 @@ class ApiClient {
         throw new Error(errorData.message || `Error ${response.status}`);
       }
 
-      // Manejar respuestas 204 No Content
-      // if (response.status === 204) {
-      //   throw new Error('El servidor no devolvió datos de autenticación')
-      // }
-
       const text = await response.text();
-      // Intentar parsear JSON de respuesta
       try {
         return text ? JSON.parse(text) : ({} as T);
       } catch {
-        console.warn("Respuesta no es JSON válido:", text);
         throw new Error("Respuesta del servidor no válida");
       }
     } catch (error) {
@@ -71,7 +57,7 @@ class ApiClient {
   }
 
   // Auth endpoints
-  async login(data: LoginDto): Promise<any> {
+  async login(data: LoginDto): Promise<UserI> {
     await this.request<any>("/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -79,9 +65,8 @@ class ApiClient {
       credentials: "include",
     });
 
-  const user = await this.getProfile();
-
-  return { user };
+    const user = await this.getProfile();
+    return user;
   }
 
   async register(data: RegisterDto): Promise<AuthResponse> {
@@ -95,10 +80,9 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(backendData),
     });
-    console.log("🚀 ~ ApiClient ~ register ~ response:", response)
 
     // Verificar que la respuesta tenga los datos necesarios
-    if (!response || !response.user || !response.accessToken) {
+    if (!response || !response.user) {
       throw new Error("Respuesta de registro inválida del servidor");
     }
 
@@ -130,14 +114,13 @@ class ApiClient {
 
   async getProfile(): Promise<UserI> {
     const response = await this.request<any>("/api/v1/auth/profile", {
-    method: "GET",
-    credentials: "include", // 👈 esto manda las cookies (accessToken/refreshToken)
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
-    console.log("🚀 ~ ApiClient ~ getProfile ~ response:", response)
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
 
     // Convertir rol del backend al frontend
     if (response.role) {
@@ -147,7 +130,6 @@ class ApiClient {
         ] || response.role;
     }
 
-    // Asegurar que los campos requeridos existan
     // Procesar nombres de manera más robusta
     if (!response.firstName && !response.lastName && response.name) {
       const nameParts = response.name.trim().split(" ");
@@ -161,7 +143,6 @@ class ApiClient {
     response.firstLogin = response.firstLogin ?? false;
     response.hasSignature = response.hasSignature ?? false;
 
-    console.log("🚀 ~ ApiClient ~ getProfile ~ response:", response)
     return response;
   }
 
@@ -171,22 +152,17 @@ class ApiClient {
     });
   }
 
-   // Logout
   async logout(): Promise<void> {
     await this.request<void>("/api/v1/auth/logout", {
       method: "POST",
       credentials: "include",
     });
-    // No necesitas borrar localStorage ni cookies aquí,
-    // el backend se encarga de limpiar las cookies HttpOnly.
   }
 
   // Storage endpoints
   async uploadSignature(file: File): Promise<{ key: string }> {
     const formData = new FormData();
     formData.append("file", file);
-
-    const token = localStorage.getItem("authToken");
 
     const response = await fetch(
       `${this.baseURL}/api/v1/storage/upload?type=FIRMA_DIGITAL`,

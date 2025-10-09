@@ -46,14 +46,11 @@ export default function RegisterPage() {
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, loading, error, user, initialized } = useAppSelector((state) => state.auth);
+  const { loading, error } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (initialized && isAuthenticated && user) {
-      const roleRoute = AuthService.getRoleForRouting(user.role);
-      router.replace(`/${roleRoute}`);
-    }
-  }, [isAuthenticated, user, router, initialized]);
+    dispatch(clearError());
+  }, [dispatch]);
 
   const handleInputChange = (
     field: keyof RegisterDto,
@@ -119,7 +116,11 @@ export default function RegisterPage() {
     if (!validateForm()) return;
 
     try {
-      await dispatch(registerThunk(formData)).unwrap();
+      const action = await dispatch(registerThunk(formData)).unwrap();
+      if (action.user) {
+        const roleRoute = AuthService.getRoleForRouting(action.user.role);
+        router.replace(`/${roleRoute}`);
+      }
     } catch (error) {
       console.error("Register error:", error);
     }

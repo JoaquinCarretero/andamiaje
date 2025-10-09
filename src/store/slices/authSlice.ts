@@ -25,10 +25,29 @@ export const loginThunk = createAsyncThunk(
   async (loginDto: LoginDto, { rejectWithValue }) => {
     try {
       const user = await apiClient.login(loginDto)
-      AuthService.setUser(user)
-      return { user }
+      if (user) {
+        AuthService.setUser(user)
+        return { user }
+      }
+      return rejectWithValue('No se pudo obtener información del usuario')
     } catch (error: any) {
       return rejectWithValue(error.message || 'Error de autenticación')
+    }
+  },
+)
+
+export const registerThunk = createAsyncThunk(
+  'auth/register',
+  async (registerDto: any, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.register(registerDto)
+      if (response && response.user) {
+        AuthService.setUser(response.user)
+        return { user: response.user }
+      }
+      return rejectWithValue('Respuesta de registro inválida')
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Error en el registro')
     }
   },
 )
@@ -79,6 +98,23 @@ const authSlice = createSlice({
         state.user = action.payload.user
       })
       .addCase(loginThunk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload as string
+        state.user = null
+        state.isAuthenticated = false
+      })
+      // Register
+      .addCase(registerThunk.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(registerThunk.fulfilled, (state, action) => {
+        state.loading = false
+        state.isAuthenticated = true
+        state.user = action.payload.user
+        state.initialized = true
+      })
+      .addCase(registerThunk.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload as string
         state.user = null

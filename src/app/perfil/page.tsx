@@ -15,8 +15,7 @@ import { AuthService } from "@/lib/auth"
 import { UserI } from "@/types/auth"
 import { apiClient } from "@/lib/api"
 import { useAppDispatch, useAppSelector } from "@/store"
-import { logout } from "@/store/slices/authSlice"
-import { getProfileThunk } from "@/store/slices/authSlice"
+import { logoutThunk, checkAuthThunk } from "@/store/slices/authSlice"
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -48,8 +47,8 @@ export default function ProfilePage() {
     if (!user) return
 
     try {
-      const updatedUser = await apiClient.updateUserProfile(user.id, updatedData)
-      await dispatch(getProfileThunk()).unwrap()
+      await apiClient.updateUserProfile(user.id, updatedData)
+      await dispatch(checkAuthThunk()).unwrap()
     } catch (error) {
       console.error('Error updating profile:', error)
     }
@@ -61,8 +60,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      await apiClient.logout()
-      dispatch(logout())
+      await dispatch(logoutThunk()).unwrap()
       localStorage.removeItem('authUser')
       router.push('/login')
     } catch (error) {

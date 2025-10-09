@@ -17,10 +17,8 @@ export class AuthService {
     const userStr = localStorage.getItem(this.USER_KEY)
     if (!userStr || userStr === 'undefined') return null
     try {
-      console.log("🚀 ~ AuthService ~ getUser ~ JSON.parse(userStr):", JSON.parse(userStr))
       return JSON.parse(userStr)
     } catch (error) {
-      console.error('Error parsing user from localStorage:', error)
       return null
     }
   }
@@ -29,7 +27,6 @@ export class AuthService {
   static async isAuthenticated(): Promise<boolean> {
     try {
       const user = await this.getCurrentUser()
-      console.log("🚀 ~ AuthService ~ isAuthenticated ~ user:", user)
       return !!user
     } catch {
       return false
@@ -39,16 +36,10 @@ export class AuthService {
   // Obtener usuario actualizado del servidor
   static async getCurrentUser(): Promise<UserI | null> {
     try {
-      // El apiClient ya enviará cookies con credentials: 'include'
       const user = await apiClient.getProfile()
       if (user) this.setUser(user)
       return user
     } catch (error: any) {
-      // Modificación: Solo registrar en consola si el error NO es el esperado "sin acceso autorizado".
-      // Esto evita llenar la consola con errores esperados durante la carga inicial.
-      if (error?.message?.toLowerCase() !== 'sin acceso autorizado') {
-        console.error('Error getting current user:', error)
-      }
       return this.getUser()
     }
   }
