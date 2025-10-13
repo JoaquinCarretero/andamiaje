@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 import { Inter, Poppins, Playfair_Display } from "next/font/google"
 import colors from "@/lib/colors"
 import { ReduxProvider } from "@/store/provider"
-import { AuthInitializer } from "@/components/auth/AuthInitializer"
+import { AuthInitializer } from "@/features/auth"
 import "./globals.css"
 
 const inter = Inter({

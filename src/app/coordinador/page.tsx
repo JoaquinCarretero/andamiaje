@@ -1,11 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { DashboardLayout } from "@/components/shared/dashboard-layout"
-import { FamilyTracking } from "@/components/coordinator/family-tracking"
-import { CompanionTracking } from "@/components/coordinator/companion-tracking"
+import { DashboardLayout } from "@/features/dashboard"
+import { FamilyTracking, CompanionTracking } from "@/features/tracking"
 import { UserRole } from "@/types/auth"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { ProtectedRoute } from "@/features/auth"
 import { useAppSelector } from "@/store"
 
 export default function CoordinadorPage() {

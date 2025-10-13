@@ -1,8 +1,8 @@
 "use client"
 
-import { DirectorDashboard } from "@/components/director/director-dashboard"
+import { DirectorDashboard } from "@/features/dashboard"
 import { UserRole } from "@/types/auth"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { ProtectedRoute } from "@/features/auth"
 import { useAppSelector } from "@/store"
 
 export default function DirectorPage() {

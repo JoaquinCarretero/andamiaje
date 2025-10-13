@@ -1,49 +1,12 @@
 import { UserI, UserRole } from '@/types/auth'
-import { apiClient } from './api'
 
+/**
+ * AuthService - Utilidades para manejo de información de usuario
+ * 
+ * NOTA: Este servicio solo contiene funciones de utilidad para formateo y presentación.
+ * El estado de autenticación se maneja exclusivamente con Redux.
+ */
 export class AuthService {
-  private static readonly USER_KEY = 'authUser'
-
-  // Guardar usuario en localStorage (opcional)
-  static setUser(user: UserI): void {
-    if (user) {
-      localStorage.setItem(this.USER_KEY, JSON.stringify(user))
-    }
-  }
-
-  // Obtener usuario del localStorage
-  static getUser(): UserI | null {
-    if (typeof window === 'undefined') return null
-    const userStr = localStorage.getItem(this.USER_KEY)
-    if (!userStr || userStr === 'undefined') return null
-    try {
-      return JSON.parse(userStr)
-    } catch (error) {
-      return null
-    }
-  }
-
-  // Verificar si hay sesión activa consultando el usuario
-  static async isAuthenticated(): Promise<boolean> {
-    try {
-      const user = await this.getCurrentUser()
-      return !!user
-    } catch {
-      return false
-    }
-  }
-  
-  // Obtener usuario actualizado del servidor
-  static async getCurrentUser(): Promise<UserI | null> {
-    try {
-      const user = await apiClient.getProfile()
-      if (user) this.setUser(user)
-      return user
-    } catch (error: any) {
-      return this.getUser()
-    }
-  }
-
   // Nombre completo
   static getFullName(user?: UserI | null): string {
     if (!user) return 'Usuario'

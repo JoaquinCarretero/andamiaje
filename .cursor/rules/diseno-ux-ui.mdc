@@ -1,0 +1,103 @@
+---
+alwaysApply: true
+---
+
+## ⚙️ Stack y herramientas de diseño
+
+- **Lenguaje:** TypeScript
+- **Framework:** Next.js (App Router)
+- **Estilos:** TailwindCSS
+- **UI Components:** shadcn/ui
+- **Iconos:** lucide-react
+- **Animaciones:** framer-motion
+- **Formularios:** react-hook-form + zod
+- **Charts:** recharts (cuando se requiera)
+
+---
+
+## 🎨 Guía de diseño y estilo visual
+
+- Diseño minimalista, limpio, profesional.
+- Paleta suave con tonos azul/gris/blanco (evitar saturación).
+- Tipografía base: `Inter`, tamaños entre `16–18px`.
+- Bordes redondeados (`rounded-2xl`), sombras suaves (`shadow-md`).
+- Espaciado generoso (`p-4` mínimo entre secciones).
+- Colores de acento: azul para acciones principales, verde para éxito, rojo para error.
+- Componentes siempre **mobile-first** y **responsivos**.
+
+---
+
+## 🪄 Principios de UX
+
+1. **Claridad ante todo:**  
+   Cada vista debe comunicar una sola tarea o acción principal.
+
+2. **Feedback inmediato:**
+
+   - Mostrar loaders, toasts, o microinteracciones en acciones importantes.
+   - Indicar visualmente éxito o error.
+
+3. **Reducción de carga cognitiva:**
+
+   - Formularios simples, guiados, y con labels claros.
+   - Agrupar campos por contexto.
+
+4. **Accesibilidad:**
+
+   - Asegurarse de que todos los inputs tengan `aria-label` o `label` visible.
+   - Colores con suficiente contraste.
+   - Estados de foco visibles.
+
+5. **Coherencia visual:**
+   - Reutilizar componentes UI.
+   - Evitar duplicar estilos inline.
+   - Centralizar patrones comunes (botones, cards, modales).
+
+---
+
+## 🧩 Buenas prácticas de código
+
+- Usar **componentes funcionales** con tipado explícito.
+- Evitar lógica de negocio dentro de componentes visuales.
+- Crear hooks personalizados (`useXyz`) para manejar estado o side effects.
+- Usar `react-query` o `tanstack-query` para manejo de datos asíncronos.
+- Validar formularios con **zod** y mostrar mensajes de error claros.
+- Escribir código declarativo, limpio y semántico.
+- Nombrar componentes según su propósito (`FormReviewCard`, `UserSignatureUploader`).
+- Dividir vistas grandes en secciones lógicas (`Header`, `Body`, `Actions`).
+
+---
+
+## 🧠 Cómo responder o modificar código
+
+Al realizar cambios en componentes, seguilos siempre con esta intención:
+
+- Si pedís una mejora visual → mantené funcionalidad intacta.
+- Si pedís refactor → priorizá simplicidad y coherencia.
+- Si el componente carece de feedback → agregá microinteracciones sutiles.
+- Si hay estilos inconsistentes → unificá con las clases de Tailwind y componentes de shadcn/ui.
+- Si un flujo es confuso → proponé alternativas UX claras.
+
+---
+
+## 💬 Ejemplos de instrucciones que deberías interpretar
+
+> “Hacé este formulario más moderno y legible.”  
+> → Usar shadcn/ui + Tailwind, mejorar jerarquía visual y validaciones.
+
+> “Agregá feedback visual al enviar el formulario.”  
+> → Implementar spinner + toast de confirmación + deshabilitar botón mientras envía.
+
+> “Unificá estilos de botones en toda la app.”  
+> → Crear componente `AppButton` reutilizable en `/components/ui`.
+
+> “Simplificá este layout para mobile.”  
+> → Ajustar grid/flex, ocultar columnas, mantener coherencia visual.
+
+---
+
+## ✅ En resumen
+
+**Tu misión:**  
+Mantener y mejorar la calidad visual, la coherencia de diseño y la experiencia de usuario de toda la interfaz de Andamiaje,  
+siguiendo las prácticas modernas de UX y código limpio.

@@ -1,468 +1,933 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { CreditCard as Edit, ArrowLeft, Key, LogOut, Briefcase, Award, User } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Navbar } from "@/components/shared/navbar"
-import { ProfileEditModal } from "@/components/ui/profile-edit-modal"
-import { useSignature } from "@/lib/signature-storage"
-import colors from "@/lib/colors"
-import { Label } from "@/components/ui/label"
-import { AuthService } from "@/lib/auth"
-import { UserI } from "@/types/auth"
-import { apiClient } from "@/lib/api"
-import { useAppDispatch, useAppSelector } from "@/store"
-import { logoutThunk, checkAuthThunk } from "@/store/slices/authSlice"
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  User,
+  Mail,
+  Phone,
+  Shield,
+  Calendar,
+  GraduationCap,
+  Briefcase,
+  Award,
+  Key,
+  LogOut,
+  Edit3,
+  Save,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Home,
+  ArrowLeft,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+  Label,
+  Input,
+  Textarea,
+  Breadcrumbs,
+  ConfirmationDialog,
+} from "@/ui";
+import { Navbar } from "@/shared";
+import { useSignature, StoredSignature } from "@/lib/signature-storage";
+import colors from "@/lib/colors";
+import { AuthService } from "@/lib/auth";
+import { apiClient } from "@/lib/api";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { logoutThunk, checkAuthThunk } from "@/features/auth";
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const { getSignature } = useSignature()
-  const [showEditModal, setShowEditModal] = useState(false)
-  const dispatch = useAppDispatch()
-  const { user, isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth)
-  const [signatureUrl, setSignatureUrl] = useState<string | null>(null)
-  const [localSignature, setLocalSignature] = useState<any>(null)
+  const router = useRouter();
+  const { getSignature } = useSignature();
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth);
 
+  // Estados
+  const [isEditing, setIsEditing] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
+  const [localSignature, setLocalSignature] = useState<StoredSignature | null>(null);
+  const [signatureError, setSignatureError] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Form data
+  const [formData, setFormData] = useState({
+    phone: "",
+    bio: "",
+    specialty: "",
+    license: "",
+    experience: "",
+  });
+
+  // Memoizar la key de la firma del servidor
+  const serverSignatureKey = useMemo(() => {
+    return user?.digitalSignature || user?.signatureKey || null;
+  }, [user?.digitalSignature, user?.signatureKey]);
+
+  // Memoizar la carga de la firma local
+  const loadLocalSignature = useCallback(() => {
+    const sig = getSignature();
+    setLocalSignature(sig);
+  }, [getSignature]);
+
+  // Cargar datos del usuario
   useEffect(() => {
-    if (!initialized) return
+    if (!initialized) return;
 
     if (!isAuthenticated || !user) {
-      router.push('/login')
-      return
+      router.push("/login");
+      return;
     }
 
-    if (user.signatureKey) {
-      const url = apiClient.getDownloadUrl(user.signatureKey)
-      setSignatureUrl(url)
+    // Cargar firma del servidor
+    if (serverSignatureKey && !signatureUrl) {
+      const fetchSignedUrl = async () => {
+        try {
+          const url = await apiClient.fetchSignedUrl(serverSignatureKey);
+          setSignatureUrl(url);
+          setSignatureError(false);
+        } catch (error) {
+          console.error("Error obteniendo URL firmada:", error);
+          setSignatureError(true);
+          loadLocalSignature();
+        }
+      };
+      fetchSignedUrl();
+    } else if (!serverSignatureKey && !localSignature) {
+      loadLocalSignature();
     }
 
-    const sig = getSignature()
-    setLocalSignature(sig)
-  }, [initialized, isAuthenticated, user, router, getSignature])
+    // Cargar datos del formulario
+    setFormData({
+      phone: user.phone || "",
+      bio: user.bio || "",
+      specialty: user.specialty || "",
+      license: user.license || "",
+      experience: user.experience || "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialized, isAuthenticated, serverSignatureKey, router]);
 
-  const handleSaveProfile = async (updatedData: Partial<UserI>) => {
-    if (!user) return
+  const handleSave = async () => {
+    if (!user) return;
 
+    setIsSaving(true);
     try {
-      await apiClient.updateUserProfile(user.id, updatedData)
-      await dispatch(checkAuthThunk()).unwrap()
+      await apiClient.updateUserProfile(user.id, formData);
+      await dispatch(checkAuthThunk()).unwrap();
+      setIsEditing(false);
     } catch (error) {
-      console.error('Error updating profile:', error)
+      console.error("Error updating profile:", error);
+    } finally {
+      setIsSaving(false);
     }
-  }
+  };
 
-  const handleChangePassword = () => {
-    router.push('/cambiar-contrasena')
-  }
+  const handleCancel = () => {
+    if (user) {
+      setFormData({
+        phone: user.phone || "",
+        bio: user.bio || "",
+        specialty: user.specialty || "",
+        license: user.license || "",
+        experience: user.experience || "",
+      });
+    }
+    setIsEditing(false);
+  };
 
   const handleLogout = async () => {
+    setShowLogoutDialog(false);
     try {
-      await dispatch(logoutThunk()).unwrap()
-      localStorage.removeItem('authUser')
-      router.push('/login')
+      await dispatch(logoutThunk()).unwrap();
+      router.push("/login");
     } catch (error) {
-      console.error("Error al cerrar sesión:", error)
+      console.error("Error al cerrar sesión:", error);
     }
-  }
-
+  };
 
   const getRoleColor = (role: string) => {
     const roleMap: Record<string, { bg: string; text: string; border: string }> = {
-      'TERAPEUTA': { bg: colors.primary[50], text: colors.primary[600], border: colors.primary[200] },
-      'COORDINADOR': { bg: colors.secondary[50], text: colors.secondary[600], border: colors.secondary[200] },
-      'ACOMPANANTE': { bg: colors.accent[50], text: colors.accent[600], border: colors.accent[200] }
-    }
-    return roleMap[role] || { bg: colors.neutral[50], text: colors.neutral[600], border: colors.neutral[200] }
-  }
+      TERAPEUTA: { bg: colors.primary[50], text: colors.primary[600], border: colors.primary[200] },
+      COORDINADOR: {
+        bg: colors.secondary[50],
+        text: colors.secondary[600],
+        border: colors.secondary[200],
+      },
+      ACOMPANANTE: { bg: colors.accent[50], text: colors.accent[600], border: colors.accent[200] },
+    };
+    return (
+      roleMap[role] || {
+        bg: colors.neutral[50],
+        text: colors.neutral[600],
+        border: colors.neutral[200],
+      }
+    );
+  };
 
   if (!initialized || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: colors.background }}
+      >
+        <div
+          className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
+          style={{ borderColor: colors.primary[500] }}
+        />
       </div>
-    )
+    );
   }
 
   if (!user || !isAuthenticated) {
-    return null
+    return null;
   }
 
-  const fullName = AuthService.getFullName(user)
-  const roleTitle = AuthService.getRoleTitle(user.role)
-  const roleColors = getRoleColor(user.role)
+  const fullName = AuthService.getFullName(user);
+  const roleTitle = AuthService.getRoleTitle(user.role);
+  const roleColors = getRoleColor(user.role);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
-      <Navbar userData={user} />
-      
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => router.back()}
-            className="w-fit rounded-lg transition-all duration-200 hover:shadow-sm"
-            style={{ 
-              color: colors.textSecondary,
-              backgroundColor: colors.neutral[50]
-            }}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver
-          </Button>
-          
-          <h1 className="font-display text-3xl lg:text-4xl font-bold" style={{ color: colors.text }}>
-            Mi Perfil
-          </h1>
-        </div>
+      <Navbar />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Información Principal */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        {/* Breadcrumbs */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-6"
+        >
+          <Breadcrumbs
+            items={[
+              { label: "Inicio", href: "/", icon: Home },
+              { label: "Mi Perfil", current: true },
+            ]}
+          />
+        </motion.div>
+
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
+                style={{
+                  color: colors.textMuted,
+                  backgroundColor: colors.surface,
+                  border: `1px solid ${colors.border}`,
+                }}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+              <div>
+                <h1
+                  className="font-display text-3xl lg:text-4xl font-bold mb-2"
+                  style={{ color: colors.text }}
+                >
+                  Mi Perfil
+                </h1>
+                <p className="text-base" style={{ color: colors.textMuted }}>
+                  Administra tu información personal y profesional
+                </p>
+              </div>
+            </div>
+
+            {!isEditing && (
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => router.push("/cambiar-contrasena")}
+                  variant="outline"
+                  className="rounded-xl h-11 transition-all duration-200 hover:shadow-md"
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.text,
+                  }}
+                >
+                  <Key className="h-4 w-4 mr-2" />
+                  Cambiar Contraseña
+                </Button>
+                <Button
+                  onClick={() => setShowLogoutDialog(true)}
+                  variant="outline"
+                  className="rounded-xl h-11 transition-all duration-200 hover:shadow-md"
+                  style={{
+                    borderColor: colors.error[300],
+                    color: colors.error[600],
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Cerrar Sesión
+                </Button>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Columna Principal */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Datos Personales */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" style={{ color: colors.primary[500] }} />
-                    <span style={{ color: colors.text }}>Información Personal</span>
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowEditModal(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Editar
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Nombre Completo</Label>
-                    <div
-                      className="h-11 px-3 py-2 rounded-md border flex items-center"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    >
-                      {fullName}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Email</Label>
-                    <div
-                      className="h-11 px-3 py-2 rounded-md border flex items-center"
-                      style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
-                      }}
-                    >
-                      {user.email}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Teléfono</Label>
-                    {user.phone ? (
+            {/* Información Personal */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card
+                className="shadow-md border-0 rounded-2xl"
+                style={{ backgroundColor: colors.surface }}
+              >
+                <CardHeader className="pb-4 border-b" style={{ borderColor: colors.border }}>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-3">
                       <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        className="p-2 rounded-xl"
+                        style={{ backgroundColor: colors.primary[50] }}
+                      >
+                        <User className="h-5 w-5" style={{ color: colors.primary[500] }} />
+                      </div>
+                      <span className="text-lg font-semibold" style={{ color: colors.text }}>
+                        Información Personal
+                      </span>
+                    </CardTitle>
+                    {!isEditing && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                        className="rounded-xl hover:shadow-md transition-all duration-200"
                         style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
+                          borderColor: colors.primary[200],
+                          color: colors.primary[600],
                         }}
                       >
-                        {user.phone}
-                      </div>
-                    ) : (
+                        <Edit3 className="h-4 w-4 mr-2" />
+                        Editar
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Nombre */}
+                    <div className="space-y-2">
+                      <Label
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <User className="h-4 w-4" />
+                        Nombre Completo
+                      </Label>
                       <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
                         style={{
                           backgroundColor: colors.neutral[50],
                           borderColor: colors.border,
-                          color: colors.textMuted
+                          color: colors.text,
                         }}
                       >
-                        <span className="text-sm">No especificado</span>
+                        <span className="font-medium">{fullName}</span>
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="space-y-2">
+                      <Label
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Mail className="h-4 w-4" />
+                        Correo Electrónico
+                      </Label>
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.text,
+                        }}
+                      >
+                        <span className="font-medium">{user.email}</span>
+                      </div>
+                    </div>
+
+                    {/* Teléfono */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="phone"
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Phone className="h-4 w-4" />
+                        Teléfono
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="phone"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          placeholder="Ingrese su teléfono"
+                          className="h-12 rounded-xl"
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: colors.primary[200],
+                            color: colors.text,
+                          }}
+                        />
+                      ) : (
+                        <div
+                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                          style={{
+                            backgroundColor: user.phone ? colors.success[50] : colors.warning[50],
+                            borderColor: user.phone ? colors.success[200] : colors.warning[200],
+                            color: colors.text,
+                          }}
+                        >
+                          {user.phone ? (
+                            <>
+                              <CheckCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.success[600] }}
+                              />
+                              <span className="font-medium">{user.phone}</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.warning[600] }}
+                              />
+                              <span
+                                className="text-sm font-medium"
+                                style={{ color: colors.warning[700] }}
+                              >
+                                No especificado
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Rol */}
+                    <div className="space-y-2">
+                      <Label
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Shield className="h-4 w-4" />
+                        Rol Profesional
+                      </Label>
+                      <div className="h-12 flex items-center">
+                        <Badge
+                          className="px-4 py-2 text-sm font-semibold rounded-xl shadow-sm"
+                          style={{
+                            backgroundColor: roleColors.bg,
+                            color: roleColors.text,
+                            border: `2px solid ${roleColors.border}`,
+                          }}
+                        >
+                          {roleTitle}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Información Profesional */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card
+                className="shadow-md border-0 rounded-2xl"
+                style={{ backgroundColor: colors.surface }}
+              >
+                <CardHeader className="pb-4 border-b" style={{ borderColor: colors.border }}>
+                  <CardTitle className="flex items-center gap-3">
+                    <div
+                      className="p-2 rounded-xl"
+                      style={{ backgroundColor: colors.secondary[50] }}
+                    >
+                      <Briefcase className="h-5 w-5" style={{ color: colors.secondary[500] }} />
+                    </div>
+                    <span className="text-lg font-semibold" style={{ color: colors.text }}>
+                      Información Profesional
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Especialidad */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="specialty"
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <GraduationCap className="h-4 w-4" />
+                        Especialidad
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="specialty"
+                          value={formData.specialty}
+                          onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
+                          placeholder="Ej: Terapia Ocupacional"
+                          className="h-12 rounded-xl"
+                        />
+                      ) : (
+                        <div
+                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                          style={{
+                            backgroundColor: user.specialty
+                              ? colors.success[50]
+                              : colors.warning[50],
+                            borderColor: user.specialty ? colors.success[200] : colors.warning[200],
+                            color: colors.text,
+                          }}
+                        >
+                          {user.specialty ? (
+                            <>
+                              <CheckCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.success[600] }}
+                              />
+                              <span className="font-medium">{user.specialty}</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.warning[600] }}
+                              />
+                              <span
+                                className="text-sm font-medium"
+                                style={{ color: colors.warning[700] }}
+                              >
+                                No especificada
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Matrícula */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="license"
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Award className="h-4 w-4" />
+                        Matrícula Profesional
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="license"
+                          value={formData.license}
+                          onChange={(e) => setFormData({ ...formData, license: e.target.value })}
+                          placeholder="Ej: MP 12345"
+                          className="h-12 rounded-xl"
+                        />
+                      ) : (
+                        <div
+                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                          style={{
+                            backgroundColor: user.license ? colors.success[50] : colors.warning[50],
+                            borderColor: user.license ? colors.success[200] : colors.warning[200],
+                            color: colors.text,
+                          }}
+                        >
+                          {user.license ? (
+                            <>
+                              <CheckCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.success[600] }}
+                              />
+                              <span className="font-medium">{user.license}</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.warning[600] }}
+                              />
+                              <span
+                                className="text-sm font-medium"
+                                style={{ color: colors.warning[700] }}
+                              >
+                                No especificada
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Fecha de Ingreso */}
+                    <div className="space-y-2">
+                      <Label
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Calendar className="h-4 w-4" />
+                        Fecha de Ingreso
+                      </Label>
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: colors.primary[50],
+                          borderColor: colors.primary[200],
+                          color: colors.text,
+                        }}
+                      >
+                        <Calendar className="h-4 w-4 mr-2" style={{ color: colors.primary[600] }} />
+                        <span className="font-medium">
+                          {user.joinDate
+                            ? new Date(user.joinDate).toLocaleDateString("es-AR")
+                            : new Date(user.createdAt).toLocaleDateString("es-AR")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Experiencia */}
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="experience"
+                        className="flex items-center gap-2 text-sm font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        <Briefcase className="h-4 w-4" />
+                        Años de Experiencia
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="experience"
+                          value={formData.experience}
+                          onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                          placeholder="Ej: 5 años"
+                          className="h-12 rounded-xl"
+                        />
+                      ) : (
+                        <div
+                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                          style={{
+                            backgroundColor: user.experience
+                              ? colors.success[50]
+                              : colors.warning[50],
+                            borderColor: user.experience
+                              ? colors.success[200]
+                              : colors.warning[200],
+                            color: colors.text,
+                          }}
+                        >
+                          {user.experience ? (
+                            <>
+                              <CheckCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.success[600] }}
+                              />
+                              <span className="font-medium">{user.experience}</span>
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle
+                                className="h-4 w-4 mr-2"
+                                style={{ color: colors.warning[600] }}
+                              />
+                              <span
+                                className="text-sm font-medium"
+                                style={{ color: colors.warning[700] }}
+                              >
+                                No especificada
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Biografía */}
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="bio"
+                      className="flex items-center gap-2 text-sm font-medium"
+                      style={{ color: colors.text }}
+                    >
+                      <GraduationCap className="h-4 w-4" />
+                      Biografía Profesional
+                    </Label>
+                    {isEditing ? (
+                      <Textarea
+                        id="bio"
+                        value={formData.bio}
+                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                        placeholder="Describa su experiencia, especialidades y enfoque profesional..."
+                        className="min-h-[120px] rounded-xl resize-none"
+                      />
+                    ) : (
+                      <div
+                        className="min-h-[100px] p-4 rounded-xl border-2"
+                        style={{
+                          backgroundColor: colors.neutral[50],
+                          borderColor: colors.border,
+                          color: colors.text,
+                        }}
+                      >
+                        {user.bio ? (
+                          <p className="leading-relaxed">{user.bio}</p>
+                        ) : (
+                          <div className="text-center py-6">
+                            <GraduationCap className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                            <p className="text-sm font-medium" style={{ color: colors.textMuted }}>
+                              No especificada
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Rol</Label>
-                    <div className="flex items-center gap-2 h-11">
-                      <Badge
-                        className="px-3 py-2 text-sm font-medium"
+
+                  {/* Botones de Edición */}
+                  {isEditing && (
+                    <div
+                      className="flex justify-end gap-3 pt-4 border-t"
+                      style={{ borderColor: colors.border }}
+                    >
+                      <Button
+                        onClick={handleCancel}
+                        variant="outline"
+                        className="rounded-xl h-11"
                         style={{
-                          backgroundColor: roleColors.bg,
-                          color: roleColors.text,
-                          border: `1px solid ${roleColors.border}`
+                          borderColor: colors.border,
+                          color: colors.textSecondary,
                         }}
                       >
-                        {roleTitle}
-                      </Badge>
+                        <X className="h-4 w-4 mr-2" />
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="rounded-xl h-11"
+                        style={{
+                          backgroundColor: colors.primary[500],
+                          color: colors.surface,
+                        }}
+                      >
+                        {isSaving ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                            Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Guardar Cambios
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  </div>
-                </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
 
-                <div className="space-y-2">
-                  <Label style={{ color: colors.text }}>Biografía Profesional</Label>
-                  {false ? ( // Temporalmente deshabilitado hasta que el backend soporte bio
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Avatar */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <Card
+                className="shadow-md border-0 rounded-2xl"
+                style={{ backgroundColor: colors.surface }}
+              >
+                <CardContent className="p-8 text-center">
+                  <motion.div
+                    className="w-32 h-32 rounded-2xl mx-auto mb-6 flex items-center justify-center relative overflow-hidden"
+                    style={{ backgroundColor: roleColors.bg }}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <div
-                      className="min-h-[100px] p-3 rounded-md border"
+                      className="absolute inset-0 opacity-10"
+                      style={{ backgroundColor: roleColors.text }}
+                    />
+                    <User className="h-16 w-16 relative z-10" style={{ color: roleColors.text }} />
+                  </motion.div>
+
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold mb-2" style={{ color: colors.text }}>
+                      {fullName}
+                    </h2>
+                    <Badge
+                      className="px-4 py-2 text-sm font-semibold rounded-xl shadow-sm"
                       style={{
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                        color: colors.text
+                        backgroundColor: roleColors.bg,
+                        color: roleColors.text,
+                        border: `2px solid ${roleColors.border}`,
                       }}
                     >
-                      {/* {user.bio} */}
+                      {roleTitle}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Firma Digital */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <Card
+                className="shadow-md border-0 rounded-2xl"
+                style={{ backgroundColor: colors.surface }}
+              >
+                <CardHeader className="pb-4 border-b" style={{ borderColor: colors.border }}>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl" style={{ backgroundColor: colors.accent[50] }}>
+                      <Award className="h-5 w-5" style={{ color: colors.accent[500] }} />
+                    </div>
+                    <span className="text-lg font-semibold" style={{ color: colors.text }}>
+                      Firma Digital
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  {(signatureUrl && !signatureError) || localSignature?.signature ? (
+                    <div className="space-y-4">
+                      <div
+                        className="p-6 rounded-xl border-2 transition-all duration-200 hover:shadow-md"
+                        style={{
+                          backgroundColor: colors.success[50],
+                          borderColor: colors.success[200],
+                        }}
+                      >
+                        <div className="flex items-center justify-center mb-4">
+                          <div className="relative">
+                            <CheckCircle
+                              className="absolute -top-2 -right-2 h-6 w-6 z-10"
+                              style={{ color: colors.success[600] }}
+                            />
+                            {signatureUrl && !signatureError ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={signatureUrl}
+                                alt="Firma digital"
+                                className="max-h-20 max-w-full object-contain border rounded-lg shadow-sm"
+                                style={{ backgroundColor: colors.surface }}
+                                onError={() => {
+                                  console.error("Error cargando firma, usando fallback local");
+                                  setSignatureError(true);
+                                  loadLocalSignature();
+                                }}
+                              />
+                            ) : localSignature?.signature ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={localSignature.signature}
+                                alt="Firma digital"
+                                className="max-h-20 max-w-full object-contain border rounded-lg shadow-sm"
+                                style={{ backgroundColor: colors.surface }}
+                              />
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <p className="font-semibold mb-1" style={{ color: colors.text }}>
+                            {fullName}
+                          </p>
+                          <p
+                            className="text-sm flex items-center justify-center gap-1"
+                            style={{ color: colors.textMuted }}
+                          >
+                            <Calendar className="h-3 w-3" />
+                            Registrada el{" "}
+                            {user.updatedAt
+                              ? new Date(user.updatedAt).toLocaleDateString("es-AR")
+                              : "Fecha no disponible"}
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        className="p-3 rounded-lg"
+                        style={{ backgroundColor: colors.success[50] }}
+                      >
+                        <p
+                          className="text-xs text-center flex items-center justify-center gap-1"
+                          style={{ color: colors.success[700] }}
+                        >
+                          <Shield className="h-3 w-3" />
+                          Firma registrada con validez legal
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <div
-                      className="min-h-[100px] p-3 rounded-md border flex items-center justify-center"
+                      className="p-6 rounded-xl border-2 text-center"
                       style={{
-                        backgroundColor: colors.neutral[50],
-                        borderColor: colors.border,
-                        color: colors.textMuted
+                        backgroundColor: colors.warning[50],
+                        borderColor: colors.warning[200],
                       }}
                     >
-                      <span className="text-sm">No especificada - Puede agregar su biografía profesional</span>
+                      <AlertCircle
+                        className="h-8 w-8 mx-auto mb-3"
+                        style={{ color: colors.warning[600] }}
+                      />
+                      <p className="font-semibold mb-2" style={{ color: colors.warning[700] }}>
+                        Firma Digital No Registrada
+                      </p>
+                      <p className="text-sm" style={{ color: colors.warning[600] }}>
+                        Debe registrar su firma digital para validar documentos oficiales.
+                      </p>
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Información Profesional */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Briefcase className="h-5 w-5" style={{ color: colors.secondary[500] }} />
-                  <span style={{ color: colors.text }}>Información Profesional</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Especialidad</Label>
-                    {user.specialty ? (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
-                        }}
-                      >
-                        {user.specialty}
-                      </div>
-                    ) : (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.neutral[50],
-                          borderColor: colors.border,
-                          color: colors.textMuted
-                        }}
-                      >
-                        <span className="text-sm">No especificada</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Matrícula</Label>
-                    {user.license ? (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
-                        }}
-                      >
-                        {user.license}
-                      </div>
-                    ) : (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.neutral[50],
-                          borderColor: colors.border,
-                          color: colors.textMuted
-                        }}
-                      >
-                        <span className="text-sm">No especificada</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Fecha de Ingreso</Label>
-                    <div
-                      className="h-11 px-3 py-2 rounded-md border flex items-center"
-                      style={{
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                        color: colors.text
-                      }}
-                    >
-                      {user.joinDate
-                        ? new Date(user.joinDate).toLocaleDateString('es-AR')
-                        : new Date(user.createdAt).toLocaleDateString('es-AR')}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label style={{ color: colors.text }}>Experiencia</Label>
-                    {user.experience ? (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.surface,
-                          borderColor: colors.border,
-                          color: colors.text
-                        }}
-                      >
-                        {user.experience}
-                      </div>
-                    ) : (
-                      <div
-                        className="h-11 px-3 py-2 rounded-md border flex items-center"
-                        style={{
-                          backgroundColor: colors.neutral[50],
-                          borderColor: colors.border,
-                          color: colors.textMuted
-                        }}
-                      >
-                        <span className="text-sm">No especificada</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Panel Lateral */}
-          <div className="space-y-6">
-            {/* Avatar y Acciones Principales */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardContent className="p-6 text-center">
-                <div 
-                  className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: roleColors.bg }}
-                >
-                  <User className="h-12 w-12" style={{ color: roleColors.text }} />
-                </div>
-                <h2 className="text-xl font-bold mb-1" style={{ color: colors.text }}>
-                  {fullName}
-                </h2>
-                <p className="text-sm mb-4" style={{ color: colors.textMuted }}>
-                  {roleTitle}
-                </p>
-                
-                <div className="space-y-3">
-                  <Button
-                    onClick={handleChangePassword}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <Key className="h-4 w-4 mr-2" />
-                    Cambiar Contraseña
-                  </Button>
-                  
-                  <Button
-                    onClick={handleLogout}
-                    className="w-full hover:bg-red-50 hover:text-red-600 hover:border-red-300"
-                    variant="outline"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Cerrar Sesión
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Firma Digital */}
-            <Card className="shadow-soft border-0" style={{ backgroundColor: colors.surface }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5" style={{ color: colors.accent[500] }} />
-                  <span style={{ color: colors.text }}>Firma Digital</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {(signatureUrl || localSignature) ? (
-                  <div className="space-y-4">
-                    <div
-                      className="p-6 rounded-lg border-2"
-                      style={{
-                        backgroundColor: colors.success[50],
-                        borderColor: colors.success[500]
-                      }}
-                    >
-                      <div className="flex items-center justify-center mb-4">
-                        <img
-                          src={signatureUrl || localSignature?.signature}
-                          alt="Firma digital"
-                          className="max-h-20 max-w-full object-contain border rounded"
-                          style={{ backgroundColor: colors.surface }}
-                        />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-medium" style={{ color: colors.text }}>
-                          {fullName}
-                        </p>
-                        <p className="text-sm" style={{ color: colors.textMuted }}>
-                          Registrada el {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString('es-AR') : 'Fecha no disponible'}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-center" style={{ color: colors.textMuted }}>
-                      Su firma digital está registrada y tiene validez legal. No puede ser modificada por seguridad.
-                    </p>
-                  </div>
-                ) : (
-                  <div
-                    className="p-6 rounded-lg border-2 text-center"
-                    style={{
-                      backgroundColor: colors.warning[50],
-                      borderColor: colors.warning[500]
-                    }}
-                  >
-                    <p className="font-medium mb-2" style={{ color: colors.text }}>
-                      Firma Digital No Registrada
-                    </p>
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      Debe registrar su firma digital para validar documentos oficiales.
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
         </div>
-
-        {/* Modal de Edición */}
-        <ProfileEditModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          onSave={handleSaveProfile}
-          initialData={{
-            phone: user.phone || "",
-            bio: user.bio || "",
-            specialty: user.specialty || "",
-            license: user.license || "",
-            experience: user.experience || ""
-          }}
-        />
       </main>
+
+      {/* Diálogo de Confirmación para Logout */}
+      <ConfirmationDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutDialog(false)}
+        title="¿Cerrar sesión?"
+        description="Perderás el acceso a tus datos hasta que vuelvas a iniciar sesión."
+        confirmText="Cerrar Sesión"
+        cancelText="Cancelar"
+      />
     </div>
-  )
+  );
 }

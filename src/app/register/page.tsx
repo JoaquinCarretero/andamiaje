@@ -1,122 +1,66 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  Eye,
-  EyeOff,
-  CreditCard,
-  Lock,
-  User,
-  Mail,
-  UserPlus,
-  Sparkles,
-  PenTool,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, CreditCard, Lock, User, Mail, UserPlus, Sparkles } from "lucide-react";
+import { Button, Input, Label, Card, CardContent, CardFooter } from "@/ui";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Image from "next/image";
 import colors from "@/lib/colors";
 import { AuthService } from "@/lib/auth";
-import { RegisterDto, UserRole } from "@/types/auth";
+import { registerSchema, type RegisterFormData } from "@/features/auth";
+import { UserRole } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { registerThunk, clearError } from "@/store/slices/authSlice";
+import { registerThunk, clearError } from "@/features/auth";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState<RegisterDto>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    documentNumber: "",
-    password: "",
-    role: UserRole.TERAPEUTA,
-  });
-  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const { error } = useAppSelector((state) => state.auth);
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      documentNumber: "",
+      password: "",
+      confirmPassword: "",
+      role: UserRole.TERAPEUTA,
+    },
+  });
+
+  // Watch password fields for validation feedback
+  const password = watch("password");
+  const confirmPassword = watch("confirmPassword");
+  const passwordsMatch = password && confirmPassword && password === confirmPassword;
 
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
-  const handleInputChange = (
-    field: keyof RegisterDto,
-    value: string | UserRole
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (localErrors[field]) {
-      setLocalErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-    if (error) {
-      dispatch(clearError());
-    }
-  };
-
-  const handleDniChange = (value: string) => {
-    const numericValue = value.replace(/\D/g, "");
-    handleInputChange("documentNumber", numericValue);
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "El nombre es obligatorio";
-    }
-
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "El apellido es obligatorio";
-    }
-
-    if (!formData.documentNumber.trim()) {
-      newErrors.documentNumber = "El DNI es obligatorio";
-    } else if (
-      formData.documentNumber.length < 7 ||
-      formData.documentNumber.length > 8
-    ) {
-      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "El email es obligatorio";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "El email no es válido";
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = "El teléfono es obligatorio";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "La contraseña es obligatoria";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
-    }
-
-    setLocalErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: RegisterFormData) => {
     try {
-      const action = await dispatch(registerThunk(formData)).unwrap();
+      // confirmPassword solo se usa para validación, el backend espera RegisterDto sin confirmPassword
+      const { firstName, lastName, email, phone, documentNumber, password, role } = data;
+      const action = await dispatch(
+        registerThunk({ firstName, lastName, email, phone, documentNumber, password, role })
+      ).unwrap();
       if (action.user) {
         const roleRoute = AuthService.getRoleForRouting(action.user.role);
         router.replace(`/${roleRoute}`);
@@ -144,7 +88,7 @@ export default function RegisterPage() {
             boxShadow: `0 20px 40px ${colors.shadowLarge}`,
           }}
         >
-          {/* Encabezado reorganizado */}
+          {/* Encabezado */}
           <div className="flex items-center justify-between p-6">
             <motion.div
               initial={{ opacity: 0 }}
@@ -157,6 +101,7 @@ export default function RegisterPage() {
                   src="/LogotipoFinalWEBJPEG.png"
                   alt="Andamiaje Logo"
                   fill
+                  sizes="288px"
                   className="object-contain scale-150"
                 />
               </div>
@@ -167,10 +112,7 @@ export default function RegisterPage() {
                 className="text-3xl font-display font-bold flex items-center justify-end gap-2"
                 style={{ color: colors.text }}
               >
-                <UserPlus
-                  className="h-6 w-6"
-                  style={{ color: colors.secondary[500] }}
-                />
+                <UserPlus className="h-6 w-6" style={{ color: colors.secondary[500] }} />
                 Registro
               </h1>
               <p className="text-base" style={{ color: colors.textMuted }}>
@@ -178,10 +120,11 @@ export default function RegisterPage() {
               </p>
             </div>
           </div>
+
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Layout horizontal optimizado - 3 columnas como en la imagen */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Layout horizontal optimizado - 2 columnas */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Datos Personales */}
                 <div
                   className="p-6 rounded-lg border-l-4 space-y-4"
@@ -190,20 +133,14 @@ export default function RegisterPage() {
                     borderLeftColor: colors.primary[500],
                   }}
                 >
-                  <h3
-                    className="font-medium text-lg"
-                    style={{ color: colors.text }}
-                  >
+                  <h3 className="font-medium text-lg" style={{ color: colors.text }}>
                     Datos Personales
                   </h3>
 
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-2">
-                        <Label
-                          htmlFor="firstName"
-                          style={{ color: colors.text }}
-                        >
+                        <Label htmlFor="firstName" style={{ color: colors.text }}>
                           Nombre *
                         </Label>
                         <div className="relative">
@@ -214,38 +151,24 @@ export default function RegisterPage() {
                           <Input
                             id="firstName"
                             placeholder="Juan"
-                            value={formData.firstName}
-                            onChange={(e) =>
-                              handleInputChange("firstName", e.target.value)
-                            }
-                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              localErrors.firstName ? "border-red-500" : ""
-                            }`}
+                            {...register("firstName")}
+                            className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: localErrors.firstName
-                                ? colors.error[500]
-                                : colors.border,
+                              borderColor: errors.firstName ? colors.error[500] : colors.border,
                               color: colors.text,
                             }}
-                            required
                           />
                         </div>
-                        {localErrors.firstName && (
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[500] }}
-                          >
-                            {localErrors.firstName}
+                        {errors.firstName && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.firstName.message}
                           </p>
                         )}
                       </div>
 
                       <div className="space-y-2">
-                        <Label
-                          htmlFor="lastName"
-                          style={{ color: colors.text }}
-                        >
+                        <Label htmlFor="lastName" style={{ color: colors.text }}>
                           Apellido *
                         </Label>
                         <div className="relative">
@@ -256,29 +179,18 @@ export default function RegisterPage() {
                           <Input
                             id="lastName"
                             placeholder="Pérez"
-                            value={formData.lastName}
-                            onChange={(e) =>
-                              handleInputChange("lastName", e.target.value)
-                            }
-                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              localErrors.lastName ? "border-red-500" : ""
-                            }`}
+                            {...register("lastName")}
+                            className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: localErrors.lastName
-                                ? colors.error[500]
-                                : colors.border,
+                              borderColor: errors.lastName ? colors.error[500] : colors.border,
                               color: colors.text,
                             }}
-                            required
                           />
                         </div>
-                        {localErrors.lastName && (
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[500] }}
-                          >
-                            {localErrors.lastName}
+                        {errors.lastName && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.lastName.message}
                           </p>
                         )}
                       </div>
@@ -289,28 +201,17 @@ export default function RegisterPage() {
                         </Label>
                         <select
                           id="role"
-                          value={formData.role}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "role",
-                              e.target.value as UserRole
-                            )
-                          }
+                          {...register("role")}
                           className="flex h-12 w-full rounded-lg border-2 px-3 py-2 text-sm transition-all duration-200"
                           style={{
                             backgroundColor: colors.surface,
                             borderColor: colors.border,
                             color: colors.text,
                           }}
-                          required
                         >
                           <option value={UserRole.TERAPEUTA}>Terapeuta</option>
-                          <option value={UserRole.ACOMPANANTE}>
-                            Acompañante Externo
-                          </option>
-                          <option value={UserRole.COORDINADOR}>
-                            Coordinador
-                          </option>
+                          <option value={UserRole.ACOMPANANTE}>Acompañante Externo</option>
+                          <option value={UserRole.COORDINADOR}>Coordinador</option>
                           <option value={UserRole.DIRECTOR}>Director</option>
                         </select>
                       </div>
@@ -328,29 +229,18 @@ export default function RegisterPage() {
                             id="email"
                             type="email"
                             placeholder="tu@email.com"
-                            value={formData.email}
-                            onChange={(e) =>
-                              handleInputChange("email", e.target.value)
-                            }
-                            className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                              localErrors.email ? "border-red-500" : ""
-                            }`}
+                            {...register("email")}
+                            className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                             style={{
                               backgroundColor: colors.surface,
-                              borderColor: localErrors.email
-                                ? colors.error[500]
-                                : colors.border,
+                              borderColor: errors.email ? colors.error[500] : colors.border,
                               color: colors.text,
                             }}
-                            required
                           />
                         </div>
-                        {localErrors.email && (
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[500] }}
-                          >
-                            {localErrors.email}
+                        {errors.email && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.email.message}
                           </p>
                         )}
                       </div>
@@ -359,29 +249,28 @@ export default function RegisterPage() {
                         <Label htmlFor="phone" style={{ color: colors.text }}>
                           Teléfono *
                         </Label>
-                        <PhoneInput
-                          country={"ar"}
-                          value={formData.phone}
-                          onChange={(phone) =>
-                            handleInputChange("phone", phone)
-                          }
-                          inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
-                          containerClass="!w-full"
-                          buttonClass="!border-0 !border-r !rounded-l-lg"
-                          inputStyle={{
-                            backgroundColor: colors.surface,
-                            borderColor: localErrors.phone
-                              ? colors.error[500]
-                              : colors.border,
-                            color: colors.text,
-                          }}
+                        <Controller
+                          name="phone"
+                          control={control}
+                          render={({ field }) => (
+                            <PhoneInput
+                              country={"ar"}
+                              value={field.value}
+                              onChange={field.onChange}
+                              inputClass="!w-full !h-12 !pl-[48px] !rounded-lg !text-base !border-2"
+                              containerClass="!w-full"
+                              buttonClass="!border-0 !border-r !rounded-l-lg"
+                              inputStyle={{
+                                backgroundColor: colors.surface,
+                                borderColor: errors.phone ? colors.error[500] : colors.border,
+                                color: colors.text,
+                              }}
+                            />
+                          )}
                         />
-                        {localErrors.phone && (
-                          <p
-                            className="text-sm"
-                            style={{ color: colors.error[500] }}
-                          >
-                            {localErrors.phone}
+                        {errors.phone && (
+                          <p className="text-sm" style={{ color: colors.error[500] }}>
+                            {errors.phone.message}
                           </p>
                         )}
                       </div>
@@ -397,10 +286,7 @@ export default function RegisterPage() {
                     borderLeftColor: colors.secondary[500],
                   }}
                 >
-                  <h3
-                    className="font-medium text-lg"
-                    style={{ color: colors.text }}
-                  >
+                  <h3 className="font-medium text-lg" style={{ color: colors.text }}>
                     Credenciales de Acceso
                   </h3>
 
@@ -416,28 +302,19 @@ export default function RegisterPage() {
                       <Input
                         id="dni"
                         placeholder="12345678"
-                        value={formData.documentNumber}
-                        onChange={(e) => handleDniChange(e.target.value)}
+                        {...register("documentNumber")}
                         maxLength={8}
-                        className={`pl-10 h-12 rounded-lg border-2 transition-all duration-200 ${
-                          localErrors.documentNumber ? "border-red-500" : ""
-                        }`}
+                        className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                         style={{
                           backgroundColor: colors.surface,
-                          borderColor: localErrors.documentNumber
-                            ? colors.error[500]
-                            : colors.border,
+                          borderColor: errors.documentNumber ? colors.error[500] : colors.border,
                           color: colors.text,
                         }}
-                        required
                       />
                     </div>
-                    {localErrors.documentNumber && (
-                      <p
-                        className="text-sm"
-                        style={{ color: colors.error[500] }}
-                      >
-                        {localErrors.documentNumber}
+                    {errors.documentNumber && (
+                      <p className="text-sm" style={{ color: colors.error[500] }}>
+                        {errors.documentNumber.message}
                       </p>
                     )}
                   </div>
@@ -456,21 +333,13 @@ export default function RegisterPage() {
                           id="password"
                           type={showPassword ? "text" : "password"}
                           placeholder="**********"
-                          value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          className={`pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200 ${
-                            localErrors.password ? "border-red-500" : ""
-                          }`}
+                          {...register("password")}
+                          className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                           style={{
                             backgroundColor: colors.surface,
-                            borderColor: localErrors.password
-                              ? colors.error[500]
-                              : colors.border,
+                            borderColor: errors.password ? colors.error[500] : colors.border,
                             color: colors.text,
                           }}
-                          required
                         />
                         <Button
                           type="button"
@@ -480,93 +349,67 @@ export default function RegisterPage() {
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
-                            <EyeOff
-                              className="h-4 w-4"
-                              style={{ color: colors.textMuted }}
-                            />
+                            <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
                           ) : (
-                            <Eye
-                              className="h-4 w-4"
-                              style={{ color: colors.textMuted }}
-                            />
+                            <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
                           )}
                         </Button>
                       </div>
-                      {localErrors.password && (
-                        <p
-                          className="text-sm"
-                          style={{ color: colors.error[500] }}
-                        >
-                          {localErrors.password}
+                      {errors.password && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.password.message}
                         </p>
                       )}
                     </div>
-                  </div>
-                </div>
 
-                {/* Información de Seguridad */}
-                <div
-                  className="p-6 rounded-lg border-l-4 space-y-4"
-                  style={{
-                    backgroundColor: colors.info[50],
-                    borderLeftColor: colors.info[500],
-                  }}
-                >
-                  <h3
-                    className="font-medium text-lg"
-                    style={{ color: colors.text }}
-                  >
-                    Información de Seguridad
-                  </h3>
-
-                  <div
-                    className="p-4 rounded-lg border-2 border-dashed"
-                    style={{
-                      backgroundColor: colors.warning[50],
-                      borderColor: colors.warning[500],
-                    }}
-                  >
-                    <div className="flex items-start gap-3">
-                      <Sparkles
-                        className="h-5 w-5 mt-0.5 flex-shrink-0"
-                        style={{ color: colors.warning[500] }}
-                      />
-                      <div className="text-sm space-y-1">
-                        <p
-                          className="font-medium"
-                          style={{ color: colors.warning[600] }}
-                        >
-                          Configuración de Seguridad
-                        </p>
-                        <p style={{ color: colors.warning[600] }}>
-                          Después del registro, deberá configurar su firma digital 
-                          para validar documentos oficiales. Este proceso es obligatorio 
-                          y se realiza una sola vez por seguridad.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="text-center space-y-3">
-                      <PenTool
-                        className="h-8 w-8 mx-auto"
-                        style={{ color: colors.info[500] }}
-                      />
-                      <div>
-                        <p
-                          className="text-sm font-medium mb-1"
-                          style={{ color: colors.text }}
-                        >
-                          Firma Digital
-                        </p>
-                        <p
-                          className="text-xs"
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword" style={{ color: colors.text }}>
+                        Confirmar Contraseña *
+                      </Label>
+                      <div className="relative">
+                        <Lock
+                          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
                           style={{ color: colors.textMuted }}
+                        />
+                        <Input
+                          id="confirmPassword"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="**********"
+                          {...register("confirmPassword")}
+                          className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
+                          style={{
+                            backgroundColor: colors.surface,
+                            borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
+                            color: colors.text,
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 rounded-md"
+                          onClick={() => setShowPassword(!showPassword)}
                         >
-                          Se configurará después del registro por seguridad
-                        </p>
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          ) : (
+                            <Eye className="h-4 w-4" style={{ color: colors.textMuted }} />
+                          )}
+                        </Button>
                       </div>
+                      {errors.confirmPassword && (
+                        <p className="text-sm" style={{ color: colors.error[500] }}>
+                          {errors.confirmPassword.message}
+                        </p>
+                      )}
+                      {passwordsMatch && !errors.confirmPassword && (
+                        <p
+                          className="text-sm flex items-center gap-1"
+                          style={{ color: colors.success[600] }}
+                        >
+                          ✓ Las contraseñas coinciden
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -586,6 +429,16 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              {/* Nota informativa sutil */}
+              <div
+                className="p-3 rounded-lg border"
+                style={{ backgroundColor: colors.primary[50], borderColor: colors.primary[200] }}
+              >
+                <p className="text-xs text-center" style={{ color: colors.primary[700] }}>
+                  💡 Después del registro configurarás tu firma digital para validar documentos
+                </p>
+              </div>
+
               <Button
                 type="submit"
                 className="w-full h-14 rounded-lg font-medium text-base transition-all duration-200 hover:scale-105 hover:shadow-medium"
@@ -593,9 +446,9 @@ export default function RegisterPage() {
                   backgroundColor: colors.secondary[500],
                   color: colors.surface,
                 }}
-                disabled={loading}
+                disabled={isSubmitting}
               >
-                {loading ? (
+                {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Creando cuenta...

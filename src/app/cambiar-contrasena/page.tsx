@@ -1,146 +1,129 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { ArrowLeft, Key, Eye, EyeOff, Shield, CircleCheck as CheckCircle } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Navbar } from "@/components/shared/navbar"
-import colors from "@/lib/colors"
-import { AuthService } from "@/lib/auth"
-import type { User } from "@/types/auth"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Key, Eye, EyeOff, Shield, CircleCheck as CheckCircle, Home, User as UserIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Breadcrumbs, ConfirmationDialog } from "@/ui";
+import { Navbar } from "@/shared";
+import colors from "@/lib/colors";
+import { useAppSelector } from "@/store";
+import { changePasswordSchema, type ChangePasswordFormData } from "@/features/auth";
 
 export default function ChangePasswordPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const { user, isAuthenticated, initialized } = useAppSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
-    confirm: false
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
+    confirm: false,
+  });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingData, setPendingData] = useState<ChangePasswordFormData | null>(null);
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<ChangePasswordFormData>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = await AuthService.getCurrentUser()
-        if (!currentUser) {
-          router.push('/login')
-          return
-        }
-        setUser(currentUser)
-      } catch (error) {
-        console.error('Error checking auth:', error)
-        router.push('/login')
-      } finally {
-        setIsLoading(false)
-      }
+    if (!initialized) return;
+
+    if (!isAuthenticated || !user) {
+      router.push("/login");
+      return;
     }
 
-    checkAuth()
-  }, [router])
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }))
-    }
-  }
+    setIsLoading(false);
+  }, [initialized, isAuthenticated, user, router]);
 
-  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
-    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }))
-  }
+  const togglePasswordVisibility = (field: "current" | "new" | "confirm") => {
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
+  };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+  const onSubmit = async (data: ChangePasswordFormData) => {
+    // Mostrar diálogo de confirmación antes de cambiar
+    setPendingData(data);
+    setShowConfirmDialog(true);
+  };
 
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = "La contraseña actual es obligatoria"
-    }
-
-    if (!formData.newPassword) {
-      newErrors.newPassword = "La nueva contraseña es obligatoria"
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = "La contraseña debe tener al menos 6 caracteres"
-    }
-
-    if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Las contraseñas no coinciden"
-    }
-
-    if (formData.currentPassword === formData.newPassword) {
-      newErrors.newPassword = "La nueva contraseña debe ser diferente a la actual"
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      setIsSubmitting(true)
-      
-      // Simular cambio de contraseña
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      setIsSubmitting(false)
-      router.push('/perfil')
-    }
-  }
+  const handleConfirmedChange = async () => {
+    if (!pendingData) return;
+    
+    setShowConfirmDialog(false);
+    // Simular cambio de contraseña
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    router.push("/perfil");
+  };
 
   const getPasswordStrength = (password: string) => {
-    let strength = 0
-    if (password.length >= 6) strength += 25
-    if (password.length >= 8) strength += 25
-    if (/[A-Z]/.test(password)) strength += 25
-    if (/[0-9]/.test(password)) strength += 25
-    
-    return strength
-  }
+    let strength = 0;
+    if (password.length >= 6) strength += 25;
+    if (password.length >= 8) strength += 25;
+    if (/[A-Z]/.test(password)) strength += 25;
+    if (/[0-9]/.test(password)) strength += 25;
 
-  const passwordStrength = getPasswordStrength(formData.newPassword)
+    return strength;
+  };
 
-  if (isLoading) {
+  const newPassword = watch("newPassword");
+  const passwordStrength = getPasswordStrength(newPassword || "");
+
+  if (!initialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
-    )
+    );
   }
 
-  if (!user) {
-    return null
+  if (!isAuthenticated || !user) {
+    return null;
   }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
-      <Navbar userData={user} />
-      
+      <Navbar />
+
       <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumbs */}
+        <div className="mb-6">
+          <Breadcrumbs
+            items={[
+              { label: "Inicio", href: "/", icon: Home },
+              { label: "Perfil", href: "/perfil", icon: UserIcon },
+              { label: "Cambiar Contraseña", current: true },
+            ]}
+          />
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="w-fit rounded-lg transition-all duration-200 hover:shadow-sm"
-            style={{ 
+            style={{
               color: colors.textSecondary,
-              backgroundColor: colors.neutral[50]
+              backgroundColor: colors.neutral[50],
             }}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver al Perfil
           </Button>
-          
+
           <h1 className="font-display text-3xl font-bold" style={{ color: colors.text }}>
             Cambiar Contraseña
           </h1>
@@ -155,25 +138,27 @@ export default function ChangePasswordPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Contraseña Actual */}
                 <div className="space-y-2">
                   <Label htmlFor="current-password" style={{ color: colors.text }}>
                     Contraseña Actual *
                   </Label>
                   <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: colors.textMuted }} />
+                    <Key
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                      style={{ color: colors.textMuted }}
+                    />
                     <Input
                       id="current-password"
                       type={showPasswords.current ? "text" : "password"}
                       placeholder="Ingrese su contraseña actual"
-                      value={formData.currentPassword}
-                      onChange={(e) => handleInputChange('currentPassword', e.target.value)}
-                      className={`pl-10 pr-12 h-12 ${errors.currentPassword ? 'border-red-500' : ''}`}
+                      {...register("currentPassword")}
+                      className="pl-10 pr-12 h-12"
                       style={{
                         backgroundColor: colors.surface,
                         borderColor: errors.currentPassword ? colors.error[500] : colors.border,
-                        color: colors.text
+                        color: colors.text,
                       }}
                     />
                     <Button
@@ -181,7 +166,7 @@ export default function ChangePasswordPage() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10"
-                      onClick={() => togglePasswordVisibility('current')}
+                      onClick={() => togglePasswordVisibility("current")}
                     >
                       {showPasswords.current ? (
                         <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
@@ -192,7 +177,7 @@ export default function ChangePasswordPage() {
                   </div>
                   {errors.currentPassword && (
                     <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.currentPassword}
+                      {errors.currentPassword.message}
                     </p>
                   )}
                 </div>
@@ -203,18 +188,20 @@ export default function ChangePasswordPage() {
                     Nueva Contraseña *
                   </Label>
                   <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: colors.textMuted }} />
+                    <Key
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                      style={{ color: colors.textMuted }}
+                    />
                     <Input
                       id="new-password"
                       type={showPasswords.new ? "text" : "password"}
                       placeholder="Ingrese su nueva contraseña"
-                      value={formData.newPassword}
-                      onChange={(e) => handleInputChange('newPassword', e.target.value)}
-                      className={`pl-10 pr-12 h-12 ${errors.newPassword ? 'border-red-500' : ''}`}
+                      {...register("newPassword")}
+                      className="pl-10 pr-12 h-12"
                       style={{
                         backgroundColor: colors.surface,
                         borderColor: errors.newPassword ? colors.error[500] : colors.border,
-                        color: colors.text
+                        color: colors.text,
                       }}
                     />
                     <Button
@@ -222,7 +209,7 @@ export default function ChangePasswordPage() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10"
-                      onClick={() => togglePasswordVisibility('new')}
+                      onClick={() => togglePasswordVisibility("new")}
                     >
                       {showPasswords.new ? (
                         <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
@@ -231,15 +218,15 @@ export default function ChangePasswordPage() {
                       )}
                     </Button>
                   </div>
-                  
+
                   {/* Indicador de fortaleza */}
-                  {formData.newPassword && (
+                  {newPassword && (
                     <div className="space-y-2">
                       <div className="flex justify-between text-xs">
                         <span style={{ color: colors.textMuted }}>Fortaleza de la contraseña</span>
                         <span style={{ color: colors.textMuted }}>{passwordStrength}%</span>
                       </div>
-                      <div 
+                      <div
                         className="w-full h-2 rounded-full overflow-hidden"
                         style={{ backgroundColor: colors.neutral[100] }}
                       >
@@ -247,18 +234,21 @@ export default function ChangePasswordPage() {
                           className="h-full transition-all duration-300"
                           style={{
                             width: `${passwordStrength}%`,
-                            backgroundColor: passwordStrength < 50 ? colors.error[500] : 
-                                           passwordStrength < 75 ? colors.warning[500] : 
-                                           colors.success[500]
+                            backgroundColor:
+                              passwordStrength < 50
+                                ? colors.error[500]
+                                : passwordStrength < 75
+                                ? colors.warning[500]
+                                : colors.success[500],
                           }}
                         />
                       </div>
                     </div>
                   )}
-                  
+
                   {errors.newPassword && (
                     <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.newPassword}
+                      {errors.newPassword.message}
                     </p>
                   )}
                 </div>
@@ -269,18 +259,20 @@ export default function ChangePasswordPage() {
                     Confirmar Nueva Contraseña *
                   </Label>
                   <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: colors.textMuted }} />
+                    <Key
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                      style={{ color: colors.textMuted }}
+                    />
                     <Input
                       id="confirm-password"
                       type={showPasswords.confirm ? "text" : "password"}
                       placeholder="Confirme su nueva contraseña"
-                      value={formData.confirmPassword}
-                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`pl-10 pr-12 h-12 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                      {...register("confirmPassword")}
+                      className="pl-10 pr-12 h-12"
                       style={{
                         backgroundColor: colors.surface,
                         borderColor: errors.confirmPassword ? colors.error[500] : colors.border,
-                        color: colors.text
+                        color: colors.text,
                       }}
                     />
                     <Button
@@ -288,7 +280,7 @@ export default function ChangePasswordPage() {
                       variant="ghost"
                       size="icon"
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10"
-                      onClick={() => togglePasswordVisibility('confirm')}
+                      onClick={() => togglePasswordVisibility("confirm")}
                     >
                       {showPasswords.confirm ? (
                         <EyeOff className="h-4 w-4" style={{ color: colors.textMuted }} />
@@ -299,16 +291,13 @@ export default function ChangePasswordPage() {
                   </div>
                   {errors.confirmPassword && (
                     <p className="text-sm" style={{ color: colors.error[500] }}>
-                      {errors.confirmPassword}
+                      {errors.confirmPassword.message}
                     </p>
                   )}
                 </div>
 
                 {/* Recomendaciones de Seguridad */}
-                <div 
-                  className="p-4 rounded-lg"
-                  style={{ backgroundColor: colors.primary[50] }}
-                >
+                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.primary[50] }}>
                   <h4 className="font-medium mb-2" style={{ color: colors.primary[700] }}>
                     Recomendaciones de Seguridad:
                   </h4>
@@ -326,7 +315,7 @@ export default function ChangePasswordPage() {
                   disabled={isSubmitting}
                   style={{
                     backgroundColor: colors.primary[500],
-                    color: colors.surface
+                    color: colors.surface,
                   }}
                 >
                   {isSubmitting ? (
@@ -345,7 +334,22 @@ export default function ChangePasswordPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Diálogo de Confirmación para Cambio de Contraseña */}
+        <ConfirmationDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          onConfirm={handleConfirmedChange}
+          onCancel={() => {
+            setShowConfirmDialog(false);
+            setPendingData(null);
+          }}
+          title="¿Confirmar cambio de contraseña?"
+          description="Su sesión se cerrará automáticamente después del cambio. Deberá iniciar sesión nuevamente con su nueva contraseña."
+          confirmText="Cambiar Contraseña"
+          cancelText="Cancelar"
+        />
       </main>
     </div>
-  )
+  );
 }

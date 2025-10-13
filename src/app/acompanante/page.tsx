@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { DashboardLayout } from "@/components/shared/dashboard-layout"
-import { WorkPlanForm } from "@/components/therapist/work-plan-form"
-import { MonthlyReportForm } from "@/components/acompanante/monthly-report-form"
-import { InvoiceUpload } from "@/components/therapist/invoice-upload"
+import { DashboardLayout } from "@/features/dashboard"
+import { WorkPlanForm, MonthlyReportForm } from "@/features/reports"
+import { InvoiceUpload } from "@/features/documents"
 import { UserRole } from "@/types/auth"
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
+import { ProtectedRoute } from "@/features/auth"
 import { useAppSelector } from "@/store"
 
 export default function AcompanantePage() {
