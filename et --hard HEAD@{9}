@@ -1,0 +1,43 @@
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{0}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{1}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{2}: checkout: moving from master to refactor
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{3}: checkout: moving from main to master
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{4}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{5}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{6}: checkout: moving from rama-final to refactor
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{7}: checkout: moving from main to rama-final
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{8}: reset: moving to a8a5024
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{9}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{10}: reset: moving to a8a5024
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{11}: checkout: moving from rama-final to rama-final
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{12}: checkout: moving from rama-final to rama-final
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{13}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{14}: checkout: moving from main to refactor
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{15}: checkout: moving from master to main
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{16}: checkout: moving from main to master
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{17}: checkout: moving from refactor to main
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{18}: checkout: moving from rama-final to refactor
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{19}: checkout: moving from rama-final to rama-final
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{20}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{21}: checkout: moving from main to refactor
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{22}: checkout: moving from main to main
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{23}: checkout: moving from refactor to main
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{24}: checkout: moving from rama-final to refactor
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{25}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{26}: checkout: moving from main to refactor
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{27}: reset: moving to 1e69c6c
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{28}: checkout: moving from refactor to main
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{29}: checkout: moving from main to refactor
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{30}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{31}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{32}: checkout: moving from master to refactor
+[33m1e69c6c[m[33m ([m[1;32mmaster[m[33m)[m HEAD@{33}: checkout: moving from main to master
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{34}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{35}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{36}: checkout: moving from main to refactor
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{37}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{38}: checkout: moving from main to rama-final
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{39}: checkout: moving from rama-final to main
+[33ma8a5024[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/rama-final[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mrama-final[m[33m)[m HEAD@{40}: checkout: moving from refactor to rama-final
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{41}: checkout: moving from refactor to refactor
+[33me800e11[m[33m ([m[1;31morigin/refactor[m[33m, [m[1;32mrefactor[m[33m)[m HEAD@{42}: checkout: moving from rama

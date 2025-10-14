@@ -316,7 +316,7 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
     dispatch({ type: "SET_EVENTS", payload: getEventsByRole(role) });
   }, [role]);
 
-  // Cargar eventos personalizados del localStorage
+  // ✅ Cargar eventos personalizados del localStorage (solo al montar o al cambiar de rol)
   useEffect(() => {
     const savedCustomEvents = localStorage.getItem(`customEvents_${role}`);
     if (savedCustomEvents) {
@@ -327,15 +327,20 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
             dueDate: new Date(event.dueDate),
           })
         );
+        // ✅ Combina los eventos base + personalizados solo una vez
+        const baseEvents = getEventsByRole(role);
         dispatch({
           type: "SET_EVENTS",
-          payload: [...state.events.filter((e) => !e.isCustom), ...customEvents],
+          payload: [...baseEvents, ...customEvents],
         });
       } catch (error) {
         console.error("Error loading custom events:", error);
       }
+    } else {
+      // Si no hay eventos personalizados, cargar solo los base
+      dispatch({ type: "SET_EVENTS", payload: getEventsByRole(role) });
     }
-  }, [role, state.events]);
+  }, [role]);
 
   // ✅ useCallback: Guardar eventos personalizados
   const saveCustomEvents = useCallback(
@@ -726,8 +731,8 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                             {daysUntil === 0
                               ? "Hoy"
                               : daysUntil === 1
-                              ? "Mañana"
-                              : `En ${daysUntil} días`}
+                                ? "Mañana"
+                                : `En ${daysUntil} días`}
                           </span>
                         </div>
                       </div>
@@ -743,8 +748,8 @@ export function CalendarWidget({ role, onNavigate }: CalendarWidgetProps) {
                         {event.priority === "high"
                           ? "Alta"
                           : event.priority === "medium"
-                          ? "Media"
-                          : "Baja"}
+                            ? "Media"
+                            : "Baja"}
                       </Badge>
                     </div>
                   </button>
