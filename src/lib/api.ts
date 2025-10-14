@@ -1,15 +1,17 @@
-import {
-  LoginDto,
-  RegisterDto,
-  AuthResponse,
-  ApiError,
-  BACKEND_ROLES,
-  FRONTEND_ROLES,
-} from "@/types/auth";
+import { LoginDto, RegisterDto, AuthResponse, BACKEND_ROLES, FRONTEND_ROLES } from "@/types/auth";
 import type { UserI } from "@/types/auth";
+import type {
+  LoginResponse,
+  RegisterResponse,
+  ProfileResponse,
+  RefreshTokenResponse,
+  UploadResponse,
+  UploadSignatureResponse,
+  UpdateProfileRequest,
+  ApiErrorResponse,
+} from "@/types/api";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://andamiaje-api.onrender.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://andamiaje-api.onrender.com";
 
 class ApiClient {
   private baseURL: string;
@@ -18,10 +20,7 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     const config: RequestInit = {
       credentials: "include",
@@ -34,19 +33,22 @@ class ApiClient {
 
       if (!response.ok) {
         const text = await response.text();
-        let errorData: ApiError = {
+        let errorData: ApiErrorResponse = {
           message: text || "Error de conexión",
           statusCode: response.status,
         };
         try {
-          errorData = JSON.parse(text);
-        } catch {}
+          const parsed = JSON.parse(text) as ApiErrorResponse;
+          errorData = parsed;
+        } catch {
+          // Usar el errorData por defecto
+        }
         throw new Error(errorData.message || `Error ${response.status}`);
       }
 
       const text = await response.text();
       try {
-        return text ? JSON.parse(text) : ({} as T);
+        return text ? (JSON.parse(text) as T) : ({} as T);
       } catch {
         throw new Error("Respuesta del servidor no válida");
       }
@@ -58,7 +60,7 @@ class ApiClient {
 
   // Auth endpoints
   async login(data: LoginDto): Promise<UserI> {
-    await this.request<any>("/api/v1/auth/login", {
+    await this.request<LoginResponse>("/api/v1/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -76,7 +78,7 @@ class ApiClient {
       role: BACKEND_ROLES[data.role] || data.role,
     };
 
-    const response = await this.request<any>("/api/v1/auth/register", {
+    const response = await this.request<RegisterResponse>("/api/v1/auth/register", {
       method: "POST",
       body: JSON.stringify(backendData),
     });
@@ -109,11 +111,11 @@ class ApiClient {
       response.user.hasSignature = response.user.hasSignature ?? false;
     }
 
-    return response;
+    return response as AuthResponse;
   }
 
   async getProfile(): Promise<UserI> {
-    const response = await this.request<any>("/api/v1/auth/profile", {
+    const response = await this.request<ProfileResponse>("/api/v1/auth/profile", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -125,9 +127,8 @@ class ApiClient {
     // Convertir rol del backend al frontend
     if (response.role) {
       response.role =
-        FRONTEND_ROLES[
-          response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES
-        ] || response.role;
+        FRONTEND_ROLES[response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES] ||
+        response.role;
     }
 
     // Procesar nombres de manera más robusta
@@ -143,11 +144,11 @@ class ApiClient {
     response.firstLogin = response.firstLogin ?? false;
     response.hasSignature = response.hasSignature ?? false;
 
-    return response;
+    return response as UserI;
   }
 
-  async refreshToken(): Promise<AuthResponse> {
-    return this.request<AuthResponse>("/api/v1/auth/refresh", {
+  async refreshToken(): Promise<RefreshTokenResponse> {
+    return this.request<RefreshTokenResponse>("/api/v1/auth/refresh", {
       method: "POST",
     });
   }
@@ -160,63 +161,77 @@ class ApiClient {
   }
 
   // Storage endpoints
-  async uploadSignature(file: File): Promise<{ key: string }> {
+  async uploadSignature(file: File): Promise<UploadSignatureResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await fetch(
-      `${this.baseURL}/api/v1/storage/upload?type=FIRMA_DIGITAL`,
-      {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      }
-    );
+    const response = await fetch(`${this.baseURL}/api/v1/storage/upload?type=FIRMA_DIGITAL`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
     if (!response.ok) {
       const text = await response.text();
-      let errorData: ApiError = {
+      let errorData: ApiErrorResponse = {
         message: text || "Error al subir archivo",
         statusCode: response.status,
       };
       try {
-        errorData = JSON.parse(text);
-      } catch {}
+        const parsed = JSON.parse(text) as ApiErrorResponse;
+        errorData = parsed;
+      } catch {
+        // Usar errorData por defecto
+      }
       throw new Error(errorData.message || `Error ${response.status}`);
     }
 
-    return response.json();
+    const uploadResult = (await response.json()) as UploadResponse;
+
+    // Refrescar el token para obtener las cookies actualizadas con hasSignature: true
+    await this.refreshToken();
+
+    // Obtener el perfil actualizado con el nuevo token
+    const updatedUser = await this.getProfile();
+
+    // Devolver tanto el resultado del upload como el usuario actualizado
+    return {
+      ...uploadResult,
+      user: updatedUser,
+    };
   }
 
   getDownloadUrl(key: string): string {
-    return `${this.baseURL}/api/v1/storage/download?key=${encodeURIComponent(
-      key
-    )}`;
+    return `${this.baseURL}/api/v1/storage/download?key=${encodeURIComponent(key)}`;
+  }
+
+  async fetchSignedUrl(key: string): Promise<string> {
+    try {
+      const response = await this.request<{ url: string }>(
+        `/api/v1/storage/download?key=${encodeURIComponent(key)}`,
+        {
+          method: "GET",
+        }
+      );
+      return response.url;
+    } catch (error) {
+      console.error("Error fetching signed URL:", error);
+      throw error;
+    }
   }
 
   // User profile update
-  async updateUserProfile(
-    userId: string,
-    data: {
-      firstLogin?: boolean;
-      hasSignature?: boolean;
-      signatureKey?: string;
-    }
-  ): Promise<UserI> {
-    const response = await this.request<any>(
-      `/api/v1/users/profile/${userId}`,
-      {
-        method: "PUT",
-        body: JSON.stringify(data),
-      }
-    );
+  async updateUserProfile(userId: string, data: UpdateProfileRequest): Promise<UserI> {
+    const response = await this.request<ProfileResponse>(`/api/v1/users/profile/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
 
     // Convertir rol del backend al frontend si es necesario
     if (response.role) {
       response.role =
-        FRONTEND_ROLES[
-          response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES
-        ] || response.role;
+        FRONTEND_ROLES[response?.role.toUpperCase() as keyof typeof FRONTEND_ROLES] ||
+        response.role;
     }
 
     // Procesar nombres
@@ -232,7 +247,7 @@ class ApiClient {
     response.firstLogin = response.firstLogin ?? false;
     response.hasSignature = response.hasSignature ?? false;
 
-    return response;
+    return response as UserI;
   }
 }
 

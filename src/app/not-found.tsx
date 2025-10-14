@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui'
 import { Chrome as Home } from 'lucide-react'
 
 export default function NotFound() {

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Eye,
   EyeOff,
@@ -16,88 +18,54 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
+  Button,
+  Input,
+  Label,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
   FloatingCard,
   AnimatedBackground,
-} from "@/components/ui/floating-elements";
+} from "@/ui";
 import Image from "next/image";
 import colors from "@/lib/colors";
 import { AuthService } from "@/lib/auth";
-import { LoginDto } from "@/types/auth";
+import { loginSchema, type LoginFormData } from "@/features/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { loginThunk, clearError } from "@/store/slices/authSlice";
+import { loginThunk, clearError } from "@/features/auth";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState<LoginDto>({
-    documentNumber: "",
-    password: "",
-  });
-  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado local para el envío del formulario
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { error } = useAppSelector((state) => state.auth); // Solo necesitamos el 'error' global
+  const { error } = useAppSelector((state) => state.auth);
+
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError: setFormError,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      documentNumber: "",
+      password: "",
+    },
+  });
 
   // Limpiar errores globales al cargar la página
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
 
-  const handleInputChange = (field: keyof LoginDto, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (localErrors[field]) {
-      setLocalErrors((prev) => ({ ...prev, [field]: "" }));
-    }
-    if (error) {
-      dispatch(clearError());
-    }
-  };
-
-  const handleDniChange = (value: string) => {
-    const numericValue = value.replace(/\D/g, "");
-    handleInputChange("documentNumber", numericValue);
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.documentNumber.trim()) {
-      newErrors.documentNumber = "El DNI es obligatorio";
-    } else if (
-      formData.documentNumber.length < 7 ||
-      formData.documentNumber.length > 8
-    ) {
-      newErrors.documentNumber = "El DNI debe tener entre 7 y 8 dígitos";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "La contraseña es obligatoria";
-    }
-
-    setLocalErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setIsSubmitting(true); // Activar estado de carga local
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const action = await dispatch(loginThunk(formData)).unwrap();
+      const action = await dispatch(loginThunk(data)).unwrap();
       if (action.user) {
         const roleRoute = AuthService.getRoleForRouting(action.user.role);
         router.replace(`/${roleRoute}`);
@@ -105,8 +73,6 @@ export default function LoginPage() {
     } catch (err) {
       console.error("Login error:", err);
       // El error se manejará a través del estado de Redux
-    } finally {
-      setIsSubmitting(false); // Desactivar estado de carga local
     }
   };
 
@@ -120,7 +86,7 @@ export default function LoginPage() {
           backgroundColor: colors.primary[50],
         }}
       >
-        {/* Imagen de fondo difuminada - aquí puedes poner tu imagen */}
+        {/* Imagen de fondo difuminada */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30 scale-110"
           style={{
@@ -294,6 +260,7 @@ export default function LoginPage() {
                   src="/LogotipoFinalWEBJPEG.png"
                   alt="Andamiaje Logo"
                   fill
+                  sizes="256px"
                   className="object-contain scale-150"
                 />
               </motion.div>
@@ -320,7 +287,7 @@ export default function LoginPage() {
 
             <CardContent className="space-y-6">
               <form
-                onSubmit={handleSubmit}
+                onSubmit={handleSubmit(onSubmit)}
                 className="space-y-5"
                 autoComplete="off"
               >
@@ -337,27 +304,25 @@ export default function LoginPage() {
                       id="dni"
                       type="text"
                       placeholder="12345678"
-                      value={formData.documentNumber}
-                      onChange={(e) => handleDniChange(e.target.value)}
+                      {...register("documentNumber")}
                       maxLength={8}
                       autoComplete="off"
                       className="pl-10 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: localErrors.documentNumber
+                        borderColor: errors.documentNumber
                           ? colors.error[500]
                           : colors.border,
                         color: colors.text,
                       }}
-                      required
                     />
                   </div>
-                  {localErrors.documentNumber && (
+                  {errors.documentNumber && (
                     <p
                       className="text-sm mt-1"
                       style={{ color: colors.error[500] }}
                     >
-                      {localErrors.documentNumber}
+                      {errors.documentNumber.message}
                     </p>
                   )}
                 </div>
@@ -375,20 +340,16 @@ export default function LoginPage() {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="**********"
-                      value={formData.password}
-                      onChange={(e) =>
-                        handleInputChange("password", e.target.value)
-                      }
+                      {...register("password")}
                       autoComplete="new-password"
                       className="pl-10 pr-12 h-12 rounded-lg border-2 transition-all duration-200"
                       style={{
                         backgroundColor: colors.surface,
-                        borderColor: localErrors.password
+                        borderColor: errors.password
                           ? colors.error[500]
                           : colors.border,
                         color: colors.text,
                       }}
-                      required
                     />
                     <Button
                       type="button"
@@ -410,12 +371,12 @@ export default function LoginPage() {
                       )}
                     </Button>
                   </div>
-                  {localErrors.password && (
+                  {errors.password && (
                     <p
                       className="text-sm mt-1"
                       style={{ color: colors.error[500] }}
                     >
-                      {localErrors.password}
+                      {errors.password.message}
                     </p>
                   )}
                 </div>
@@ -444,7 +405,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                 <Button
+                <Button
                   type="submit"
                   className="w-full h-12 rounded-lg font-medium text-base transition-all duration-200 hover:scale-105 hover:shadow-medium"
                   style={{

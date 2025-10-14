@@ -19,7 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/features/*": ["./src/features/*"],
+      "@/ui/*": ["./src/ui/*"],
+      "@/ui": ["./src/ui"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/core/*": ["./src/core/*"]
     },
     "typeRoots": ["node_modules/@types"]
   },

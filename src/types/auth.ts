@@ -1,29 +1,29 @@
 export const UserRole = {
-  TERAPEUTA: 'TERAPEUTA',
-  ACOMPANANTE: 'ACOMPANANTE',
-  COORDINADOR: 'COORDINADOR',
-  COORDINADOR_UNO: 'COORDINADOR_UNO',
-  DIRECTOR: 'DIRECTOR'
+  TERAPEUTA: "TERAPEUTA",
+  ACOMPANANTE: "ACOMPANANTE",
+  COORDINADOR: "COORDINADOR",
+  COORDINADOR_UNO: "COORDINADOR_UNO",
+  DIRECTOR: "DIRECTOR",
 } as const;
 
-export type UserRole = typeof UserRole[keyof typeof UserRole];
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 // Mapeo para el backend
 export const BACKEND_ROLES = {
-  [UserRole.TERAPEUTA]: 'TERAPEUTA',
-  [UserRole.ACOMPANANTE]: 'ACOMPANIANTE_EXTERNO',
-  [UserRole.COORDINADOR]: 'COORDINADOR_UNO',
-  [UserRole.COORDINADOR_UNO]: 'COORDINADOR_UNO',
-  [UserRole.DIRECTOR]: 'DIRECTOR'
+  [UserRole.TERAPEUTA]: "TERAPEUTA",
+  [UserRole.ACOMPANANTE]: "ACOMPANIANTE_EXTERNO",
+  [UserRole.COORDINADOR]: "COORDINADOR_UNO",
+  [UserRole.COORDINADOR_UNO]: "COORDINADOR_UNO",
+  [UserRole.DIRECTOR]: "DIRECTOR",
 } as const;
 
 // Mapeo desde el backend
 export const FRONTEND_ROLES = {
-  'TERAPEUTA': UserRole.TERAPEUTA,
-  'ACOMPANIANTE_EXTERNO': UserRole.ACOMPANANTE,
-  'COORDINADOR_UNO': UserRole.COORDINADOR,
+  TERAPEUTA: UserRole.TERAPEUTA,
+  ACOMPANIANTE_EXTERNO: UserRole.ACOMPANANTE,
+  COORDINADOR_UNO: UserRole.COORDINADOR,
   // 'coordinador_dos': UserRole.COORDINADOR,
-  'DIRECTOR': UserRole.DIRECTOR
+  DIRECTOR: UserRole.DIRECTOR,
 } as const;
 
 export interface LoginDto {
@@ -60,6 +60,7 @@ export interface UserI {
   firstLogin?: boolean;
   hasSignature?: boolean;
   signatureKey?: string;
+  digitalSignature?: string; // Key de la firma digital en el servidor
 }
 
 // Alias para compatibilidad
