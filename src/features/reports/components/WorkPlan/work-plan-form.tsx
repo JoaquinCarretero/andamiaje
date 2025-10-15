@@ -280,15 +280,7 @@ export function WorkPlanForm() {
   return (
     <>
       {/* ✅ Indicador de guardado automático */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
-            Plan de Trabajo
-          </h2>
-          <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>
-            Tus cambios se guardan automáticamente
-          </p>
-        </div>
+      <div className="flex justify-end items-center mb-6">
         <SaveIndicator 
           status={saveStatus} 
           lastSaved={lastSaved}

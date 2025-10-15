@@ -19,6 +19,7 @@ import { AuthService } from "@/lib/auth";
 import { UserRole } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { logoutThunk } from "@/features/auth";
+import { useToast } from "@/lib/hooks/use-toast";
 
 interface NavbarProps {
   onNavigate?: (view: string) => void;
@@ -27,6 +28,7 @@ interface NavbarProps {
 export function Navbar({ onNavigate }: NavbarProps) {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { toast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user: currentUser } = useAppSelector((state) => state.auth);
 
@@ -37,6 +39,10 @@ export function Navbar({ onNavigate }: NavbarProps) {
   const handleLogout = () => {
     dispatch(logoutThunk()); // <-- CORRECCIÓN AQUÍ
     router.push("/login");
+    toast({
+      title: "Sesión cerrada",
+      description: "Has cerrado sesión correctamente.",
+    });
   };
 
   if (!currentUser) {

@@ -16,11 +16,12 @@ export default {
     extend: {
       fontFamily: {
         sans: ["var(--font-inter)", ...fontFamily.sans],
-        display: ["var(--font-playfair)"],
+        display: ["var(--font-poppins)"],
         poppins: ["var(--font-poppins)"],
       },
       colors: {
         ...colors,
+        placeholder: colors.neutral[400],
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
