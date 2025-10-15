@@ -335,3 +335,18 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.5 !important;
   }
 }
+
+/* Fix para el color de fondo del autocompletado del navegador */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--card) inset !important;
+  box-shadow: 0 0 0 30px var(--card) inset !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+}
+
+/* Forzar aceleración por hardware para animaciones más suaves */
+.will-change-transform {
+  will-change: transform;
+}
