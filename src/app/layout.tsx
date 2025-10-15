@@ -4,6 +4,7 @@ import { Inter, Poppins, Playfair_Display } from "next/font/google"
 import colors from "@/lib/colors"
 import { ReduxProvider } from "@/store/provider"
 import { AuthInitializer } from "@/features/auth"
+import { Toaster } from "@/ui/primitives/toaster"
 import "./globals.css"
 
 const inter = Inter({
@@ -51,6 +52,7 @@ export default function RootLayout({
         <ReduxProvider>
           <AuthInitializer />
           {children}
+          <Toaster />
         </ReduxProvider>
       </body>
     </html>

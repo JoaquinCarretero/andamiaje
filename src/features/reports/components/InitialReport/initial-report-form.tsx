@@ -6,9 +6,11 @@ import { FileText, Save, Send, AlertCircle, Eye } from "lucide-react"
 import { PDFPreviewModal } from "../../utils/pdf-preview-modal"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
+import { useToast } from "@/lib/hooks/use-toast"
 
 export function InitialReportForm() {
   const { getSignature } = useSignature()
+  const { toast } = useToast()
   const [showPDFPreview, setShowPDFPreview] = useState(false)
   const [formData, setFormData] = useState({
     patientName: "",
@@ -91,6 +93,11 @@ export function InitialReportForm() {
     e.preventDefault()
     if (validateForm()) {
       setShowPDFPreview(true)
+      toast({
+        title: "Informe enviado (simulado)",
+        description: "El informe se ha enviado correctamente.",
+        variant: "success",
+      });
     }
   }
 
@@ -376,6 +383,12 @@ export function InitialReportForm() {
                 <Button 
                   type="button"
                   variant="outline"
+                  onClick={() => {
+                    toast({
+                      title: "Borrador guardado (simulado)",
+                      description: "El borrador del informe se ha guardado.",
+                    });
+                  }}
                   style={{
                     borderColor: colors.border,
                     color: colors.textSecondary

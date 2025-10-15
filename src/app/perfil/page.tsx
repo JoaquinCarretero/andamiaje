@@ -42,12 +42,14 @@ import { AuthService } from "@/lib/auth";
 import { apiClient } from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { logoutThunk, checkAuthThunk } from "@/features/auth";
+import { useToast } from "@/lib/hooks/use-toast";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { getSignature } = useSignature();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth);
+  const { toast } = useToast();
 
   // Estados
   const [isEditing, setIsEditing] = useState(false);
@@ -123,8 +125,18 @@ export default function ProfilePage() {
       await apiClient.updateUserProfile(user.id, formData);
       await dispatch(checkAuthThunk()).unwrap();
       setIsEditing(false);
+      toast({
+        title: "¡Perfil actualizado!",
+        description: "Tus datos han sido guardados correctamente.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast({
+        title: "Error al actualizar",
+        description: "No se pudieron guardar los cambios. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setIsSaving(false);
     }
