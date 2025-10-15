@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label } from "@/ui"
+import { useState, useEffect, useRef } from "react"
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, useAutoSave, SaveIndicator } from "@/ui"
 import { Users, Save, Send, AlertCircle, Eye } from "lucide-react"
 import { PDFPreviewModal } from "../../utils/pdf-preview-modal"
 import { useSignature } from "@/lib/signature-storage"
@@ -18,6 +18,46 @@ export function MeetingMinutesForm() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const { saveStatus, lastSaved, triggerSave } = useAutoSave({
+    onSave: async (data: typeof formData) => {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      localStorage.setItem('meetingMinutes_draft', JSON.stringify({
+        ...data,
+        savedAt: new Date().toISOString()
+      }))
+    },
+    debounceMs: 2000,
+    onError: (error) => {
+      console.error('Error al guardar borrador:', error)
+    }
+  })
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('meetingMinutes_draft')
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        const { savedAt, ...draftData } = draft
+        setFormData(draftData)
+      } catch (error) {
+        console.error('Error al cargar borrador:', error)
+      }
+    }
+  }, [])
+
+  const lastSavedDataRef = useRef<string>("");
+
+  useEffect(() => {
+    const hasSignificantData = formData.patientName.trim() || formData.subject.trim()
+
+    const currentDataString = JSON.stringify(formData);
+
+    if (hasSignificantData && currentDataString !== lastSavedDataRef.current) {
+      lastSavedDataRef.current = currentDataString;
+      triggerSave(formData);
+    }
+  }, [formData, triggerSave])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -238,11 +278,12 @@ export function MeetingMinutesForm() {
       >
         <CardContent className="p-4">
           <form onSubmit={handleSubmit}>
-            <div className="flex justify-between">
-              <div className="flex gap-2">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 items-center">
                 <Button 
                   type="button"
                   variant="outline"
+                  onClick={() => triggerSave(formData)}
                   style={{
                     borderColor: colors.border,
                     color: colors.textSecondary
@@ -251,7 +292,10 @@ export function MeetingMinutesForm() {
                   <Save className="h-4 w-4 mr-2" />
                   Guardar Borrador
                 </Button>
-                
+                <SaveIndicator status={saveStatus} lastSaved={lastSaved} />
+              </div>
+
+              <div className="flex gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -265,18 +309,18 @@ export function MeetingMinutesForm() {
                   <Eye className="h-4 w-4 mr-2" />
                   Vista Previa
                 </Button>
-              </div>
 
-              <Button
-                type="submit"
-                style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface
-                }}
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Finalizar Acta
-              </Button>
+                <Button
+                  type="submit"
+                  style={{
+                    backgroundColor: colors.primary[500],
+                    color: colors.surface
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Finalizar Acta
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

@@ -939,6 +939,7 @@ export default function ProfilePage() {
         description="Perderás el acceso a tus datos hasta que vuelvas a iniciar sesión."
         confirmText="Cerrar Sesión"
         cancelText="Cancelar"
+        type="info"
       />
     </div>
   );
