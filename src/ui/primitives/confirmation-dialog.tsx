@@ -127,10 +127,10 @@ export function ConfirmationDialog({
       case "info":
         return {
           icon: <Info className="h-6 w-6" />,
-          iconColor: colors.info[950],
-          iconBg: colors.info[980],
+          iconColor: colors.info[500],
+          iconBg: colors.info[50],
           buttonStyle: {
-            backgroundColor: colors.primary[500],
+            backgroundColor: colors.info[500],
             color: colors.surface,
           },
         };

@@ -233,36 +233,33 @@ export default function ProfilePage() {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="mb-8"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => router.back()}
-                className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
-                style={{
-                  color: colors.textMuted,
-                  backgroundColor: colors.surface,
-                  border: `1px solid ${colors.border}`,
-                }}
+          <div className="flex items-center justify-between gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
+              style={{
+                color: colors.textMuted,
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver
+            </Button>
+            <div className="text-right">
+              <h1
+                className="font-display text-3xl lg:text-4xl font-bold mb-2"
+                style={{ color: colors.text }}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver
-              </Button>
-              <div>
-                <h1
-                  className="font-display text-3xl lg:text-4xl font-bold mb-2"
-                  style={{ color: colors.text }}
-                >
-                  Mi Perfil
-                </h1>
-                <p className="text-base" style={{ color: colors.textMuted }}>
-                  Administra tu información personal y profesional
-                </p>
-              </div>
+                Mi Perfil
+              </h1>
+              <p className="text-base" style={{ color: colors.textMuted }}>
+                Administra tu información personal y profesional
+              </p>
             </div>
-
             {!isEditing && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 ml-auto">
                 <Button
                   onClick={() => router.push("/cambiar-contrasena")}
                   variant="outline"

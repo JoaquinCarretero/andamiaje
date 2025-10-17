@@ -1,18 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Badge } from "@/ui"
-import { Upload, FileText, Trash2, CheckCircle, Calendar, AlertCircle } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Badge, useConfirmation, PDFPreviewModal } from "@/ui"
+import { Upload, FileText, Trash2, CheckCircle, Calendar, AlertCircle, Eye } from "lucide-react"
 import colors from "@/lib/colors"
 
 export function InvoiceUpload() {
+  const { confirm, ConfirmDialog } = useConfirmation();
   const [uploadedFiles, setUploadedFiles] = useState([
     { 
       id: 1, 
       name: "Factura_Enero_2024.pdf", 
       month: "Enero 2024", 
       uploadDate: "2024-01-31", 
-      size: "245 KB" 
+      size: "245 KB",
+      file: null
     },
     {
       id: 2,
@@ -20,8 +22,11 @@ export function InvoiceUpload() {
       month: "Febrero 2024",
       uploadDate: "2024-02-29",
       size: "198 KB",
+      file: null
     },
   ])
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     month: "",
@@ -48,24 +53,47 @@ export function InvoiceUpload() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      // Simular subida de archivo
-      const newFile = {
-        id: uploadedFiles.length + 1,
-        name: `Factura_${formData.month.replace(' ', '_')}.pdf`,
-        month: formData.month,
-        uploadDate: new Date().toISOString().split('T')[0],
-        size: "156 KB"
-      }
-      setUploadedFiles([...uploadedFiles, newFile])
-      setFormData({ month: "", description: "" })
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   }
 
-  const removeFile = (id: number) => {
-    setUploadedFiles(uploadedFiles.filter(file => file.id !== id))
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (validateForm() && selectedFile) {
+      // Simular subida de archivo
+      const newFile = {
+        id: uploadedFiles.length + 1,
+        name: selectedFile.name,
+        month: formData.month,
+        uploadDate: new Date().toISOString().split('T')[0],
+        size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+        file: selectedFile,
+      }
+      setUploadedFiles([...uploadedFiles, newFile])
+      setFormData({ month: "", description: "" })
+      setSelectedFile(null)
+    }
+  }
+
+  const removeFile = async (id: number) => {
+    const confirmed = await confirm({
+      title: "¿Eliminar factura?",
+      description: "Esta acción no se puede deshacer.",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      type: "danger",
+    });
+
+    if (confirmed) {
+      setUploadedFiles(uploadedFiles.filter(file => file.id !== id))
+    }
+  }
+
+  const viewFile = (file: File) => {
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
   }
 
   return (
@@ -103,16 +131,11 @@ export function InvoiceUpload() {
                   }}
                 >
                   <option value="">Seleccionar mes</option>
-                  <option value="Marzo 2024">Marzo 2024</option>
-                  <option value="Abril 2024">Abril 2024</option>
-                  <option value="Mayo 2024">Mayo 2024</option>
-                  <option value="Junio 2024">Junio 2024</option>
-                  <option value="Julio 2024">Julio 2024</option>
-                  <option value="Agosto 2024">Agosto 2024</option>
-                  <option value="Septiembre 2024">Septiembre 2024</option>
-                  <option value="Octubre 2024">Octubre 2024</option>
-                  <option value="Noviembre 2024">Noviembre 2024</option>
-                  <option value="Diciembre 2024">Diciembre 2024</option>
+                  {Array.from({ length: new Date().getFullYear() - 2022 }, (_, i) => 2023 + i).flatMap(year =>
+                    Array.from({ length: 12 }, (_, j) => new Date(year, j).toLocaleString('es-AR', { month: 'long' }) + ' ' + year)
+                  ).map(monthYear => (
+                    <option key={monthYear} value={monthYear}>{monthYear}</option>
+                  ))}
                 </select>
                 {errors.month && (
                   <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
@@ -145,11 +168,12 @@ export function InvoiceUpload() {
               className="border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 hover:border-primary/50"
               style={{ borderColor: colors.border }}
             >
+              <input type="file" id="file-upload" className="hidden" onChange={handleFileChange} accept="application/pdf" />
               <Upload className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
               <p className="text-sm mb-2" style={{ color: colors.textMuted }}>
-                Arrastra tu archivo PDF aquí o
+                {selectedFile ? selectedFile.name : "Arrastra tu archivo PDF aquí o"}
               </p>
-              <Button variant="outline" size="sm" type="button">
+              <Button variant="outline" size="sm" type="button" onClick={() => document.getElementById('file-upload')?.click()}>
                 Seleccionar archivo
               </Button>
               <p className="text-xs mt-2" style={{ color: colors.textMuted }}>
@@ -223,17 +247,15 @@ export function InvoiceUpload() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="default" 
-                      className="text-xs"
-                      style={{
-                        backgroundColor: colors.success[500],
-                        color: colors.surface
-                      }}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => viewFile(file.file as File)}
+                      disabled={!file.file}
                     >
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Subida
-                    </Badge>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ver
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="icon"
@@ -249,6 +271,13 @@ export function InvoiceUpload() {
           )}
         </CardContent>
       </Card>
+      <PDFPreviewModal
+        isOpen={!!previewUrl}
+        onClose={() => setPreviewUrl(null)}
+        title="Vista Previa de Factura"
+        pdfUrl={previewUrl || ""}
+      />
+      <ConfirmDialog />
     </div>
   )
 }

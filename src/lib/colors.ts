@@ -110,10 +110,7 @@ const colors = {
     600: '#2563eb',
     700: '#1d4ed8',
     800: '#1e40af',
-    900: '#1e3a8a',
-    950: '#13100f',
-    980: '#eeddd2',
-    990: '#b17c54'
+    900: '#1e3a8a'
   },
   
   // Colores específicos para la aplicación
