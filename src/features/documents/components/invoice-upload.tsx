@@ -17,6 +17,7 @@ export function InvoiceUpload() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [filter, setFilter] = useState({ month: "", year: "" });
 
   useEffect(() => {
     const storedFiles = localStorage.getItem("uploadedInvoices");
@@ -42,6 +43,9 @@ export function InvoiceUpload() {
     if (!formData.month) {
       newErrors.month = "Debe seleccionar el mes"
     }
+    if (!selectedFile) {
+      newErrors.file = "Debe seleccionar un archivo"
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -56,18 +60,21 @@ export function InvoiceUpload() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm() && selectedFile) {
-      // Simular subida de archivo
-      const newFile = {
-        id: uploadedFiles.length + 1,
-        name: selectedFile.name,
-        month: formData.month,
-        uploadDate: new Date().toISOString().split('T')[0],
-        size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
-        file: selectedFile,
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onload = () => {
+        const newFile = {
+          id: Date.now(),
+          name: selectedFile.name,
+          month: formData.month,
+          uploadDate: new Date().toISOString().split('T')[0],
+          size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+          file: reader.result,
+        }
+        setUploadedFiles([...uploadedFiles, newFile])
+        setFormData({ month: "", description: "" })
+        setSelectedFile(null)
       }
-      setUploadedFiles([...uploadedFiles, newFile])
-      setFormData({ month: "", description: "" })
-      setSelectedFile(null)
     }
   }
 
@@ -85,9 +92,13 @@ export function InvoiceUpload() {
     }
   }
 
-  const viewFile = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+  const viewFile = (file: File | string) => {
+    if (typeof file === 'string') {
+      setPreviewUrl(file);
+    } else {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   }
 
   return (
@@ -141,33 +152,16 @@ export function InvoiceUpload() {
                   </div>
                 )}
               </div>
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="invoice-description" style={{ color: colors.text }}>
-                  Descripción (Opcional)
-                </Label>
-                <Input 
-                  id="invoice-description" 
-                  placeholder="Ej: Sesiones de terapia ocupacional"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="h-11"
-                  style={{
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    color: colors.text
-                  }}
-                />
-              </div>
             </div>
 
             {/* Zona de arrastrar y soltar */}
             <div 
-              className="border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 hover:border-primary/50"
-              style={{ borderColor: colors.border }}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 hover:border-primary/50 ${selectedFile ? 'bg-primary-50 border-primary-500' : ''}`}
+              style={{ borderColor: errors.file ? colors.error[500] : colors.border }}
             >
               <input type="file" id="file-upload" className="hidden" onChange={handleFileChange} accept="application/pdf" />
-              <Upload className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
-              <p className="text-sm mb-2" style={{ color: colors.textMuted }}>
+              <Upload className="h-12 w-12 mx-auto mb-4" style={{ color: selectedFile ? colors.primary[500] : colors.textMuted }} />
+              <p className={`text-sm mb-2 font-medium ${selectedFile ? 'text-primary-700' : 'text-textMuted'}`}>
                 {selectedFile ? selectedFile.name : "Arrastra tu archivo PDF aquí o"}
               </p>
               <Button variant="outline" size="sm" type="button" onClick={() => document.getElementById('file-upload')?.click()}>
@@ -176,6 +170,12 @@ export function InvoiceUpload() {
               <p className="text-xs mt-2" style={{ color: colors.textMuted }}>
                 Solo archivos PDF, máximo 10MB
               </p>
+              {errors.file && (
+                <div className="flex items-center justify-center gap-1 text-sm mt-2" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.file}
+                </div>
+              )}
             </div>
 
             <Button 
@@ -201,23 +201,45 @@ export function InvoiceUpload() {
           borderColor: colors.border 
         }}
       >
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" style={{ color: colors.secondary[500] }} />
             <span style={{ color: colors.text }}>Facturas Subidas</span>
           </CardTitle>
+          <div className="flex gap-2">
+            <select value={filter.month} onChange={e => setFilter({ ...filter, month: e.target.value })} className="flex h-9 w-full rounded-md border px-3 py-1 text-sm transition-all duration-200" style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}>
+              <option value="">Filtrar por mes</option>
+              {Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('es-AR', { month: 'long' })).map(month => (
+                <option key={month} value={month}>{month}</option>
+              ))}
+            </select>
+            <select value={filter.year} onChange={e => setFilter({ ...filter, year: e.target.value })} className="flex h-9 w-full rounded-md border px-3 py-1 text-sm transition-all duration-200" style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}>
+              <option value="">Filtrar por año</option>
+              {Array.from({ length: new Date().getFullYear() - 2022 }, (_, i) => 2023 + i).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </CardHeader>
         <CardContent>
-          {uploadedFiles.length === 0 ? (
+          {uploadedFiles.filter(file => {
+            if (filter.month && !file.month.toLowerCase().includes(filter.month.toLowerCase())) return false;
+            if (filter.year && !file.month.includes(filter.year)) return false;
+            return true;
+          }).length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
               <p className="text-sm" style={{ color: colors.textMuted }}>
-                No hay facturas subidas aún
+                No hay facturas que coincidan con los filtros
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {uploadedFiles.map((file) => (
+              {uploadedFiles.filter(file => {
+                if (filter.month && !file.month.toLowerCase().includes(filter.month.toLowerCase())) return false;
+                if (filter.year && !file.month.includes(filter.year)) return false;
+                return true;
+              }).map((file) => (
                 <div
                   key={file.id}
                   className="flex items-center justify-between p-4 border rounded-lg transition-colors duration-200 hover:bg-muted/50"
