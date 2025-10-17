@@ -7,24 +7,7 @@ import colors from "@/lib/colors"
 
 export function InvoiceUpload() {
   const { confirm, ConfirmDialog } = useConfirmation();
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { 
-      id: 1, 
-      name: "Factura_Enero_2024.pdf", 
-      month: "Enero 2024", 
-      uploadDate: "2024-01-31", 
-      size: "245 KB",
-      file: null
-    },
-    {
-      id: 2,
-      name: "Factura_Febrero_2024.pdf",
-      month: "Febrero 2024",
-      uploadDate: "2024-02-29",
-      size: "198 KB",
-      file: null
-    },
-  ])
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -34,6 +17,17 @@ export function InvoiceUpload() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const storedFiles = localStorage.getItem("uploadedInvoices");
+    if (storedFiles) {
+      setUploadedFiles(JSON.parse(storedFiles));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("uploadedInvoices", JSON.stringify(uploadedFiles));
+  }, [uploadedFiles]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -131,11 +125,14 @@ export function InvoiceUpload() {
                   }}
                 >
                   <option value="">Seleccionar mes</option>
-                  {Array.from({ length: new Date().getFullYear() - 2022 }, (_, i) => 2023 + i).flatMap(year =>
-                    Array.from({ length: 12 }, (_, j) => new Date(year, j).toLocaleString('es-AR', { month: 'long' }) + ' ' + year)
-                  ).map(monthYear => (
-                    <option key={monthYear} value={monthYear}>{monthYear}</option>
-                  ))}
+                  {Array.from({ length: 3 }, (_, i) => {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    return date;
+                  }).map(date => {
+                    const monthYear = date.toLocaleString('es-AR', { month: 'long', year: 'numeric' });
+                    return <option key={monthYear} value={monthYear}>{monthYear}</option>
+                  })}
                 </select>
                 {errors.month && (
                   <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>

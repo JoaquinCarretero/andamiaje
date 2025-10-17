@@ -40,6 +40,7 @@ export { WelcomeSignatureModal } from "./welcome-signature-modal";
 export { NotificationsModal } from "./notifications-modal";
 export { ProfileCompletionBanner } from "./profile-completion-banner";
 export { ProfileEditModal } from "./profile-edit-modal";
+export { PDFPreviewModal } from "@/features/reports/utils/pdf-preview-modal";
 
 // Complex Components
 export { Sidebar } from "./sidebar";

@@ -234,19 +234,21 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <div className="flex items-center justify-between gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => router.back()}
-              className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
-              style={{
-                color: colors.textMuted,
-                backgroundColor: colors.surface,
-                border: `1px solid ${colors.border}`,
-              }}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
-            </Button>
+            <div>
+              <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
+                style={{
+                  color: colors.textMuted,
+                  backgroundColor: colors.surface,
+                  border: `1px solid ${colors.border}`,
+                }}
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Volver
+              </Button>
+            </div>
             <div className="text-right">
               <h1
                 className="font-display text-3xl lg:text-4xl font-bold mb-2"
@@ -259,7 +261,7 @@ export default function ProfilePage() {
               </p>
             </div>
             {!isEditing && (
-              <div className="flex gap-3 ml-auto">
+              <div className="flex gap-3">
                 <Button
                   onClick={() => router.push("/cambiar-contrasena")}
                   variant="outline"
