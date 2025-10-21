@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Badge, useConfirmation, PDFPreviewModal } from "@/ui"
 import { Upload, FileText, Trash2, CheckCircle, Calendar, AlertCircle, Eye } from "lucide-react"
 import colors from "@/lib/colors"
+import { useEffect } from "react"
 
 export function InvoiceUpload() {
   const { confirm, ConfirmDialog } = useConfirmation();
