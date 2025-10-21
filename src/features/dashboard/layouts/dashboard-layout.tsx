@@ -342,7 +342,7 @@ export const DashboardLayout = memo(function DashboardLayout({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="grid grid-cols-1 xl:grid-cols-3 gap-8"
+                className="grid grid-cols-1 xl:grid-cols-3 gap-8 will-change-transform"
               >
                 <div className="xl:col-span-2">
                   {/* Header de bienvenida mejorado */}
@@ -515,44 +515,40 @@ export const DashboardLayout = memo(function DashboardLayout({
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6"
+                className="flex items-center justify-between gap-6"
               >
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="ghost"
-                    onClick={() => onNavigate("dashboard")}
-                    className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
-                    style={{
-                      color: colors.textMuted,
-                      backgroundColor: colors.surface,
-                      border: `1px solid ${colors.border}`,
-                    }}
+                <Button
+                  variant="ghost"
+                  onClick={() => onNavigate("dashboard")}
+                  className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
+                  style={{
+                    color: colors.textMuted,
+                    backgroundColor: colors.surface,
+                    border: `1px solid ${colors.border}`,
+                  }}
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Volver al Dashboard
+                </Button>
+
+                <div className="text-right">
+                  <h1
+                    className="font-display text-2xl lg:text-3xl font-bold mb-1"
+                    style={{ color: colors.text }}
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Volver al Dashboard
-                  </Button>
-
-                  <div className="h-8 w-px" style={{ backgroundColor: colors.border }} />
-
-                  <div>
-                    <h1
-                      className="font-display text-2xl lg:text-3xl font-bold mb-1"
-                      style={{ color: colors.text }}
-                    >
-                      {currentView === "plan-trabajo" && "Plan de Trabajo"}
-                      {currentView === "informe-inicial" && "Informe Inicial"}
-                      {currentView === "informe-semestral" && "Informe Semestral"}
-                      {currentView === "reporte-mensual" && "Reporte Mensual"}
-                      {currentView === "seguimiento-acompanantes" && "Seguimiento de Acompañantes"}
-                      {currentView === "seguimiento-flia" && "Seguimiento de Familias"}
-                      {currentView === "actas" && "Actas de Reunión"}
-                      {currentView === "facturas" && "Gestión de Facturas"}
-                    </h1>
-                    <p className="text-sm" style={{ color: colors.textMuted }}>
-                      {AuthService.getRoleTitle(userData?.role)} •{" "}
-                      {new Date().toLocaleDateString("es-AR")}
-                    </p>
-                  </div>
+                    {currentView === "plan-trabajo" && "Plan de Trabajo"}
+                    {currentView === "informe-inicial" && "Informe Inicial"}
+                    {currentView === "informe-semestral" && "Informe Semestral"}
+                    {currentView === "reporte-mensual" && "Reporte Mensual"}
+                    {currentView === "seguimiento-acompanantes" && "Seguimiento de Acompañantes"}
+                    {currentView === "seguimiento-flia" && "Seguimiento de Familias"}
+                    {currentView === "actas" && "Actas de Reunión"}
+                    {currentView === "facturas" && "Gestión de Facturas"}
+                  </h1>
+                  <p className="text-sm" style={{ color: colors.textMuted }}>
+                    {AuthService.getRoleTitle(userData?.role)} •{" "}
+                    {new Date().toLocaleDateString("es-AR")}
+                  </p>
                 </div>
               </motion.div>
 

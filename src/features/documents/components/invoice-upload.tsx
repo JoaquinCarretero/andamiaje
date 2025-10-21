@@ -1,27 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Badge } from "@/ui"
-import { Upload, FileText, Trash2, CheckCircle, Calendar, AlertCircle } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Label, Badge, useConfirmation, PDFPreviewModal } from "@/ui"
+import { Upload, FileText, Trash2, CheckCircle, Calendar, AlertCircle, Eye } from "lucide-react"
 import colors from "@/lib/colors"
 
 export function InvoiceUpload() {
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { 
-      id: 1, 
-      name: "Factura_Enero_2024.pdf", 
-      month: "Enero 2024", 
-      uploadDate: "2024-01-31", 
-      size: "245 KB" 
-    },
-    {
-      id: 2,
-      name: "Factura_Febrero_2024.pdf",
-      month: "Febrero 2024",
-      uploadDate: "2024-02-29",
-      size: "198 KB",
-    },
-  ])
+  const { confirm, ConfirmDialog } = useConfirmation();
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     month: "",
@@ -29,6 +17,18 @@ export function InvoiceUpload() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [filter, setFilter] = useState({ month: "", year: "" });
+
+  useEffect(() => {
+    const storedFiles = localStorage.getItem("uploadedInvoices");
+    if (storedFiles) {
+      setUploadedFiles(JSON.parse(storedFiles));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("uploadedInvoices", JSON.stringify(uploadedFiles));
+  }, [uploadedFiles]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -43,29 +43,62 @@ export function InvoiceUpload() {
     if (!formData.month) {
       newErrors.month = "Debe seleccionar el mes"
     }
+    if (!selectedFile) {
+      newErrors.file = "Debe seleccionar un archivo"
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm()) {
-      // Simular subida de archivo
-      const newFile = {
-        id: uploadedFiles.length + 1,
-        name: `Factura_${formData.month.replace(' ', '_')}.pdf`,
-        month: formData.month,
-        uploadDate: new Date().toISOString().split('T')[0],
-        size: "156 KB"
-      }
-      setUploadedFiles([...uploadedFiles, newFile])
-      setFormData({ month: "", description: "" })
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
     }
   }
 
-  const removeFile = (id: number) => {
-    setUploadedFiles(uploadedFiles.filter(file => file.id !== id))
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (validateForm() && selectedFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onload = () => {
+        const newFile = {
+          id: Date.now(),
+          name: selectedFile.name,
+          month: formData.month,
+          uploadDate: new Date().toISOString().split('T')[0],
+          size: `${(selectedFile.size / 1024).toFixed(2)} KB`,
+          file: reader.result,
+        }
+        setUploadedFiles([...uploadedFiles, newFile])
+        setFormData({ month: "", description: "" })
+        setSelectedFile(null)
+      }
+    }
+  }
+
+  const removeFile = async (id: number) => {
+    const confirmed = await confirm({
+      title: "¿Eliminar factura?",
+      description: "Esta acción no se puede deshacer.",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      type: "danger",
+    });
+
+    if (confirmed) {
+      setUploadedFiles(uploadedFiles.filter(file => file.id !== id))
+    }
+  }
+
+  const viewFile = (file: File | string) => {
+    if (typeof file === 'string') {
+      setPreviewUrl(file);
+    } else {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   }
 
   return (
@@ -103,16 +136,14 @@ export function InvoiceUpload() {
                   }}
                 >
                   <option value="">Seleccionar mes</option>
-                  <option value="Marzo 2024">Marzo 2024</option>
-                  <option value="Abril 2024">Abril 2024</option>
-                  <option value="Mayo 2024">Mayo 2024</option>
-                  <option value="Junio 2024">Junio 2024</option>
-                  <option value="Julio 2024">Julio 2024</option>
-                  <option value="Agosto 2024">Agosto 2024</option>
-                  <option value="Septiembre 2024">Septiembre 2024</option>
-                  <option value="Octubre 2024">Octubre 2024</option>
-                  <option value="Noviembre 2024">Noviembre 2024</option>
-                  <option value="Diciembre 2024">Diciembre 2024</option>
+                  {Array.from({ length: 3 }, (_, i) => {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    return date;
+                  }).map(date => {
+                    const monthYear = date.toLocaleString('es-AR', { month: 'long', year: 'numeric' });
+                    return <option key={monthYear} value={monthYear}>{monthYear}</option>
+                  })}
                 </select>
                 {errors.month && (
                   <div className="flex items-center gap-1 text-sm" style={{ color: colors.error[500] }}>
@@ -121,40 +152,30 @@ export function InvoiceUpload() {
                   </div>
                 )}
               </div>
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="invoice-description" style={{ color: colors.text }}>
-                  Descripción (Opcional)
-                </Label>
-                <Input 
-                  id="invoice-description" 
-                  placeholder="Ej: Sesiones de terapia ocupacional"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className="h-11"
-                  style={{
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    color: colors.text
-                  }}
-                />
-              </div>
             </div>
 
             {/* Zona de arrastrar y soltar */}
             <div 
-              className="border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 hover:border-primary/50"
-              style={{ borderColor: colors.border }}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 hover:border-primary/50 ${selectedFile ? 'bg-primary-50 border-primary-500' : ''}`}
+              style={{ borderColor: errors.file ? colors.error[500] : colors.border }}
             >
-              <Upload className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
-              <p className="text-sm mb-2" style={{ color: colors.textMuted }}>
-                Arrastra tu archivo PDF aquí o
+              <input type="file" id="file-upload" className="hidden" onChange={handleFileChange} accept="application/pdf" />
+              <Upload className="h-12 w-12 mx-auto mb-4" style={{ color: selectedFile ? colors.primary[500] : colors.textMuted }} />
+              <p className={`text-sm mb-2 font-medium ${selectedFile ? 'text-primary-700' : 'text-textMuted'}`}>
+                {selectedFile ? selectedFile.name : "Arrastra tu archivo PDF aquí o"}
               </p>
-              <Button variant="outline" size="sm" type="button">
+              <Button variant="outline" size="sm" type="button" onClick={() => document.getElementById('file-upload')?.click()}>
                 Seleccionar archivo
               </Button>
               <p className="text-xs mt-2" style={{ color: colors.textMuted }}>
                 Solo archivos PDF, máximo 10MB
               </p>
+              {errors.file && (
+                <div className="flex items-center justify-center gap-1 text-sm mt-2" style={{ color: colors.error[500] }}>
+                  <AlertCircle className="h-4 w-4" />
+                  {errors.file}
+                </div>
+              )}
             </div>
 
             <Button 
@@ -180,23 +201,45 @@ export function InvoiceUpload() {
           borderColor: colors.border 
         }}
       >
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" style={{ color: colors.secondary[500] }} />
             <span style={{ color: colors.text }}>Facturas Subidas</span>
           </CardTitle>
+          <div className="flex gap-2">
+            <select value={filter.month} onChange={e => setFilter({ ...filter, month: e.target.value })} className="flex h-9 w-full rounded-md border px-3 py-1 text-sm transition-all duration-200" style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}>
+              <option value="">Filtrar por mes</option>
+              {Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('es-AR', { month: 'long' })).map(month => (
+                <option key={month} value={month}>{month}</option>
+              ))}
+            </select>
+            <select value={filter.year} onChange={e => setFilter({ ...filter, year: e.target.value })} className="flex h-9 w-full rounded-md border px-3 py-1 text-sm transition-all duration-200" style={{ backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }}>
+              <option value="">Filtrar por año</option>
+              {Array.from({ length: new Date().getFullYear() - 2022 }, (_, i) => 2023 + i).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
         </CardHeader>
         <CardContent>
-          {uploadedFiles.length === 0 ? (
+          {uploadedFiles.filter(file => {
+            if (filter.month && !file.month.toLowerCase().includes(filter.month.toLowerCase())) return false;
+            if (filter.year && !file.month.includes(filter.year)) return false;
+            return true;
+          }).length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: colors.textMuted }} />
               <p className="text-sm" style={{ color: colors.textMuted }}>
-                No hay facturas subidas aún
+                No hay facturas que coincidan con los filtros
               </p>
             </div>
           ) : (
             <div className="space-y-3">
-              {uploadedFiles.map((file) => (
+              {uploadedFiles.filter(file => {
+                if (filter.month && !file.month.toLowerCase().includes(filter.month.toLowerCase())) return false;
+                if (filter.year && !file.month.includes(filter.year)) return false;
+                return true;
+              }).map((file) => (
                 <div
                   key={file.id}
                   className="flex items-center justify-between p-4 border rounded-lg transition-colors duration-200 hover:bg-muted/50"
@@ -223,17 +266,15 @@ export function InvoiceUpload() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge 
-                      variant="default" 
-                      className="text-xs"
-                      style={{
-                        backgroundColor: colors.success[500],
-                        color: colors.surface
-                      }}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => viewFile(file.file as File)}
+                      disabled={!file.file}
                     >
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Subida
-                    </Badge>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Ver
+                    </Button>
                     <Button 
                       variant="ghost" 
                       size="icon"
@@ -249,6 +290,13 @@ export function InvoiceUpload() {
           )}
         </CardContent>
       </Card>
+      <PDFPreviewModal
+        isOpen={!!previewUrl}
+        onClose={() => setPreviewUrl(null)}
+        title="Vista Previa de Factura"
+        pdfUrl={previewUrl || ""}
+      />
+      <ConfirmDialog />
     </div>
   )
 }

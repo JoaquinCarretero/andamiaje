@@ -34,6 +34,7 @@ import {
   Textarea,
   Breadcrumbs,
   ConfirmationDialog,
+  ProfileEditModal,
 } from "@/ui";
 import { Navbar } from "@/shared";
 import { useSignature, StoredSignature } from "@/lib/signature-storage";
@@ -42,15 +43,17 @@ import { AuthService } from "@/lib/auth";
 import { apiClient } from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { logoutThunk, checkAuthThunk } from "@/features/auth";
+import { useToast } from "@/lib/hooks/use-toast";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { getSignature } = useSignature();
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, initialized, loading } = useAppSelector((state) => state.auth);
+  const { toast } = useToast();
 
   // Estados
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
   const [localSignature, setLocalSignature] = useState<StoredSignature | null>(null);
@@ -115,32 +118,29 @@ export default function ProfilePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialized, isAuthenticated, serverSignatureKey, router]);
 
-  const handleSave = async () => {
+  const handleSave = async (data: typeof formData) => {
     if (!user) return;
 
     setIsSaving(true);
     try {
-      await apiClient.updateUserProfile(user.id, formData);
+      await apiClient.updateUserProfile(user.id, data);
       await dispatch(checkAuthThunk()).unwrap();
-      setIsEditing(false);
+      setIsEditModalOpen(false);
+      toast({
+        title: "¡Perfil actualizado!",
+        description: "Tus datos han sido guardados correctamente.",
+        variant: "success",
+      });
     } catch (error) {
       console.error("Error updating profile:", error);
+      toast({
+        title: "Error al actualizar",
+        description: "No se pudieron guardar los cambios. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleCancel = () => {
-    if (user) {
-      setFormData({
-        phone: user.phone || "",
-        bio: user.bio || "",
-        specialty: user.specialty || "",
-        license: user.license || "",
-        experience: user.experience || "",
-      });
-    }
-    setIsEditing(false);
   };
 
   const handleLogout = async () => {
@@ -221,62 +221,31 @@ export default function ProfilePage() {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="mb-8"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => router.back()}
-                className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
-                style={{
-                  color: colors.textMuted,
-                  backgroundColor: colors.surface,
-                  border: `1px solid ${colors.border}`,
-                }}
+          <div className="flex items-center justify-between gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="w-fit rounded-xl transition-all duration-200 hover:shadow-md hover:scale-105"
+              style={{
+                color: colors.textMuted,
+                backgroundColor: colors.surface,
+                border: `1px solid ${colors.border}`,
+              }}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver
+            </Button>
+            <div className="text-right flex-grow">
+              <h1
+                className="font-display text-3xl lg:text-4xl font-bold mb-2"
+                style={{ color: colors.text }}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Volver
-              </Button>
-              <div>
-                <h1
-                  className="font-display text-3xl lg:text-4xl font-bold mb-2"
-                  style={{ color: colors.text }}
-                >
-                  Mi Perfil
-                </h1>
-                <p className="text-base" style={{ color: colors.textMuted }}>
-                  Administra tu información personal y profesional
-                </p>
-              </div>
+                Mi Perfil
+              </h1>
+              <p className="text-base" style={{ color: colors.textMuted }}>
+                Administra tu información personal y profesional
+              </p>
             </div>
-
-            {!isEditing && (
-              <div className="flex gap-3">
-                <Button
-                  onClick={() => router.push("/cambiar-contrasena")}
-                  variant="outline"
-                  className="rounded-xl h-11 transition-all duration-200 hover:shadow-md"
-                  style={{
-                    borderColor: colors.border,
-                    color: colors.text,
-                  }}
-                >
-                  <Key className="h-4 w-4 mr-2" />
-                  Cambiar Contraseña
-                </Button>
-                <Button
-                  onClick={() => setShowLogoutDialog(true)}
-                  variant="outline"
-                  className="rounded-xl h-11 transition-all duration-200 hover:shadow-md"
-                  style={{
-                    borderColor: colors.error[300],
-                    color: colors.error[600],
-                  }}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Cerrar Sesión
-                </Button>
-              </div>
-            )}
           </div>
         </motion.div>
 
@@ -306,21 +275,19 @@ export default function ProfilePage() {
                         Información Personal
                       </span>
                     </CardTitle>
-                    {!isEditing && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsEditing(true)}
-                        className="rounded-xl hover:shadow-md transition-all duration-200"
-                        style={{
-                          borderColor: colors.primary[200],
-                          color: colors.primary[600],
-                        }}
-                      >
-                        <Edit3 className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="rounded-xl hover:shadow-md transition-all duration-200"
+                      style={{
+                        borderColor: colors.primary[200],
+                        color: colors.primary[600],
+                      }}
+                    >
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Editar
+                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
@@ -377,52 +344,37 @@ export default function ProfilePage() {
                         <Phone className="h-4 w-4" />
                         Teléfono
                       </Label>
-                      {isEditing ? (
-                        <Input
-                          id="phone"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="Ingrese su teléfono"
-                          className="h-12 rounded-xl"
-                          style={{
-                            backgroundColor: colors.surface,
-                            borderColor: colors.primary[200],
-                            color: colors.text,
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
-                          style={{
-                            backgroundColor: user.phone ? colors.success[50] : colors.warning[50],
-                            borderColor: user.phone ? colors.success[200] : colors.warning[200],
-                            color: colors.text,
-                          }}
-                        >
-                          {user.phone ? (
-                            <>
-                              <CheckCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.success[600] }}
-                              />
-                              <span className="font-medium">{user.phone}</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.warning[600] }}
-                              />
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: colors.warning[700] }}
-                              >
-                                No especificado
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )}
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: user.phone ? colors.success[50] : colors.warning[50],
+                          borderColor: user.phone ? colors.success[200] : colors.warning[200],
+                          color: colors.text,
+                        }}
+                      >
+                        {user.phone ? (
+                          <>
+                            <CheckCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.success[600] }}
+                            />
+                            <span className="font-medium">{user.phone}</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.warning[600] }}
+                            />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: colors.warning[700] }}
+                            >
+                              No especificado
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* Rol */}
@@ -487,49 +439,39 @@ export default function ProfilePage() {
                         <GraduationCap className="h-4 w-4" />
                         Especialidad
                       </Label>
-                      {isEditing ? (
-                        <Input
-                          id="specialty"
-                          value={formData.specialty}
-                          onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
-                          placeholder="Ej: Terapia Ocupacional"
-                          className="h-12 rounded-xl"
-                        />
-                      ) : (
-                        <div
-                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
-                          style={{
-                            backgroundColor: user.specialty
-                              ? colors.success[50]
-                              : colors.warning[50],
-                            borderColor: user.specialty ? colors.success[200] : colors.warning[200],
-                            color: colors.text,
-                          }}
-                        >
-                          {user.specialty ? (
-                            <>
-                              <CheckCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.success[600] }}
-                              />
-                              <span className="font-medium">{user.specialty}</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.warning[600] }}
-                              />
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: colors.warning[700] }}
-                              >
-                                No especificada
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )}
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: user.specialty
+                            ? colors.success[50]
+                            : colors.warning[50],
+                          borderColor: user.specialty ? colors.success[200] : colors.warning[200],
+                          color: colors.text,
+                        }}
+                      >
+                        {user.specialty ? (
+                          <>
+                            <CheckCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.success[600] }}
+                            />
+                            <span className="font-medium">{user.specialty}</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.warning[600] }}
+                            />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: colors.warning[700] }}
+                            >
+                              No especificada
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* Matrícula */}
@@ -542,47 +484,37 @@ export default function ProfilePage() {
                         <Award className="h-4 w-4" />
                         Matrícula Profesional
                       </Label>
-                      {isEditing ? (
-                        <Input
-                          id="license"
-                          value={formData.license}
-                          onChange={(e) => setFormData({ ...formData, license: e.target.value })}
-                          placeholder="Ej: MP 12345"
-                          className="h-12 rounded-xl"
-                        />
-                      ) : (
-                        <div
-                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
-                          style={{
-                            backgroundColor: user.license ? colors.success[50] : colors.warning[50],
-                            borderColor: user.license ? colors.success[200] : colors.warning[200],
-                            color: colors.text,
-                          }}
-                        >
-                          {user.license ? (
-                            <>
-                              <CheckCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.success[600] }}
-                              />
-                              <span className="font-medium">{user.license}</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.warning[600] }}
-                              />
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: colors.warning[700] }}
-                              >
-                                No especificada
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )}
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: user.license ? colors.success[50] : colors.warning[50],
+                          borderColor: user.license ? colors.success[200] : colors.warning[200],
+                          color: colors.text,
+                        }}
+                      >
+                        {user.license ? (
+                          <>
+                            <CheckCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.success[600] }}
+                            />
+                            <span className="font-medium">{user.license}</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.warning[600] }}
+                            />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: colors.warning[700] }}
+                            >
+                              No especificada
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     {/* Fecha de Ingreso */}
@@ -621,51 +553,41 @@ export default function ProfilePage() {
                         <Briefcase className="h-4 w-4" />
                         Años de Experiencia
                       </Label>
-                      {isEditing ? (
-                        <Input
-                          id="experience"
-                          value={formData.experience}
-                          onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                          placeholder="Ej: 5 años"
-                          className="h-12 rounded-xl"
-                        />
-                      ) : (
-                        <div
-                          className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
-                          style={{
-                            backgroundColor: user.experience
-                              ? colors.success[50]
-                              : colors.warning[50],
-                            borderColor: user.experience
-                              ? colors.success[200]
-                              : colors.warning[200],
-                            color: colors.text,
-                          }}
-                        >
-                          {user.experience ? (
-                            <>
-                              <CheckCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.success[600] }}
-                              />
-                              <span className="font-medium">{user.experience}</span>
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle
-                                className="h-4 w-4 mr-2"
-                                style={{ color: colors.warning[600] }}
-                              />
-                              <span
-                                className="text-sm font-medium"
-                                style={{ color: colors.warning[700] }}
-                              >
-                                No especificada
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )}
+                      <div
+                        className="h-12 px-4 py-3 rounded-xl border-2 flex items-center"
+                        style={{
+                          backgroundColor: user.experience
+                            ? colors.success[50]
+                            : colors.warning[50],
+                          borderColor: user.experience
+                            ? colors.success[200]
+                            : colors.warning[200],
+                          color: colors.text,
+                        }}
+                      >
+                        {user.experience ? (
+                          <>
+                            <CheckCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.success[600] }}
+                            />
+                            <span className="font-medium">{user.experience}</span>
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle
+                              className="h-4 w-4 mr-2"
+                              style={{ color: colors.warning[600] }}
+                            />
+                            <span
+                              className="text-sm font-medium"
+                              style={{ color: colors.warning[700] }}
+                            >
+                              No especificada
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -679,15 +601,6 @@ export default function ProfilePage() {
                       <GraduationCap className="h-4 w-4" />
                       Biografía Profesional
                     </Label>
-                    {isEditing ? (
-                      <Textarea
-                        id="bio"
-                        value={formData.bio}
-                        onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                        placeholder="Describa su experiencia, especialidades y enfoque profesional..."
-                        className="min-h-[120px] rounded-xl resize-none"
-                      />
-                    ) : (
                       <div
                         className="min-h-[100px] p-4 rounded-xl border-2"
                         style={{
@@ -707,50 +620,7 @@ export default function ProfilePage() {
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Botones de Edición */}
-                  {isEditing && (
-                    <div
-                      className="flex justify-end gap-3 pt-4 border-t"
-                      style={{ borderColor: colors.border }}
-                    >
-                      <Button
-                        onClick={handleCancel}
-                        variant="outline"
-                        className="rounded-xl h-11"
-                        style={{
-                          borderColor: colors.border,
-                          color: colors.textSecondary,
-                        }}
-                      >
-                        <X className="h-4 w-4 mr-2" />
-                        Cancelar
-                      </Button>
-                      <Button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="rounded-xl h-11"
-                        style={{
-                          backgroundColor: colors.primary[500],
-                          color: colors.surface,
-                        }}
-                      >
-                        {isSaving ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                            Guardando...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            Guardar Cambios
-                          </>
-                        )}
-                      </Button>
                     </div>
-                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -796,6 +666,25 @@ export default function ProfilePage() {
                     >
                       {roleTitle}
                     </Badge>
+                  </div>
+
+                  <div className="mt-6 flex flex-col gap-2">
+                    <Button
+                      onClick={() => router.push("/cambiar-contrasena")}
+                      variant="outline"
+                      className="w-full justify-start text-left"
+                    >
+                      <Key className="h-4 w-4 mr-2" />
+                      Cambiar Contraseña
+                    </Button>
+                    <Button
+                      onClick={() => setShowLogoutDialog(true)}
+                      variant="outline"
+                      className="w-full justify-start text-left text-error-600 hover:bg-error-50 hover:text-error-700"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar Sesión
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -927,6 +816,13 @@ export default function ProfilePage() {
         description="Perderás el acceso a tus datos hasta que vuelvas a iniciar sesión."
         confirmText="Cerrar Sesión"
         cancelText="Cancelar"
+        type="info"
+      />
+      <ProfileEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSave}
+        initialData={formData}
       />
     </div>
   );

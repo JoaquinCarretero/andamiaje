@@ -1,14 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label } from "@/ui"
+import { useState, useEffect, useRef } from "react"
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Label, useAutoSave, SaveIndicator } from "@/ui"
 import { FileText, Save, Send, AlertCircle, Eye } from "lucide-react"
 import { PDFPreviewModal } from "../../utils/pdf-preview-modal"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
+import { useToast } from "@/lib/hooks/use-toast"
 
 export function InitialReportForm() {
   const { getSignature } = useSignature()
+  const { toast } = useToast()
   const [showPDFPreview, setShowPDFPreview] = useState(false)
   const [formData, setFormData] = useState({
     patientName: "",
@@ -21,6 +23,46 @@ export function InitialReportForm() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const { saveStatus, lastSaved, triggerSave } = useAutoSave({
+    onSave: async (data: typeof formData) => {
+      await new Promise(resolve => setTimeout(resolve, 500))
+      localStorage.setItem('initialReport_draft', JSON.stringify({
+        ...data,
+        savedAt: new Date().toISOString()
+      }))
+    },
+    debounceMs: 2000,
+    onError: (error) => {
+      console.error('Error al guardar borrador:', error)
+    }
+  })
+
+  useEffect(() => {
+    const savedDraft = localStorage.getItem('initialReport_draft')
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft)
+        const { savedAt, ...draftData } = draft
+        setFormData(draftData)
+      } catch (error) {
+        console.error('Error al cargar borrador:', error)
+      }
+    }
+  }, [])
+
+  const lastSavedDataRef = useRef<string>("");
+
+  useEffect(() => {
+    const hasSignificantData = formData.patientName.trim() || formData.diagnosis.trim()
+
+    const currentDataString = JSON.stringify(formData);
+
+    if (hasSignificantData && currentDataString !== lastSavedDataRef.current) {
+      lastSavedDataRef.current = currentDataString;
+      triggerSave(formData);
+    }
+  }, [formData, triggerSave])
 
   const calculateAge = (birthDate: string) => {
     if (!birthDate) return ""
@@ -91,6 +133,11 @@ export function InitialReportForm() {
     e.preventDefault()
     if (validateForm()) {
       setShowPDFPreview(true)
+      toast({
+        title: "Informe enviado (simulado)",
+        description: "El informe se ha enviado correctamente.",
+        variant: "success",
+      });
     }
   }
 
@@ -371,11 +418,12 @@ export function InitialReportForm() {
       >
         <CardContent className="p-4">
           <form onSubmit={handleSubmit}>
-            <div className="flex justify-between">
-              <div className="flex gap-2">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 items-center">
                 <Button 
                   type="button"
                   variant="outline"
+                  onClick={() => triggerSave(formData)}
                   style={{
                     borderColor: colors.border,
                     color: colors.textSecondary
@@ -384,7 +432,10 @@ export function InitialReportForm() {
                   <Save className="h-4 w-4 mr-2" />
                   Guardar Borrador
                 </Button>
-                
+                <SaveIndicator status={saveStatus} lastSaved={lastSaved} />
+              </div>
+
+              <div className="flex gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -398,18 +449,18 @@ export function InitialReportForm() {
                   <Eye className="h-4 w-4 mr-2" />
                   Vista Previa
                 </Button>
-              </div>
 
-              <Button
-                type="submit"
-                style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface
-                }}
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Enviar Informe
-              </Button>
+                <Button
+                  type="submit"
+                  style={{
+                    backgroundColor: colors.primary[500],
+                    color: colors.surface
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Enviar Informe
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>

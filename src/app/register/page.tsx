@@ -17,12 +17,14 @@ import { registerSchema, type RegisterFormData } from "@/features/auth";
 import { UserRole } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { registerThunk, clearError } from "@/features/auth";
+import { useToast } from "@/lib/hooks/use-toast";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { error } = useAppSelector((state) => state.auth);
+  const { toast } = useToast();
 
   // React Hook Form setup
   const {
@@ -62,11 +64,21 @@ export default function RegisterPage() {
         registerThunk({ firstName, lastName, email, phone, documentNumber, password, role })
       ).unwrap();
       if (action.user) {
+        toast({
+          title: "¡Cuenta creada con éxito!",
+          description: "Ahora serás redirigido a la página de tu perfil.",
+          variant: "success",
+        });
         const roleRoute = AuthService.getRoleForRouting(action.user.role);
         router.replace(`/${roleRoute}`);
       }
     } catch (error) {
       console.error("Register error:", error);
+      toast({
+        title: "Error en el registro",
+        description: "Hubo un problema al crear tu cuenta. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
     }
   };
 

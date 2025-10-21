@@ -200,7 +200,7 @@ export function ConfirmationDialog({
           </div>
         )}
 
-        <AlertDialogFooter className="gap-2 sm:gap-0">
+        <AlertDialogFooter className="flex justify-between w-full">
           <AlertDialogCancel
             onClick={handleCancel}
             disabled={isLoading}

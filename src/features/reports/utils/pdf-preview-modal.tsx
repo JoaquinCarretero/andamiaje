@@ -13,10 +13,11 @@ interface PDFPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  content: React.ReactNode;
+  content?: React.ReactNode;
   patientName?: string;
   professionalName?: string;
   date?: string;
+  pdfUrl?: string;
 }
 
 export function PDFPreviewModal({
@@ -27,6 +28,7 @@ export function PDFPreviewModal({
   patientName = "",
   professionalName = "",
   date = "",
+  pdfUrl,
 }: PDFPreviewModalProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -142,113 +144,119 @@ export function PDFPreviewModal({
         </CardHeader>
 
         <CardContent className="p-0">
-          <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
-            <div
-              ref={contentRef}
-              className="p-8 bg-white"
-              style={{
-                fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
-                lineHeight: "1.6",
-                color: "#000000",
-                letterSpacing: "0.5px",
-              }}
-            >
-              {/* Header del documento */}
+          {pdfUrl ? (
+            <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
+              <iframe src={pdfUrl} width="100%" height="100%" style={{ minHeight: '70vh' }} />
+            </div>
+          ) : (
+            <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
               <div
-                className="text-center mb-8 pb-6 border-b-2"
-                style={{ borderColor: colors.primary[500] }}
+                ref={contentRef}
+                className="p-8 bg-white"
+                style={{
+                  fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
+                  lineHeight: "1.6",
+                  color: "#000000",
+                  letterSpacing: "0.5px",
+                }}
               >
-                <div className="w-32 h-24 relative mx-auto mb-4">
-                  <Image
-                    src="/LogotipoFinalWEBJPEG.png"
-                    alt="Andamiaje Logo"
-                    fill
-                    sizes="128px"
-                    className="object-contain"
-                  />
-                </div>
-                <h1
-                  className="text-2xl font-bold mb-2"
-                  style={{ color: colors.primary[500], letterSpacing: "0.8px" }}
+                {/* Header del documento */}
+                <div
+                  className="text-center mb-8 pb-6 border-b-2"
+                  style={{ borderColor: colors.primary[500] }}
                 >
-                  ANDAMIAJE - CENTRO DE REHABILITACIÓN
-                </h1>
-                <h2
-                  className="text-xl font-semibold"
-                  style={{ color: colors.text, letterSpacing: "0.6px" }}
-                >
-                  {title}
-                </h2>
-              </div>
+                  <div className="w-32 h-24 relative mx-auto mb-4">
+                    <Image
+                      src="/LogotipoFinalWEBJPEG.png"
+                      alt="Andamiaje Logo"
+                      fill
+                      sizes="128px"
+                      className="object-contain"
+                    />
+                  </div>
+                  <h1
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: colors.primary[500], letterSpacing: "0.8px" }}
+                  >
+                    ANDAMIAJE - CENTRO DE REHABILITACIÓN
+                  </h1>
+                  <h2
+                    className="text-xl font-semibold"
+                    style={{ color: colors.text, letterSpacing: "0.6px" }}
+                  >
+                    {title}
+                  </h2>
+                </div>
 
-              {/* Información del documento */}
-              <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Paciente:</p>
-                  <p className="font-semibold">{patientName}</p>
+                {/* Información del documento */}
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Paciente:</p>
+                    <p className="font-semibold">{patientName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Fecha:</p>
+                    <p className="font-semibold">{date}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Profesional:</p>
+                    <p className="font-semibold">{professionalName}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Documento:</p>
+                    <p className="font-semibold">{title}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Fecha:</p>
-                  <p className="font-semibold">{date}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Profesional:</p>
-                  <p className="font-semibold">{professionalName}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Documento:</p>
-                  <p className="font-semibold">{title}</p>
-                </div>
-              </div>
 
-              {/* Contenido del documento */}
-              <div className="mb-12">{content}</div>
+                {/* Contenido del documento */}
+                <div className="mb-12">{content}</div>
 
-              {/* Firma */}
-              {storedSignature && (
-                <div className="mt-16 pt-8 border-t-2" style={{ borderColor: colors.border }}>
-                  <div className="flex justify-center mb-8">
-                    <div className="flex items-end gap-16 w-full max-w-2xl">
-                      <div className="flex-1 text-center">
-                        <div
-                          className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center"
-                          style={{ borderColor: colors.text }}
-                        >
-                          {/* Firma digital en Base64 desde localStorage */}
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={storedSignature.signature}
-                            alt="Firma digital"
-                            className="max-h-16 max-w-full object-contain"
-                          />
+                {/* Firma */}
+                {storedSignature && (
+                  <div className="mt-16 pt-8 border-t-2" style={{ borderColor: colors.border }}>
+                    <div className="flex justify-center mb-8">
+                      <div className="flex items-end gap-16 w-full max-w-2xl">
+                        <div className="flex-1 text-center">
+                          <div
+                            className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center"
+                            style={{ borderColor: colors.text }}
+                          >
+                            {/* Firma digital en Base64 desde localStorage */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={storedSignature.signature}
+                              alt="Firma digital"
+                              className="max-h-16 max-w-full object-contain"
+                            />
+                          </div>
+                          <p className="text-sm font-medium">Firma del Profesional</p>
                         </div>
-                        <p className="text-sm font-medium">Firma del Profesional</p>
-                      </div>
-                      <div className="flex-1 text-center">
-                        <div
-                          className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center"
-                          style={{ borderColor: colors.text }}
-                        >
-                          <p className="text-sm font-medium">{storedSignature.name}</p>
+                        <div className="flex-1 text-center">
+                          <div
+                            className="border-b-2 pb-4 mb-3 h-20 flex items-end justify-center"
+                            style={{ borderColor: colors.text }}
+                          >
+                            <p className="text-sm font-medium">{storedSignature.name}</p>
+                          </div>
+                          <p className="text-sm font-medium">Aclaración</p>
                         </div>
-                        <p className="text-sm font-medium">Aclaración</p>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="text-center">
-                    <p className="text-xs text-gray-500">
-                      Documento firmado digitalmente el {new Date().toLocaleDateString("es-AR")} a
-                      las {new Date().toLocaleTimeString("es-AR")}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Esta firma digital tiene validez legal según la Ley 25.506 de Firma Digital
-                    </p>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500">
+                        Documento firmado digitalmente el {new Date().toLocaleDateString("es-AR")} a
+                        las {new Date().toLocaleTimeString("es-AR")}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Esta firma digital tiene validez legal según la Ley 25.506 de Firma Digital
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

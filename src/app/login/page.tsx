@@ -37,12 +37,14 @@ import { AuthService } from "@/lib/auth";
 import { loginSchema, type LoginFormData } from "@/features/auth";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { loginThunk, clearError } from "@/features/auth";
+import { useToast } from "@/lib/hooks/use-toast";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { error } = useAppSelector((state) => state.auth);
+  const { toast } = useToast();
 
   // React Hook Form setup
   const {
@@ -67,12 +69,21 @@ export default function LoginPage() {
     try {
       const action = await dispatch(loginThunk(data)).unwrap();
       if (action.user) {
+        toast({
+          title: "¡Inicio de sesión exitoso!",
+          description: "Bienvenido de nuevo.",
+          variant: "success",
+        });
         const roleRoute = AuthService.getRoleForRouting(action.user.role);
         router.replace(`/${roleRoute}`);
       }
     } catch (err) {
       console.error("Login error:", err);
-      // El error se manejará a través del estado de Redux
+      toast({
+        title: "Error al iniciar sesión",
+        description: "El DNI o la contraseña son incorrectos. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
+      });
     }
   };
 

@@ -279,21 +279,6 @@ export function WorkPlanForm() {
 
   return (
     <>
-      {/* ✅ Indicador de guardado automático */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
-            Plan de Trabajo
-          </h2>
-          <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>
-            Tus cambios se guardan automáticamente
-          </p>
-        </div>
-        <SaveIndicator 
-          status={saveStatus} 
-          lastSaved={lastSaved}
-        />
-      </div>
 
       {/* Layout horizontal optimizado - 3 columnas */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -757,11 +742,12 @@ export function WorkPlanForm() {
       >
         <CardContent className="p-4">
           <form onSubmit={handleSubmit}>
-            <div className="flex justify-between">
-              <div className="flex gap-2">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 items-center">
                 <Button 
                   type="button"
                   variant="outline"
+                  onClick={() => triggerSave(formData)}
                   style={{
                     borderColor: colors.border,
                     color: colors.textSecondary
@@ -770,7 +756,10 @@ export function WorkPlanForm() {
                   <Save className="h-4 w-4 mr-2" />
                   Guardar Borrador
                 </Button>
-                
+                <SaveIndicator status={saveStatus} lastSaved={lastSaved} />
+              </div>
+
+              <div className="flex gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -784,18 +773,18 @@ export function WorkPlanForm() {
                   <Eye className="h-4 w-4 mr-2" />
                   Vista Previa
                 </Button>
-              </div>
 
-              <Button
-                type="submit"
-                style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface
-                }}
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Enviar Plan
-              </Button>
+                <Button
+                  type="submit"
+                  style={{
+                    backgroundColor: colors.primary[500],
+                    color: colors.surface
+                  }}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Enviar Plan
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>
