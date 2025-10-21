@@ -274,6 +274,7 @@ export default function ProfilePage() {
                   <Key className="h-4 w-4 mr-2" />
                   Cambiar Contraseña
                 </Button>
+
                 <Button
                   onClick={() => setShowLogoutDialog(true)}
                   variant="outline"

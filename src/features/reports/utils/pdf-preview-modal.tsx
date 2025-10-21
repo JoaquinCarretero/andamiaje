@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { X, Download, FileText } from "lucide-react";
+import { X } from "lucide-react";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/ui";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -112,30 +112,8 @@ export function PDFPreviewModal({
         <CardHeader className="pb-4 border-b" style={{ borderColor: colors.border }}>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" style={{ color: colors.primary[500] }} />
-              <span style={{ color: colors.text }}>Vista Previa - {title}</span>
             </CardTitle>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={generatePDF}
-                disabled={isGenerating}
-                style={{
-                  backgroundColor: colors.primary[500],
-                  color: colors.surface,
-                }}
-              >
-                {isGenerating ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Generando...
-                  </div>
-                ) : (
-                  <>
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF
-                  </>
-                )}
-              </Button>
               <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
                 <X className="h-5 w-5" />
               </Button>
