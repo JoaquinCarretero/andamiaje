@@ -165,12 +165,12 @@ export function PDFPreviewModal({
                   className="text-center mb-8 pb-6 border-b-2"
                   style={{ borderColor: colors.primary[500] }}
                 >
-                  <div className="w-32 h-24 relative mx-auto mb-4">
+                  <div className="w-48 h-32 relative mx-auto mb-4">
                     <Image
                       src="/LogotipoFinalWEBJPEG.png"
                       alt="Andamiaje Logo"
                       fill
-                      sizes="128px"
+                      sizes="192px"
                       className="object-contain"
                     />
                   </div>

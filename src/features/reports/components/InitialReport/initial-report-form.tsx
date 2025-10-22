@@ -69,15 +69,21 @@ export function InitialReportForm() {
     
     const birth = new Date(birthDate)
     const today = new Date()
+
+    if (birth > today) {
+      return "Fecha inválida"
+    }
     
     let years = today.getFullYear() - birth.getFullYear()
     let months = today.getMonth() - birth.getMonth()
     
-    if (months < 0) {
+    if (months < 0 || (months === 0 && today.getDate() < birth.getDate())) {
       years--
-      months += 12
+      months = (months + 12) % 12
     }
     
+    if (years < 0) return "Fecha inválida"
+
     if (years < 10) {
       return `${years} años${months > 0 ? ` y ${months} meses` : ""}`
     }
@@ -144,33 +150,43 @@ export function InitialReportForm() {
   const calculatedAge = calculateAge(formData.birthDate)
   const signature = getSignature()
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    const [year, month, day] = dateString.split('-')
+    return `${day}/${month}/${year}`
+  }
+
   const pdfContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Datos del Paciente</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Nombre:</strong> {formData.patientName}</div>
-          <div><strong>DNI:</strong> {formData.dni}</div>
-          <div><strong>Fecha de Nacimiento:</strong> {formData.birthDate}</div>
-          <div><strong>Edad:</strong> {calculatedAge}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[200], color: colors.primary[700] }}>
+          Datos del Paciente
+        </h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+          <div><strong className="font-semibold text-gray-600">Nombre:</strong> {formData.patientName}</div>
+          <div><strong className="font-semibold text-gray-600">DNI:</strong> {formData.dni}</div>
+          <div><strong className="font-semibold text-gray-600">Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
+          <div><strong className="font-semibold text-gray-600">Edad:</strong> {calculatedAge}</div>
         </div>
-        <div className="mt-4">
-          <p><strong>Diagnóstico (según CUD):</strong></p>
-          <p className="mt-2">{formData.diagnosis}</p>
+        <div className="mt-6">
+          <p><strong className="font-semibold text-gray-600">Diagnóstico (según CUD):</strong></p>
+          <p className="mt-2 text-gray-800 bg-gray-50 p-3 rounded-md border" style={{ borderColor: colors.border }}>{formData.diagnosis}</p>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Información Clínica</h3>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.secondary[200], color: colors.secondary[700] }}>
+          Información Clínica
+        </h3>
         
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Introducción:</h4>
-          <p>{formData.introduction}</p>
+          <h4 className="font-semibold text-gray-700 mb-2">Introducción:</h4>
+          <p className="text-gray-800 bg-gray-50 p-3 rounded-md border" style={{ borderColor: colors.border }}>{formData.introduction}</p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Caracterización:</h4>
-          <p>{formData.characterization}</p>
+          <h4 className="font-semibold text-gray-700 mb-2">Caracterización:</h4>
+          <p className="text-gray-800 bg-gray-50 p-3 rounded-md border" style={{ borderColor: colors.border }}>{formData.characterization}</p>
         </div>
       </div>
     </div>

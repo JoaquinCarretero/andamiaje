@@ -54,7 +54,16 @@ export function InvoiceUpload() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) { // 10 MB
+        setErrors(prev => ({ ...prev, file: "El archivo no debe exceder los 10MB" }));
+        setSelectedFile(null);
+      } else {
+        setSelectedFile(file);
+        if (errors.file) {
+          setErrors(prev => ({ ...prev, file: "" }));
+        }
+      }
     }
   }
 
