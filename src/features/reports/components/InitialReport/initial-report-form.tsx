@@ -7,6 +7,7 @@ import { PDFPreviewModal } from "../../utils/pdf-preview-modal"
 import { useSignature } from "@/lib/signature-storage"
 import colors from "@/lib/colors"
 import { useToast } from "@/lib/hooks/use-toast"
+import { calculateAge, formatDate } from "@/lib/date-utils"
 
 export function InitialReportForm() {
   const { getSignature } = useSignature()
@@ -64,25 +65,6 @@ export function InitialReportForm() {
     }
   }, [formData, triggerSave])
 
-  const calculateAge = (birthDate: string) => {
-    if (!birthDate) return ""
-    
-    const birth = new Date(birthDate)
-    const today = new Date()
-    
-    let years = today.getFullYear() - birth.getFullYear()
-    let months = today.getMonth() - birth.getMonth()
-    
-    if (months < 0) {
-      years--
-      months += 12
-    }
-    
-    if (years < 10) {
-      return `${years} años${months > 0 ? ` y ${months} meses` : ""}`
-    }
-    return `${years} años`
-  }
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -141,7 +123,8 @@ export function InitialReportForm() {
     }
   }
 
-  const calculatedAge = calculateAge(formData.birthDate)
+  const ageResult = calculateAge(formData.birthDate);
+  const calculatedAge = typeof ageResult === 'number' ? `${ageResult} años` : ageResult;
   const signature = getSignature()
 
   const pdfContent = (
@@ -151,7 +134,7 @@ export function InitialReportForm() {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div><strong>Nombre:</strong> {formData.patientName}</div>
           <div><strong>DNI:</strong> {formData.dni}</div>
-          <div><strong>Fecha de Nacimiento:</strong> {formData.birthDate}</div>
+          <div><strong>Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
           <div><strong>Edad:</strong> {calculatedAge}</div>
         </div>
         <div className="mt-4">

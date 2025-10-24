@@ -103,7 +103,7 @@ export function PDFPreviewModal({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       <Card
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden border-0 shadow-2xl"
+        className="relative w-full max-w-6xl max-h-[95vh] overflow-hidden border-0 shadow-2xl"
         style={{
           backgroundColor: colors.surface,
           boxShadow: `0 25px 50px ${colors.shadowLarge}`,
@@ -165,23 +165,23 @@ export function PDFPreviewModal({
                   className="text-center mb-8 pb-6 border-b-2"
                   style={{ borderColor: colors.primary[500] }}
                 >
-                  <div className="w-32 h-24 relative mx-auto mb-4">
+                  <div className="w-40 h-32 relative mx-auto mb-4">
                     <Image
                       src="/LogotipoFinalWEBJPEG.png"
                       alt="Andamiaje Logo"
                       fill
-                      sizes="128px"
+                      sizes="160px"
                       className="object-contain"
                     />
                   </div>
                   <h1
-                    className="text-2xl font-bold mb-2"
+                    className="text-3xl font-bold mb-2 underline"
                     style={{ color: colors.primary[500], letterSpacing: "0.8px" }}
                   >
                     ANDAMIAJE - CENTRO DE REHABILITACIÓN
                   </h1>
                   <h2
-                    className="text-xl font-semibold"
+                    className="text-2xl font-semibold"
                     style={{ color: colors.text, letterSpacing: "0.6px" }}
                   >
                     {title}
@@ -189,22 +189,25 @@ export function PDFPreviewModal({
                 </div>
 
                 {/* Información del documento */}
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded">
+                <div
+                  className="grid grid-cols-2 gap-6 mb-8 p-6 rounded-lg"
+                  style={{ backgroundColor: colors.primary[25] }}
+                >
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Paciente:</p>
-                    <p className="font-semibold">{patientName}</p>
+                    <p className="text-md font-semibold" style={{ color: colors.textMuted }}>Paciente:</p>
+                    <p className="text-lg font-bold" style={{ color: colors.primary[600] }}>{patientName}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Fecha:</p>
-                    <p className="font-semibold">{date}</p>
+                    <p className="text-md font-semibold" style={{ color: colors.textMuted }}>Fecha:</p>
+                    <p className="text-lg font-bold" style={{ color: colors.primary[600] }}>{date}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Profesional:</p>
-                    <p className="font-semibold">{professionalName}</p>
+                    <p className="text-md font-semibold" style={{ color: colors.textMuted }}>Profesional:</p>
+                    <p className="text-lg font-bold" style={{ color: colors.primary[600] }}>{professionalName}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Documento:</p>
-                    <p className="font-semibold">{title}</p>
+                    <p className="text-md font-semibold" style={{ color: colors.textMuted }}>Documento:</p>
+                    <p className="text-lg font-bold" style={{ color: colors.primary[600] }}>{title}</p>
                   </div>
                 </div>
 
