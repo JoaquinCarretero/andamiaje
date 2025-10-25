@@ -17,27 +17,44 @@ export const formatDate = (date: string | Date): string => {
 };
 
 /**
- * Calcula la edad a partir de una fecha de nacimiento, evitando valores negativos.
+ * Calcula la edad a partir de una fecha de nacimiento.
+ * Si la edad es menor a 10 años, devuelve un string con años y meses.
  * @param birthDate La fecha de nacimiento (string o Date).
- * @returns La edad calculada.
+ * @returns La edad calculada en años, o en años y meses si es menor de 10.
  */
 export const calculateAge = (birthDate: string | Date): number | string => {
   try {
-    const d = new Date(birthDate);
+    const birth = new Date(birthDate);
     const today = new Date();
 
-    if (d > today) {
-      return 0; // O manejar como error, por ahora 0 si la fecha es futura
+    if (birth > today) {
+      return 0;
     }
 
-    let age = today.getFullYear() - d.getFullYear();
-    const m = today.getMonth() - d.getMonth();
+    let totalMonths = (today.getFullYear() - birth.getFullYear()) * 12 + (today.getMonth() - birth.getMonth());
 
-    if (m < 0 || (m === 0 && today.getDate() < d.getDate())) {
-      age--;
+    if (today.getDate() < birth.getDate()) {
+      totalMonths--;
     }
 
-    return age < 0 ? 0 : age;
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    if (years < 0) return 0;
+
+    if (years < 10) {
+      const yearText = years > 0 ? `${years} ${years === 1 ? 'año' : 'años'}` : '';
+      const monthText = months > 0 ? `${months} ${months === 1 ? 'mes' : 'meses'}` : '';
+
+      if (yearText && monthText) {
+        return `${yearText} y ${monthText}`;
+      }
+      if (yearText) return yearText;
+      if (monthText) return monthText;
+      return "Menos de un mes";
+    }
+
+    return years;
   } catch (error) {
     console.error("Error al calcular edad:", error);
     return "Edad inválida";
