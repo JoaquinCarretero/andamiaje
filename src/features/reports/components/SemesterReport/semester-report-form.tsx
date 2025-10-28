@@ -146,47 +146,47 @@ export default function SemesterReportForm() {
   const signature = getSignature()
 
   const pdfContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Datos del Paciente</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Nombre:</strong> {formData.patientName}</div>
-          <div><strong>DNI:</strong> {formData.dni}</div>
-          <div><strong>Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
-          <div><strong>Edad:</strong> {calculatedAge}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Datos del Paciente</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Nombre:</strong> {formData.patientName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>DNI:</strong> {formData.dni}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Edad:</strong> {calculatedAge}</div>
         </div>
         <div className="mt-4">
-          <p><strong>Diagnóstico (según CUD):</strong></p>
-          <p className="mt-2">{formData.diagnosis}</p>
+          <p><strong style={{ color: colors.primary[600] }}>Diagnóstico (según CUD):</strong></p>
+          <p className="mt-2 text-base">{formData.diagnosis}</p>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Datos del Profesional</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Profesional:</strong> {formData.professionalName}</div>
-          <div><strong>Especialidad:</strong> {formData.specialty}</div>
-          <div><strong>Matrícula:</strong> {formData.license}</div>
-          <div><strong>Período de Atención:</strong> {formData.attentionPeriod}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Datos del Profesional</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Profesional:</strong> {formData.professionalName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Especialidad:</strong> {formData.specialty}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Matrícula:</strong> {formData.license}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Período de Atención:</strong> {formData.attentionPeriod}</div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Informe Semestral</h3>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Informe Semestral</h3>
         
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Caracterización:</h4>
-          <p>{formData.characterization}</p>
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Caracterización:</h4>
+          <p className="text-base">{formData.characterization}</p>
         </div>
 
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Evolución del Período:</h4>
-          <p>{formData.periodEvolution}</p>
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Evolución del Período:</h4>
+          <p className="text-base">{formData.periodEvolution}</p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Sugerencias:</h4>
-          <p>{formData.suggestions}</p>
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Sugerencias:</h4>
+          <p className="text-base">{formData.suggestions}</p>
         </div>
       </div>
     </div>

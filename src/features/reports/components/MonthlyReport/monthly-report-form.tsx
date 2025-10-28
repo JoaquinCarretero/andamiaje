@@ -127,30 +127,30 @@ export function MonthlyReportForm() {
   const signature = getSignature()
 
   const pdfContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Información del Reporte</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Estudiante:</strong> {formData.studentName}</div>
-          <div><strong>Mes:</strong> {formData.month}</div>
-          <div><strong>Sesiones Realizadas:</strong> {formData.sessionsCompleted}</div>
-          <div><strong>Acompañante:</strong> Prof. Ana Martínez</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Información del Reporte</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Estudiante:</strong> {formData.studentName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Mes:</strong> {formData.month}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Sesiones Realizadas:</strong> {formData.sessionsCompleted}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Acompañante:</strong> Prof. Ana Martínez</div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Actividades Realizadas</h3>
-        <p>{formData.activitiesPerformed}</p>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Actividades Realizadas</h3>
+        <p className="text-base">{formData.activitiesPerformed}</p>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Progreso del Estudiante</h3>
-        <p>{formData.academicProgress}</p>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Progreso del Estudiante</h3>
+        <p className="text-base">{formData.academicProgress}</p>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Observaciones</h3>
-        <p>{formData.generalObservations}</p>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Observaciones</h3>
+        <p className="text-base">{formData.generalObservations}</p>
       </div>
     </div>
   )

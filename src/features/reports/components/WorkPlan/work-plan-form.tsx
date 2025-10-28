@@ -201,42 +201,42 @@ export function WorkPlanForm() {
   const signature = getSignature()
 
   const pdfContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Datos del Paciente</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Nombre:</strong> {formData.patientName}</div>
-          <div><strong>DNI:</strong> {formData.dni}</div>
-          <div><strong>Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
-          <div><strong>Edad:</strong> {calculatedAge}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Datos del Paciente</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Nombre:</strong> {formData.patientName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>DNI:</strong> {formData.dni}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Fecha de Nacimiento:</strong> {formatDate(formData.birthDate)}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Edad:</strong> {calculatedAge}</div>
         </div>
         <div className="mt-4">
-          <p><strong>Diagnóstico (según CUD):</strong></p>
-          <p className="mt-2">{formData.diagnosis}</p>
+          <p><strong style={{ color: colors.primary[600] }}>Diagnóstico (según CUD):</strong></p>
+          <p className="mt-2 text-base">{formData.diagnosis}</p>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Datos del Profesional</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Profesional:</strong> {formData.professionalName}</div>
-          <div><strong>Especialidad:</strong> {formData.specialty}</div>
-          <div><strong>Matrícula:</strong> {formData.license}</div>
-          <div><strong>Período:</strong> {formData.period}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Datos del Profesional</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Profesional:</strong> {formData.professionalName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Especialidad:</strong> {formData.specialty}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Matrícula:</strong> {formData.license}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Período:</strong> {formData.period}</div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Plan de Trabajo</h3>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Plan de Trabajo</h3>
         
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Fundamentación:</h4>
-          <p>{formData.rationale}</p>
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Fundamentación:</h4>
+          <p className="text-base">{formData.rationale}</p>
         </div>
 
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Objetivos Generales:</h4>
-          <ul className="list-disc list-inside space-y-1">
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Objetivos Generales:</h4>
+          <ul className="list-disc list-inside space-y-1 text-base">
             {formData.generalObjectives.filter(obj => obj.trim()).map((objective, index) => (
               <li key={index}>{objective}</li>
             ))}
@@ -244,8 +244,8 @@ export function WorkPlanForm() {
         </div>
 
         <div className="mb-6">
-          <h4 className="font-semibold mb-2">Objetivos Específicos:</h4>
-          <ul className="list-disc list-inside space-y-1">
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Objetivos Específicos:</h4>
+          <ul className="list-disc list-inside space-y-1 text-base">
             {formData.specificObjectives.filter(obj => obj.trim()).map((objective, index) => (
               <li key={index}>{objective}</li>
             ))}
@@ -253,8 +253,8 @@ export function WorkPlanForm() {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">Modalidad de Abordaje:</h4>
-          <p>{formData.approach}</p>
+          <h4 className="text-lg font-bold underline mb-2" style={{ color: colors.secondary[600] }}>Modalidad de Abordaje:</h4>
+          <p className="text-base">{formData.approach}</p>
         </div>
       </div>
     </div>

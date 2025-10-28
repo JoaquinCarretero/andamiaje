@@ -99,19 +99,19 @@ export function MeetingMinutesForm() {
   const signature = getSignature()
 
   const pdfContent = (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Información de la Reunión</h3>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div><strong>Paciente:</strong> {formData.patientName}</div>
-          <div><strong>Fecha:</strong> {formData.meetingDate}</div>
-          <div><strong>Modalidad:</strong> {formData.modality}</div>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Información de la Reunión</h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-base">
+          <div><strong style={{ color: colors.primary[600] }}>Paciente:</strong> {formData.patientName}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Fecha:</strong> {formData.meetingDate}</div>
+          <div><strong style={{ color: colors.primary[600] }}>Modalidad:</strong> {formData.modality}</div>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Asunto de la Reunión</h3>
-        <p>{formData.subject}</p>
+        <h3 className="text-xl font-bold mb-4 pb-2 border-b-2" style={{ borderColor: colors.primary[300] }}>Asunto de la Reunión</h3>
+        <p className="text-base">{formData.subject}</p>
       </div>
     </div>
   )
