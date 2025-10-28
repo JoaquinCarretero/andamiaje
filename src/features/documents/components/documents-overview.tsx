@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge } from "@/ui"
-import { FileText, Search, Download, Eye, Edit, Calendar, User, Phone, Mail, X, ChevronDown, ChevronUp, Filter } from "lucide-react"
-import { UserProfilePopover } from "../../dashboard/components/user-profile-popover"
-import colors from "@/lib/colors"
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle, Button, Input } from "@/ui";
+import { FileText, Search, Download, Eye, Edit, Calendar, User, X, Filter } from "lucide-react";
+import { UserProfilePopover } from "../../dashboard/components/user-profile-popover";
+import { PDFPreviewModal } from "../../reports/utils/pdf-preview-modal";
+import colors from "@/lib/colors";
 
 interface Document {
   id: number
@@ -14,6 +15,7 @@ interface Document {
   professionalEmail: string
   professionalPhone: string
   date: string
+  pdfUrl?: string;
 }
 
 interface DocumentsOverviewProps {
@@ -33,9 +35,18 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
   const [filterType, setFilterType] = useState("all")
   const [filterRole, setFilterRole] = useState("all")
   const [dateFrom, setDateFrom] = useState("")
-  const [dateTo, setDateTo] = useState("")
-  const [selectedProfessional, setSelectedProfessional] = useState<any>(null)
-  const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 })
+  const [dateTo, setDateTo] = useState("");
+  const [selectedProfessional, setSelectedProfessional] = useState<any>(null);
+  const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | undefined>(undefined);
+
+  const handlePreview = useCallback((doc: Document) => {
+    setSelectedDocument(doc);
+    setPdfUrl(doc.pdfUrl); // Asumimos que el documento tiene una URL de PDF
+    setIsPreviewOpen(true);
+  }, []);
 
   const [documents] = useState<Document[]>([
     {
@@ -48,6 +59,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "maria.gonzalez@andamiaje.com",
       professionalPhone: "+54 11 1234-5678",
       date: "2024-01-15",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 2,
@@ -59,6 +71,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "maria.gonzalez@andamiaje.com",
       professionalPhone: "+54 11 1234-5678",
       date: "2024-01-20",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 3,
@@ -70,6 +83,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "ana.martinez@andamiaje.com",
       professionalPhone: "+54 11 2345-6789",
       date: "2024-01-30",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 4,
@@ -81,6 +95,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "maria.gonzalez@andamiaje.com",
       professionalPhone: "+54 11 1234-5678",
       date: "2024-01-25",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 5,
@@ -92,6 +107,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "lucre.martinez@andamiaje.com",
       professionalPhone: "+54 11 3456-7890",
       date: "2024-01-28",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 6,
@@ -102,6 +118,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "carlos.lopez@andamiaje.com",
       professionalPhone: "+54 11 4567-8901",
       date: "2024-01-22",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 7,
@@ -113,6 +130,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "laura.fernandez@andamiaje.com",
       professionalPhone: "+54 11 5678-9012",
       date: "2024-01-18",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     },
     {
       id: 8,
@@ -124,6 +142,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
       professionalEmail: "ana.martinez@andamiaje.com",
       professionalPhone: "+54 11 2345-6789",
       date: "2023-12-30",
+      pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     }
   ])
 
@@ -446,6 +465,7 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
                           variant="outline"
                           size="sm"
                           className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+                          onClick={() => handlePreview(doc)}
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           Ver
@@ -486,6 +506,26 @@ export function DocumentsOverview({ initialFilter = "" }: DocumentsOverviewProps
         professional={selectedProfessional}
         position={popoverPosition}
       />
+
+      {selectedDocument && (
+        <PDFPreviewModal
+          isOpen={isPreviewOpen}
+          onClose={() => {
+            setIsPreviewOpen(false);
+            setSelectedDocument(null);
+            if (pdfUrl) {
+              URL.revokeObjectURL(pdfUrl);
+              setPdfUrl(undefined);
+            }
+          }}
+          title={selectedDocument.title}
+          pdfUrl={pdfUrl}
+          content={<div>{selectedDocument.title}</div>}
+          patientName={selectedDocument.patientName}
+          professionalName={selectedDocument.professionalName}
+          date={selectedDocument.date}
+        />
+      )}
     </div>
-  )
+  );
 }
